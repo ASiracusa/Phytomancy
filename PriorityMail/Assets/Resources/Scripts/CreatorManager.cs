@@ -7,6 +7,7 @@ public class CreatorManager : MonoBehaviour
 {
     private GameObject cam;
     private GameObject[,,] board;
+    private delegate void MonocoordFunction(int x, int y, int z);
 
     void Start()
     {
@@ -50,7 +51,7 @@ public class CreatorManager : MonoBehaviour
 
     private IEnumerator EditBoard ()
     {
-        Vector3Int selectedCorner = Vector3Int.zero;
+        Vector3Int primarySelection = Vector3Int.zero;
 
         while (true)
         {
@@ -63,11 +64,11 @@ public class CreatorManager : MonoBehaviour
                 {
                     if (Input.GetMouseButtonDown(0))
                     {
-                        selectedCorner = GetAdjacentCoords(hit);
+                        primarySelection = GetAdjacentCoords(hit);
                     }
                     else
                     {
-                        selectedCorner = new Vector3Int((int)(hit.transform.position.x + 9.5f), (int)(hit.transform.position.y), (int)(hit.transform.position.z + 9.5f));
+                        primarySelection = new Vector3Int((int)(hit.transform.position.x + 9.5f), (int)(hit.transform.position.y), (int)(hit.transform.position.z + 9.5f));
                     }
                 }
             }
@@ -78,41 +79,27 @@ public class CreatorManager : MonoBehaviour
                 Ray ray = cam.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out hit, 100, ~0))
                 {
-                    Vector3Int selected;
+                    Vector3Int secondarySelection;
+                    MonocoordFunction tsf;
 
                     if (Input.GetMouseButtonUp(0))
                     {
-                        selected = GetAdjacentCoords(hit);
-
-                        for (int x = (selectedCorner.x > selected.x ? selected.x : selectedCorner.x); x <= (selectedCorner.x < selected.x ? selected.x : selectedCorner.x); x++)
-                        {
-                            for (int y = (selectedCorner.y > selected.y ? selected.y : selectedCorner.y); y <= (selectedCorner.y < selected.y ? selected.y : selectedCorner.y); y++)
-                            {
-                                for (int z = (selectedCorner.z > selected.z ? selected.z : selectedCorner.z); z <= (selectedCorner.z < selected.z ? selected.z : selectedCorner.z); z++)
-                                {
-                                    GameObject tile = Instantiate(Resources.Load("Prefabs/BoardElements/floor"), new Vector3(x - 9.5f, y, z - 9.5f), Quaternion.identity) as GameObject;
-                                    if (board[x, y, z] != null)
-                                    {
-                                        GameObject.Destroy(board[x, y, z]);
-                                    }
-                                    board[x, y, z] = tile;
-                                }
-                            }
-                        }
+                        secondarySelection = GetAdjacentCoords(hit);
+                        tsf = PlaceStandardTile;
                     }
                     else
                     {
-                        selected = new Vector3Int((int)(hit.transform.position.x + 9.5f), (int)(hit.transform.position.y), (int)(hit.transform.position.z + 9.5f));
+                        secondarySelection = new Vector3Int((int)(hit.transform.position.x + 9.5f), (int)(hit.transform.position.y), (int)(hit.transform.position.z + 9.5f));
+                        tsf = RemoveTile;
+                    }
 
-                        for (int x = (selectedCorner.x > selected.x ? selected.x : selectedCorner.x); x <= (selectedCorner.x < selected.x ? selected.x : selectedCorner.x); x++)
+                    for (int x = (primarySelection.x > secondarySelection.x ? secondarySelection.x : primarySelection.x); x <= (primarySelection.x < secondarySelection.x ? secondarySelection.x : primarySelection.x); x++)
+                    {
+                        for (int y = (primarySelection.y > secondarySelection.y ? secondarySelection.y : primarySelection.y); y <= (primarySelection.y < secondarySelection.y ? secondarySelection.y : primarySelection.y); y++)
                         {
-                            for (int y = (selectedCorner.y > selected.y ? selected.y : selectedCorner.y); y <= (selectedCorner.y < selected.y ? selected.y : selectedCorner.y); y++)
+                            for (int z = (primarySelection.z > secondarySelection.z ? secondarySelection.z : primarySelection.z); z <= (primarySelection.z < secondarySelection.z ? secondarySelection.z : primarySelection.z); z++)
                             {
-                                for (int z = (selectedCorner.z > selected.z ? selected.z : selectedCorner.z); z <= (selectedCorner.z < selected.z ? selected.z : selectedCorner.z); z++)
-                                {
-                                    GameObject.Destroy(board[x, y, z]);
-                                    board[x, y, z] = null;
-                                }
+                                tsf(x, y, z);
                             }
                         }
                     }
@@ -123,6 +110,7 @@ public class CreatorManager : MonoBehaviour
         }
     }
 
+    // Returns the coords of the tile next to a selected block depending on which facet was clicked.
     private Vector3Int GetAdjacentCoords (RaycastHit hit) 
     {
         float xDist = hit.point.x - hit.transform.position.x;
@@ -132,13 +120,31 @@ public class CreatorManager : MonoBehaviour
         if (Mathf.Abs(xDist) > Mathf.Abs(yDist) && Mathf.Abs(xDist) > Mathf.Abs(zDist))
         {
             return new Vector3Int((int)(hit.transform.position.x + 9.5f + (xDist > 0 ? 1 : -1)), (int)(hit.transform.position.y), (int)(hit.transform.position.z + 9.5f));
-        } else if (Mathf.Abs(yDist) > Mathf.Abs(xDist) && Mathf.Abs(yDist) > Mathf.Abs(zDist))
+        }
+        else if (Mathf.Abs(yDist) > Mathf.Abs(xDist) && Mathf.Abs(yDist) > Mathf.Abs(zDist))
         {
             return new Vector3Int((int)(hit.transform.position.x + 9.5f), (int)(hit.transform.position.y + (yDist > 0 ? 1 : -1)), (int)(hit.transform.position.z + 9.5f));
-        } else
+        }
+        else
         {
             return new Vector3Int((int)(hit.transform.position.x + 9.5f), (int)(hit.transform.position.y), (int)(hit.transform.position.z + 9.5f + (zDist > 0 ? 1 : -1)));
         }
 
+    }
+
+    private void RemoveTile (int x, int y, int z)
+    {
+        GameObject.Destroy(board[x, y, z]);
+        board[x, y, z] = null;
+    }
+
+    private void PlaceStandardTile (int x, int y, int z)
+    {
+        GameObject tile = Instantiate(Resources.Load("Prefabs/BoardElements/floor"), new Vector3(x - 9.5f, y, z - 9.5f), Quaternion.identity) as GameObject;
+        if (board[x, y, z] != null)
+        {
+            GameObject.Destroy(board[x, y, z]);
+        }
+        board[x, y, z] = tile;
     }
 }
