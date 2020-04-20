@@ -30,20 +30,30 @@ public class CreatorManager : MonoBehaviour
     private IEnumerator RotateBoard ()
     {
         float pos = 0;
+        float velocity = 0;
 
         while (true)
         {
-            if (Input.GetKey(KeyCode.A))
+            if (Input.GetKey(KeyCode.A) && velocity < 1f)
             {
-                pos += Time.deltaTime;
+                velocity += Time.deltaTime / 5;
             }
-            if (Input.GetKey(KeyCode.D))
+            if (Input.GetKey(KeyCode.D) && velocity > -1f)
             {
-                pos -= Time.deltaTime;
+                velocity -= Time.deltaTime / 5;
             }
+
+            if (Input.GetMouseButton(2))
+            {
+                velocity = Input.GetAxis("Mouse X") / 15f;
+            }
+
+            pos += velocity;
 
             cam.transform.position = new Vector3(17 * -Mathf.Sin(pos), 20, 17 * -Mathf.Cos(pos));
             cam.transform.eulerAngles = new Vector3(45, pos * 180 / Mathf.PI, 0);
+
+            velocity *= 0.95f;
 
             yield return null;
         }
