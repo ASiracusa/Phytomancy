@@ -11,6 +11,8 @@ public class CreatorManager : MonoBehaviour
     private Camera cam;
     private GameObject[,,] board;
 
+    private Vector3Int primarySelection;
+
     // BOARD DATA
     private Vector3Int brambleCoords;
 
@@ -25,6 +27,7 @@ public class CreatorManager : MonoBehaviour
         camAnchor = GameObject.Find("CameraAnchor");
         cam = GameObject.Find("CameraAnchor/Camera").GetComponent<Camera>();
         board = new GameObject[20, 10, 20];
+        primarySelection = Vector3Int.zero;
 
         for (int x = 0; x < 20; x++)
         {
@@ -35,111 +38,14 @@ public class CreatorManager : MonoBehaviour
             }
         }
 
-        StartCoroutine(RotateBoard());
-        StartCoroutine(EditBoard());
-    }
-
-
-
-    private IEnumerator RotateBoard ()
-    {
-        float pos = 0;
-        float velocity = 0;
-
-        while (true)
-        {
-            if (Input.GetKey(KeyCode.A) && velocity < 1f)
-            {
-                velocity += Time.deltaTime / 5;
-            }
-            if (Input.GetKey(KeyCode.D) && velocity > -1f)
-            {
-                velocity -= Time.deltaTime / 5;
-            }
-
-            if (Input.GetMouseButton(2))
-            {
-                velocity = Input.GetAxis("Mouse X") / 15f;
-            }
-
-            pos += velocity;
-
-            camAnchor.transform.position = new Vector3(17 * -Mathf.Sin(pos), 20, 17 * -Mathf.Cos(pos));
-            camAnchor.transform.eulerAngles = new Vector3(45, pos * 180 / Mathf.PI, 0);
-
-            velocity *= 0.95f;
-
-            yield return null;
-        }
-    }
-    
-
-
-    private IEnumerator EditBoard ()
-    {
-        Vector3Int primarySelection = Vector3Int.zero;
-
-        while (true)
-        {
-            // Runs whenever the editor clicks on a tile
-            if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
-            {
-                RaycastHit hit;
-                Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out hit, 100, ~0))
-                {
-                    if (Input.GetMouseButtonDown(0))
-                    {
-                        primarySelection = GetAdjacentCoords(hit);
-                    }
-                    else
-                    {
-                        primarySelection = new Vector3Int((int)(hit.transform.position.x + 9.5f), (int)(hit.transform.position.y), (int)(hit.transform.position.z + 9.5f));
-                    }
-                }
-            }
-
-            if (Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1))
-            {
-                RaycastHit hit;
-                Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out hit, 100, ~0))
-                {
-                    Vector3Int secondarySelection;
-                    MonocoordFunction tsf;
-
-                    if (Input.GetMouseButtonUp(0))
-                    {
-                        secondarySelection = GetAdjacentCoords(hit);
-                        tsf = PlaceStandardTile;
-                    }
-                    else
-                    {
-                        secondarySelection = new Vector3Int((int)(hit.transform.position.x + 9.5f), (int)(hit.transform.position.y), (int)(hit.transform.position.z + 9.5f));
-                        tsf = RemoveTile;
-                    }
-
-                    for (int x = (primarySelection.x > secondarySelection.x ? secondarySelection.x : primarySelection.x); x <= (primarySelection.x < secondarySelection.x ? secondarySelection.x : primarySelection.x); x++)
-                    {
-                        for (int y = (primarySelection.y > secondarySelection.y ? secondarySelection.y : primarySelection.y); y <= (primarySelection.y < secondarySelection.y ? secondarySelection.y : primarySelection.y); y++)
-                        {
-                            for (int z = (primarySelection.z > secondarySelection.z ? secondarySelection.z : primarySelection.z); z <= (primarySelection.z < secondarySelection.z ? secondarySelection.z : primarySelection.z); z++)
-                            {
-                                tsf(x, y, z);
-                            }
-                        }
-                    }
-                }
-            }
-
-            yield return null;
-        }
+        CameraManager.current.onClick += SetPrimarySelection;
+        CameraManager.current.onRelease += ExecuteSelection;
     }
 
 
 
     // Returns the coords of the tile next to a selected block depending on which facet was clicked.
-    private Vector3Int GetAdjacentCoords (RaycastHit hit) 
+    private static Vector3Int GetAdjacentCoords (RaycastHit hit) 
     {
         float xDist = hit.point.x - hit.transform.position.x;
         float yDist = hit.point.y - hit.transform.position.y;
@@ -178,5 +84,49 @@ public class CreatorManager : MonoBehaviour
             GameObject.Destroy(board[x, y, z]);
         }
         board[x, y, z] = tile;
+    }
+
+
+
+    private void SetPrimarySelection (bool left, RaycastHit hit)
+    {
+        if (left)
+        {
+            primarySelection = GetAdjacentCoords(hit);
+        }
+        else
+        {
+            primarySelection = new Vector3Int((int)(hit.transform.position.x + 9.5f), (int)(hit.transform.position.y), (int)(hit.transform.position.z + 9.5f));
+        }
+    }
+
+
+
+    private void ExecuteSelection (bool left, RaycastHit hit)
+    {
+        Vector3Int secondarySelection;
+        MonocoordFunction tsf;
+
+        if (left)
+        {
+            secondarySelection = GetAdjacentCoords(hit);
+            tsf = PlaceStandardTile;
+        }
+        else
+        {
+            secondarySelection = new Vector3Int((int)(hit.transform.position.x + 9.5f), (int)(hit.transform.position.y), (int)(hit.transform.position.z + 9.5f));
+            tsf = RemoveTile;
+        }
+
+        for (int x = (primarySelection.x > secondarySelection.x ? secondarySelection.x : primarySelection.x); x <= (primarySelection.x < secondarySelection.x ? secondarySelection.x : primarySelection.x); x++)
+        {
+            for (int y = (primarySelection.y > secondarySelection.y ? secondarySelection.y : primarySelection.y); y <= (primarySelection.y < secondarySelection.y ? secondarySelection.y : primarySelection.y); y++)
+            {
+                for (int z = (primarySelection.z > secondarySelection.z ? secondarySelection.z : primarySelection.z); z <= (primarySelection.z < secondarySelection.z ? secondarySelection.z : primarySelection.z); z++)
+                {
+                    tsf(x, y, z);
+                }
+            }
+        }
     }
 }
