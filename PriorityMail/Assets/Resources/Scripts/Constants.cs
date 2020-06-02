@@ -1,4 +1,6 @@
-﻿public enum Facet
+﻿using System.Collections.Generic;
+
+public enum Facet
 {
     Up = 0,
     Down = 1,
@@ -26,4 +28,21 @@ public enum Direction
     Down = -1,
     North = 1,
     South = -1
+}
+
+public delegate TileElement TileElementConstructor(params object[] vars);
+
+public class Constants
+{
+
+    public static readonly string[] TILE_ELEMENTS = new string[] {
+        "Bramble",
+        "Sigil",
+        "Ground"
+    };
+
+    public static readonly Dictionary<string, TileElementConstructor> TILE_CONSTRUCTORS = new Dictionary<string, TileElementConstructor> {
+        {"Bramble", Bramble.GenerateTileElement}
+    };
+
 }

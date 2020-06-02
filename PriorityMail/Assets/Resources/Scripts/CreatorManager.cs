@@ -5,13 +5,25 @@ using UnityEngine.EventSystems;
 
 public class CreatorManager : MonoBehaviour
 {
-    private GameObject cam;
+    public static CreatorManager current;
+
+    private GameObject camAnchor;
+    private Camera cam;
     private GameObject[,,] board;
+
+    // BOARD DATA
+    private Vector3Int brambleCoords;
+
     private delegate void MonocoordFunction(int x, int y, int z);
+
+
 
     void Start()
     {
-        cam = GameObject.Find("Camera");
+        current = this;
+        
+        camAnchor = GameObject.Find("CameraAnchor");
+        cam = GameObject.Find("CameraAnchor/Camera").GetComponent<Camera>();
         board = new GameObject[20, 10, 20];
 
         for (int x = 0; x < 20; x++)
@@ -26,6 +38,8 @@ public class CreatorManager : MonoBehaviour
         StartCoroutine(RotateBoard());
         StartCoroutine(EditBoard());
     }
+
+
 
     private IEnumerator RotateBoard ()
     {
@@ -50,14 +64,16 @@ public class CreatorManager : MonoBehaviour
 
             pos += velocity;
 
-            cam.transform.position = new Vector3(17 * -Mathf.Sin(pos), 20, 17 * -Mathf.Cos(pos));
-            cam.transform.eulerAngles = new Vector3(45, pos * 180 / Mathf.PI, 0);
+            camAnchor.transform.position = new Vector3(17 * -Mathf.Sin(pos), 20, 17 * -Mathf.Cos(pos));
+            camAnchor.transform.eulerAngles = new Vector3(45, pos * 180 / Mathf.PI, 0);
 
             velocity *= 0.95f;
 
             yield return null;
         }
     }
+    
+
 
     private IEnumerator EditBoard ()
     {
@@ -69,7 +85,7 @@ public class CreatorManager : MonoBehaviour
             if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
             {
                 RaycastHit hit;
-                Ray ray = cam.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
+                Ray ray = cam.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out hit, 100, ~0))
                 {
                     if (Input.GetMouseButtonDown(0))
@@ -86,7 +102,7 @@ public class CreatorManager : MonoBehaviour
             if (Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1))
             {
                 RaycastHit hit;
-                Ray ray = cam.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
+                Ray ray = cam.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out hit, 100, ~0))
                 {
                     Vector3Int secondarySelection;
@@ -120,6 +136,8 @@ public class CreatorManager : MonoBehaviour
         }
     }
 
+
+
     // Returns the coords of the tile next to a selected block depending on which facet was clicked.
     private Vector3Int GetAdjacentCoords (RaycastHit hit) 
     {
@@ -142,11 +160,15 @@ public class CreatorManager : MonoBehaviour
 
     }
 
+
+
     private void RemoveTile (int x, int y, int z)
     {
         GameObject.Destroy(board[x, y, z]);
         board[x, y, z] = null;
     }
+
+
 
     private void PlaceStandardTile (int x, int y, int z)
     {

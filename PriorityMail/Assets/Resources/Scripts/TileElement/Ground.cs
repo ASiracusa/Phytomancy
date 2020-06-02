@@ -8,6 +8,17 @@ public class Ground : Monocoord
 
     public Ground (params object[] vars)
     {
-        facets = vars[0] as Shade[];
+        SetCoords((int[])vars[0]);
+        facets = (Shade[])vars[1];
+    }
+
+    public static TileElement GenerateTileElement(params object[] vars)
+    {
+        return new Ground(vars);
+    }
+
+    public void ColorFacet (Facet facet, Shade shade)
+    {
+        facets[(int)facet] = shade;
     }
 }
