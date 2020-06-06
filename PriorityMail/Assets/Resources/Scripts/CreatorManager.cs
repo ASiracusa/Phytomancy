@@ -2,16 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using TMPro;
+using System;
 
 public class CreatorManager : MonoBehaviour
 {
     public static CreatorManager current;
 
-    private GameObject camAnchor;
-    private Camera cam;
     private GameObject[,,] board;
 
+    // EDITOR DATA
     private Vector3Int primarySelection;
+    private TileElement tileModel;
 
     // BOARD DATA
     private Vector3Int brambleCoords;
@@ -23,9 +25,7 @@ public class CreatorManager : MonoBehaviour
     void Start()
     {
         current = this;
-        
-        camAnchor = GameObject.Find("CameraAnchor");
-        cam = GameObject.Find("CameraAnchor/Camera").GetComponent<Camera>();
+
         board = new GameObject[20, 10, 20];
         primarySelection = Vector3Int.zero;
 
@@ -40,6 +40,8 @@ public class CreatorManager : MonoBehaviour
 
         CameraManager.current.onClick += SetPrimarySelection;
         CameraManager.current.onRelease += ExecuteSelection;
+
+        GenerateTileMenu();
     }
 
 
@@ -127,6 +129,19 @@ public class CreatorManager : MonoBehaviour
                     tsf(x, y, z);
                 }
             }
+        }
+    }
+
+
+
+    private void GenerateTileMenu ()
+    {
+        GameObject tileMenu = GameObject.Find("EditorCanvas/LeftMenu/AddMenu/TEMenu");
+        for (int i = 0; i < Constants.TILE_MODELS.Length; i++)
+        {
+            GameObject icon = Instantiate(Resources.Load<GameObject>("Prefabs/TEIcon"), tileMenu.transform) as GameObject;
+            icon.transform.localPosition = new Vector3(0, 135 - 55 * i, 0);
+            icon.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = Enum.ToObject(typeof(TileElementNames), i).ToString();
         }
     }
 }

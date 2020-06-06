@@ -6,13 +6,15 @@ public class Ground : Monocoord
 {
     private Shade[] facets;
 
+    public Ground () { }
+
     public Ground (params object[] vars)
     {
         SetCoords((int[])vars[0]);
         facets = (Shade[])vars[1];
     }
 
-    public static TileElement GenerateTileElement(params object[] vars)
+    public override TileElement GenerateTileElement(params object[] vars)
     {
         return new Ground(vars);
     }

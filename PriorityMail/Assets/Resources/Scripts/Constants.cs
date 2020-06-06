@@ -30,19 +30,22 @@ public enum Direction
     South = -1
 }
 
+public enum TileElementNames
+{
+    Bramble,
+    Sigil,
+    Ground
+}
+
 public delegate TileElement TileElementConstructor(params object[] vars);
 
 public class Constants
 {
 
-    public static readonly string[] TILE_ELEMENTS = new string[] {
-        "Bramble",
-        "Sigil",
-        "Ground"
-    };
-
-    public static readonly Dictionary<string, TileElementConstructor> TILE_CONSTRUCTORS = new Dictionary<string, TileElementConstructor> {
-        {"Bramble", Bramble.GenerateTileElement}
+    public static readonly TileElement[] TILE_MODELS = new TileElement[] {
+        new Bramble(),
+        new Sigil(),
+        new Ground()
     };
 
 }
