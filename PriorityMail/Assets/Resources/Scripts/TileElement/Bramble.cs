@@ -36,4 +36,9 @@ public class Bramble : Monocoord
     {
         return "Bramble";
     }
+
+    public Facet GetDirection ()
+    {
+        return facing;
+    }
 }

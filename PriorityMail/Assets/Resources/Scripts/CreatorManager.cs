@@ -416,4 +416,51 @@ public class CreatorManager : MonoBehaviour
         print(index);
         tileModel = Constants.TILE_MODELS[index];
     }
+
+
+
+    public void SaveLevel()
+    {
+        print(sigil.GetPos());
+
+        Shade[,,][] grounds = new Shade[board.GetLength(0), board.GetLength(1), board.GetLength(2)][];
+        for (int x = 0; x < board.GetLength(0); x++)
+        {
+            for (int y = 0; y < board.GetLength(1); y++)
+            {
+                for (int z = 0; z < board.GetLength(2); z++)
+                {
+                    if (board[x, y, z] is Ground)
+                    {
+                        grounds[x, y, z] = ((Ground)(board[x, y, z])).GetShades();
+                    }
+                }
+            }
+        }
+
+        LevelData _ld = new LevelData(
+            "heights",
+            new int[]
+            {
+                bramble.GetPos().x,
+                bramble.GetPos().y,
+                bramble.GetPos().z
+            },
+            bramble.GetDirection(),
+            new int[]
+            {
+                sigil.GetPos().x,
+                sigil.GetPos().y,
+                sigil.GetPos().z
+            },
+            grounds
+        );
+        print("_ld:");
+        print(_ld.sigilCoords[0]);
+
+        SerializationManager.SaveLevel("auburn", "heights", _ld);
+
+        LevelData ld = (LevelData)SerializationManager.LoadLevel(Application.persistentDataPath + "/worlds/auburn/heights.lvl");
+        print(ld.sigilCoords);
+    }
 }

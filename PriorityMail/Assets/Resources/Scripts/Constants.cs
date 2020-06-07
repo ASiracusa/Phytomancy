@@ -12,7 +12,7 @@ public enum Facet
 
 public enum Shade
 {
-    Background,
+    Nothing,
     Color1,
     Color2,
     Color3,

@@ -32,11 +32,6 @@ public class Ground : Monocoord, IColorable
         return new Ground(vars);
     }
 
-    public void ColorFacet(Facet facet, Shade shade)
-    {
-        facets[(int)facet] = shade;
-    }
-
     public override EditorTEIndices[] GetEditorTEIndices()
     {
         return new EditorTEIndices[]
@@ -53,5 +48,10 @@ public class Ground : Monocoord, IColorable
     public void SetShade (Shade shade, int index)
     {
         facets[index] = shade;
+    }
+
+    public Shade[] GetShades ()
+    {
+        return facets;
     }
 }
