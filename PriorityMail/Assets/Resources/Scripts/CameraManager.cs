@@ -27,7 +27,7 @@ public class CameraManager : MonoBehaviour
         {
             RaycastHit hit;
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out hit, 100, ~0))
+            if (Physics.Raycast(ray, out hit, 100, ~8))
             {
                 if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
                 {

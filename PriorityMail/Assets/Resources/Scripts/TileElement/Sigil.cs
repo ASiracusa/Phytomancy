@@ -15,4 +15,17 @@ public class Sigil : Monocoord
     {
         return new Sigil(vars);
     }
+
+    public override EditorTEIndices[] GetEditorTEIndices()
+    {
+        return new EditorTEIndices[]
+        {
+            EditorTEIndices.Pos1
+        };
+    }
+
+    public override string TileName()
+    {
+        return "Sigil";
+    }
 }

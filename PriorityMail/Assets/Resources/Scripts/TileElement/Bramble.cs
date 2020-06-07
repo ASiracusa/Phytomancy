@@ -18,4 +18,18 @@ public class Bramble : Monocoord
     {
         return new Bramble(vars);
     }
+
+    public override EditorTEIndices[] GetEditorTEIndices()
+    {
+        return new EditorTEIndices[]
+        {
+            EditorTEIndices.Pos1,
+            EditorTEIndices.Direction
+        };
+    }
+
+    public override string TileName()
+    {
+        return "Bramble";
+    }
 }

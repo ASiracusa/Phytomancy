@@ -12,4 +12,27 @@ public abstract class Dicoord : TileElement
         pos1 = new Vector3Int(_pos1[0], _pos1[1], _pos1[2]);
         pos2 = new Vector3Int(_pos2[0], _pos2[1], _pos2[2]);
     }
+
+    public override void MoveToPos()
+    {
+        model.transform.position = pos1;
+    }
+
+    public override void DeleteTileElement(TileElement[,,] board)
+    {
+        for (int x = pos1.x; x <= pos2.x; x++)
+        {
+            for (int y = pos1.y; y <= pos2.y; y++)
+            {
+                for (int z = pos1.z; z <= pos2.z; z++)
+                {
+                    if (board.GetLength(0) > x && board.GetLength(1) > y && board.GetLength(2) > z)
+                    {
+                        board[x, y, z] = null;
+                    }
+                }
+            }
+        }
+        RemoveModel();
+    }
 }

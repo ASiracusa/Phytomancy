@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class Vine : Monocoord
 {
@@ -20,4 +21,16 @@ public class Vine : Monocoord
         return new Vine(vars);
     }
 
+    public override EditorTEIndices[] GetEditorTEIndices()
+    {
+        return new EditorTEIndices[]
+        {
+            EditorTEIndices.Pos1
+        };
+    }
+
+    public override string TileName()
+    {
+        return "Vine";
+    }
 }

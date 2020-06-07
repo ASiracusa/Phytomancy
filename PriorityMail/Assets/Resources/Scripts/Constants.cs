@@ -37,6 +37,13 @@ public enum TileElementNames
     Ground
 }
 
+public enum EditorTEIndices
+{
+    Pos1,
+    Pos2,
+    Direction
+}
+
 public delegate TileElement TileElementConstructor(params object[] vars);
 
 public class Constants
