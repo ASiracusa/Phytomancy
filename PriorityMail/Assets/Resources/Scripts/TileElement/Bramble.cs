@@ -10,7 +10,11 @@ public class Bramble : Monocoord
 
     private Bramble (params object[] vars)
     {
-        SetCoords((int[])vars[0]);
+        SetCoords(new int[] {
+            ((Vector3Int)vars[0]).x,
+            ((Vector3Int)vars[0]).y,
+            ((Vector3Int)vars[0]).z
+        });
         facing = (Facet)vars[1];
     }
 

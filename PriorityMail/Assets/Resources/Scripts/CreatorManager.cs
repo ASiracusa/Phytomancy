@@ -17,9 +17,26 @@ public class CreatorManager : MonoBehaviour
     private Vector3Int primarySelection;
     private TileElement tileModel;
     private Facet direction;
+    private Shade paintColor;
 
     // BOARD DATA
-    private Vector3Int brambleCoords;
+    private Bramble bramble;
+    private Sigil sigil;
+
+    private Color32[] palette = new Color32[]
+    {
+        new Color32 (0x00, 0x00, 0x00, 0xFF),
+        new Color32 (0x11, 0x00, 0x00, 0xFF),
+        new Color32 (0x22, 0x00, 0x00, 0xFF),
+        new Color32 (0x33, 0x00, 0x00, 0xFF),
+        new Color32 (0x44, 0x00, 0x00, 0xFF),
+        new Color32 (0x55, 0x00, 0x00, 0xFF),
+        new Color32 (0x66, 0x00, 0x00, 0xFF),
+        new Color32 (0x77, 0x00, 0x00, 0xFF),
+        new Color32 (0x88, 0x00, 0x00, 0xFF),
+        new Color32 (0x99, 0x00, 0x00, 0xFF),
+        new Color32 (0xAA, 0x00, 0x00, 0xFF)
+    };
 
     private delegate void MonocoordFunction(int x, int y, int z);
 
@@ -30,7 +47,7 @@ public class CreatorManager : MonoBehaviour
         current = this;
         tileModel = Constants.TILE_MODELS[(int)TileElementNames.Ground];
 
-        board = new Ground[20, 10, 20];
+        board = new TileElement[20, 10, 20];
         primarySelection = Vector3Int.zero;
         direction = Facet.North;
 
@@ -41,10 +58,10 @@ public class CreatorManager : MonoBehaviour
                 Ground bottom = (Ground)tileModel.GenerateTileElement(
                     new Vector3Int(x, 0, z)
                 );
-                bottom.model = Instantiate(Resources.Load(tileModel.TileName())) as GameObject;
-                bottom.MoveToPos();
-                //Instantiate(Resources.Load("Prefabs/BoardElements/floor"), new Vector3(x - 9.5f, 0, z - 9.5f), Quaternion.identity) as GameObject;
                 board[x, 0, z] = bottom;
+                bottom.model = Instantiate(Resources.Load("Models/" + tileModel.TileName())) as GameObject;
+                board[x, 0, z].BindDataToModel();
+                bottom.MoveToPos();
             }
         }
 
@@ -60,39 +77,24 @@ public class CreatorManager : MonoBehaviour
     // Returns the coords of the tile next to a selected block depending on which facet was clicked.
     private static Vector3Int GetAdjacentCoords (RaycastHit hit) 
     {
-        float xDist = hit.point.x - hit.transform.position.x;
-        float yDist = hit.point.y - hit.transform.position.y;
-        float zDist = hit.point.z - hit.transform.position.z;
+        print(hit.transform.position);
+        float xDist = hit.point.x - hit.transform.parent.position.x;
+        float yDist = hit.point.y - hit.transform.parent.position.y;
+        float zDist = hit.point.z - hit.transform.parent.position.z;
 
         if (Mathf.Abs(xDist) > Mathf.Abs(yDist) && Mathf.Abs(xDist) > Mathf.Abs(zDist))
         {
-            return new Vector3Int((int)(hit.transform.position.x + (xDist > 0 ? 1 : -1)), (int)(hit.transform.position.y), (int)(hit.transform.position.z));
+            return new Vector3Int((int)(hit.transform.parent.position.x + (xDist > 0 ? 1 : -1)), (int)(hit.transform.parent.position.y), (int)(hit.transform.parent.position.z));
         }
         else if (Mathf.Abs(yDist) > Mathf.Abs(xDist) && Mathf.Abs(yDist) > Mathf.Abs(zDist))
         {
-            return new Vector3Int((int)(hit.transform.position.x), (int)(hit.transform.position.y + (yDist > 0 ? 1 : -1)), (int)(hit.transform.position.z));
+            return new Vector3Int((int)(hit.transform.parent.position.x), (int)(hit.transform.parent.position.y + (yDist > 0 ? 1 : -1)), (int)(hit.transform.parent.position.z));
         }
         else
         {
-            return new Vector3Int((int)(hit.transform.position.x), (int)(hit.transform.position.y), (int)(hit.transform.position.z + (zDist > 0 ? 1 : -1)));
+            return new Vector3Int((int)(hit.transform.parent.position.x), (int)(hit.transform.parent.position.y), (int)(hit.transform.parent.position.z + (zDist > 0 ? 1 : -1)));
         }
 
-    }
-
-
-
-    private static Vector3Int GetAdjacentTileElement (RaycastHit hit)
-    {
-        TileElement data = hit.collider.gameObject.GetComponent<ModelTileBridge>().Data;
-        if (data is Monocoord)
-        {
-            return ((Monocoord)data).GetPos();
-        }
-        else if (data is Dicoord)
-        {
-
-        }
-        return new Vector3Int(-1, -1, -1);
     }
 
 
@@ -121,7 +123,6 @@ public class CreatorManager : MonoBehaviour
         if (left)
         {
             primarySelection = GetAdjacentCoords(hit);
-            print(primarySelection);
         }
         else
         {
@@ -165,6 +166,14 @@ public class CreatorManager : MonoBehaviour
                 {
                     for (int z = primarySelection.z; z <= secondarySelection.z; z++)
                     {
+                        if (board[x, y, z] != null && board[x, y, z] is Bramble)
+                        {
+                            bramble = null;
+                        }
+                        if (board[x, y, z] != null && board[x, y, z] is Sigil)
+                        {
+                            sigil = null;
+                        }
                         board[x, y, z]?.DeleteTileElement(board);
                     }
                 }
@@ -176,11 +185,47 @@ public class CreatorManager : MonoBehaviour
         }
         else if (tileModel is Bramble)
         {
+            if (primarySelection.Equals(secondarySelection))
+            {
+                if (bramble != null)
+                {
+                    board[bramble.GetPos().x, bramble.GetPos().y, bramble.GetPos().z].DeleteTileElement(board);
+                }
 
+                EditorTEIndices[] etei = tileModel.GetEditorTEIndices();
+                object[] data = new object[etei.Length];
+                for (int d = 0; d < data.Length; d++)
+                {
+                    data[d] = constructorVals[(int)etei[d]];
+                }
+                board[primarySelection.x, primarySelection.y, primarySelection.z] = tileModel.GenerateTileElement(data);
+                board[primarySelection.x, primarySelection.y, primarySelection.z].model = Instantiate(Resources.Load("Models/Bramble")) as GameObject;
+                board[primarySelection.x, primarySelection.y, primarySelection.z].BindDataToModel();
+                board[primarySelection.x, primarySelection.y, primarySelection.z].MoveToPos();
+                bramble = (Bramble)board[primarySelection.x, primarySelection.y, primarySelection.z];
+            }
         }
         else if (tileModel is Sigil)
         {
+            if (primarySelection.Equals(secondarySelection))
+            {
+                if (sigil != null)
+                {
+                    board[sigil.GetPos().x, sigil.GetPos().y, sigil.GetPos().z].DeleteTileElement(board);
+                }
 
+                EditorTEIndices[] etei = tileModel.GetEditorTEIndices();
+                object[] data = new object[etei.Length];
+                for (int d = 0; d < data.Length; d++)
+                {
+                    data[d] = constructorVals[(int)etei[d]];
+                }
+                board[primarySelection.x, primarySelection.y, primarySelection.z] = tileModel.GenerateTileElement(data);
+                board[primarySelection.x, primarySelection.y, primarySelection.z].model = Instantiate(Resources.Load("Models/Sigil")) as GameObject;
+                board[primarySelection.x, primarySelection.y, primarySelection.z].BindDataToModel();
+                board[primarySelection.x, primarySelection.y, primarySelection.z].MoveToPos();
+                sigil = (Sigil)board[primarySelection.x, primarySelection.y, primarySelection.z];
+            }
         }
         else
         {
@@ -193,6 +238,14 @@ public class CreatorManager : MonoBehaviour
                 {
                     for (int z = primarySelection.z; z <= secondarySelection.z; z++)
                     {
+                        if (board[x, y, z] != null && board[x, y, z] is Bramble)
+                        {
+                            bramble = null;
+                        }
+                        if (board[x, y, z] != null && board[x, y, z] is Sigil)
+                        {
+                            sigil = null;
+                        }
                         if (board[x, y, z] != null)
                         {
                             board[x, y, z].DeleteTileElement(board);
@@ -203,7 +256,8 @@ public class CreatorManager : MonoBehaviour
                             data[d] = constructorVals[(int)etei[d]];
                         }
                         board[x, y, z] = tileModel.GenerateTileElement(data);
-                        board[x, y, z].model = Instantiate(Resources.Load(tileModel.TileName())) as GameObject;
+                        board[x, y, z].model = Instantiate(Resources.Load("Models/" + tileModel.TileName())) as GameObject;
+                        board[x, y, z].BindDataToModel();
                         board[x, y, z].MoveToPos();
                     }
                 }
@@ -221,6 +275,8 @@ public class CreatorManager : MonoBehaviour
             GameObject icon = Instantiate(Resources.Load<GameObject>("Prefabs/TEIcon"), tileMenu.transform) as GameObject;
             icon.transform.localPosition = new Vector3(0, 135 - 55 * i, 0);
             icon.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = Enum.ToObject(typeof(TileElementNames), i).ToString();
+            int _i = i;
+            icon.GetComponent<Button>().onClick.AddListener(delegate { ChangeTileModel(_i); });
         }
     }
 
@@ -304,5 +360,60 @@ public class CreatorManager : MonoBehaviour
             }
             yield return null;
         }
+    }
+
+
+
+    public void ChangeMenu (int menu)
+    {
+        CameraManager.current.onClick -= SetPrimarySelection;
+        CameraManager.current.onRelease -= ExecuteSelection;
+        CameraManager.current.onHold -= ColorMesh;
+
+        if (menu == 0)
+        {
+
+        }
+        else if (menu == 1)
+        {
+            CameraManager.current.onClick += SetPrimarySelection;
+            CameraManager.current.onRelease += ExecuteSelection;
+        }
+        else if (menu == 2)
+        {
+            CameraManager.current.onClick += SetPrimarySelection;
+            CameraManager.current.onRelease += ExecuteSelection;
+        }
+        else if (menu == 3)
+        {
+            CameraManager.current.onHold += ColorMesh;
+        }
+    }
+
+
+
+    private void ColorMesh (bool left, RaycastHit hit)
+    {
+        if (hit.transform.gameObject.GetComponent<ColoredMeshBridge>() != null)
+        {
+            hit.transform.gameObject.GetComponent<MeshRenderer>().material.color = palette[(int)paintColor];
+            ((IColorable)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).SetShade(paintColor,
+                hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index);
+        }
+    }
+
+
+
+    public void ChangeColor (int colorIndex)
+    {
+        paintColor = (Shade)colorIndex;
+    }
+
+
+    
+    public void ChangeTileModel (int index)
+    {
+        print(index);
+        tileModel = Constants.TILE_MODELS[index];
     }
 }

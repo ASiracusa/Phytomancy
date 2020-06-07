@@ -12,12 +12,17 @@ public enum Facet
 
 public enum Shade
 {
-    Background = 0,
-    Color1 = 1,
-    Color2 = 2,
-    Color3 = 3,
-    Color4 = 4,
-    Color5 = 5
+    Background,
+    Color1,
+    Color2,
+    Color3,
+    Color4,
+    Color5,
+    Color6,
+    Color7,
+    Color8,
+    Color9,
+    Color10
 }
 
 public enum Direction

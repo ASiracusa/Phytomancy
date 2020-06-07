@@ -16,6 +16,11 @@ public abstract class TileElement
         model = null;
     }
 
+    public void BindDataToModel()
+    {
+        model.GetComponent<ModelTileBridge>().Data = this;
+    }
+
     public abstract void MoveToPos();
 
     public abstract TileElement GenerateTileElement(params object[] vars);

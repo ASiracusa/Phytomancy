@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class Ground : Monocoord
+public class Ground : Monocoord, IColorable
 {
     private Shade[] facets;
 
@@ -16,6 +16,15 @@ public class Ground : Monocoord
             ((Vector3Int)vars[0]).y,
             ((Vector3Int)vars[0]).z
         });
+        facets = new Shade[]
+        {
+            Shade.Color1,
+            Shade.Color1,
+            Shade.Color1,
+            Shade.Color1,
+            Shade.Color1,
+            Shade.Color1
+        };
     }
 
     public override TileElement GenerateTileElement(params object[] vars)
@@ -26,11 +35,6 @@ public class Ground : Monocoord
     public void ColorFacet(Facet facet, Shade shade)
     {
         facets[(int)facet] = shade;
-    }
-
-    public void GenerateModel()
-    {
-
     }
 
     public override EditorTEIndices[] GetEditorTEIndices()
@@ -44,5 +48,10 @@ public class Ground : Monocoord
     public override string TileName()
     {
         return "Ground";
+    }
+
+    public void SetShade (Shade shade, int index)
+    {
+        facets[index] = shade;
     }
 }

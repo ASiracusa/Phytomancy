@@ -37,6 +37,10 @@ public class CameraManager : MonoBehaviour
                 {
                     Release(Input.GetMouseButtonUp(0), hit);
                 }
+                else if (Input.GetMouseButton(0) || Input.GetMouseButton(1))
+                {
+                    Hold(Input.GetMouseButton(0), hit);
+                }
                 else
                 {
                     Hover(hit);
@@ -89,6 +93,12 @@ public class CameraManager : MonoBehaviour
     public void Click(bool left, RaycastHit hit)
     {
         onClick?.Invoke(left, hit);
+    }
+
+    public event Action<bool, RaycastHit> onHold;
+    public void Hold(bool left, RaycastHit hit)
+    {
+        onHold?.Invoke(left, hit);
     }
 
     public event Action<bool, RaycastHit> onRelease;

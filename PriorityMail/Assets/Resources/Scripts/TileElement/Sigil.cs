@@ -8,7 +8,11 @@ public class Sigil : Monocoord
 
     public Sigil (params object[] vars)
     {
-        SetCoords((int[])vars[0]);
+        SetCoords(new int[] {
+            ((Vector3Int)vars[0]).x,
+            ((Vector3Int)vars[0]).y,
+            ((Vector3Int)vars[0]).z
+        });
     }
 
     public override TileElement GenerateTileElement(params object[] vars)
