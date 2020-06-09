@@ -21,6 +21,11 @@ public class Vine : Monocoord
         return new Vine(vars);
     }
 
+    public override TileElement LoadTileElement(params object[] vars)
+    {
+        return new Vine(vars);
+    }
+
     public override EditorTEIndices[] GetEditorTEIndices()
     {
         return new EditorTEIndices[]

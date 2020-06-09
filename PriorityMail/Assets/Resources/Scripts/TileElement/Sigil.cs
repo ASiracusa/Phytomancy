@@ -2,8 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Sigil : Monocoord
+public class Sigil : Monocoord, IMonoSpacious
 {
+    private MonoSpaciousHelper _msh;
+    private bool _expecting;
+
+    public MonoSpaciousHelper Helper { get => _msh; set => _msh = value; }
+    public bool Expecting { get => _expecting; set => _expecting = value; }
+
     public Sigil() { }
 
     public Sigil (params object[] vars)
@@ -20,6 +26,13 @@ public class Sigil : Monocoord
         return new Sigil(vars);
     }
 
+    public override TileElement LoadTileElement(params object[] vars)
+    {
+        Sigil s = new Sigil(vars);
+        s.Helper = new MonoSpaciousHelper();
+        return s;
+    }
+
     public override EditorTEIndices[] GetEditorTEIndices()
     {
         return new EditorTEIndices[]
@@ -32,4 +45,8 @@ public class Sigil : Monocoord
     {
         return "Sigil";
     }
+
+    public void TileEnters (TileElement enterer) { }
+
+    public void TileLeaves (TileElement leaver) { }
 }

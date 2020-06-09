@@ -5,7 +5,7 @@ public class LevelData
     public int[] brambleCoords;
     public Facet brambleDirection;
     public int[] sigilCoords;
-    Shade[,,][] grounds;
+    public Shade[,,][] grounds;
 
     public LevelData(string _levelName, int[] _brambleCoords, Facet _brambleDirection, int[] _sigilCoords, Shade[,,][] _grounds)
     {

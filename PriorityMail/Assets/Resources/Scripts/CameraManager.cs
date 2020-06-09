@@ -58,11 +58,11 @@ public class CameraManager : MonoBehaviour
 
         while (true)
         {
-            if (Input.GetKey(KeyCode.A) && velocity < 1f)
+            if (Input.GetKey(KeyCode.Q) && velocity < 1f)
             {
                 velocity += Time.deltaTime / 5;
             }
-            if (Input.GetKey(KeyCode.D) && velocity > -1f)
+            if (Input.GetKey(KeyCode.E) && velocity > -1f)
             {
                 velocity -= Time.deltaTime / 5;
             }

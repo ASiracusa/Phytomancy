@@ -6,9 +6,12 @@ public abstract class TileElement
 {
     public GameObject model;
     protected string tileName;
-    protected bool weighted;
-    protected bool full;
-    protected Dictionary<string, MeshRenderer> models;
+
+    // PHYSICS VARIABLES
+    public bool Massless { get; protected set; }
+    public bool Pushable { get; protected set; }
+    public bool Weedblocked { get; protected set; }
+    public bool Squishy { get; protected set; }
 
     public void RemoveModel()
     {
@@ -21,13 +24,29 @@ public abstract class TileElement
         model.GetComponent<ModelTileBridge>().Data = this;
     }
 
+    protected void SetPhysics(bool massless, bool pushable, bool weedblocked, bool squishy)
+    {
+        Massless = massless;
+        Pushable = pushable;
+        Weedblocked = weedblocked;
+        Squishy = squishy;
+    }
+
     public abstract void MoveToPos();
 
     public abstract TileElement GenerateTileElement(params object[] vars);
+
+    public abstract TileElement LoadTileElement(params object[] vars);
 
     public abstract void DeleteTileElement(TileElement[,,] board);
 
     public abstract EditorTEIndices[] GetEditorTEIndices();
 
     public abstract string TileName();
+
+    public abstract void Move(TileElement[,,] board, Facet direction);
+
+    public abstract bool Push(TileElement[,,] board, Facet direction);
+
+    public abstract void Fall(TileElement[,,] board);
 }

@@ -23,6 +23,13 @@ public class Bramble : Monocoord
         return new Bramble(vars);
     }
 
+    public override TileElement LoadTileElement(params object[] vars)
+    {
+        Bramble bramble = new Bramble(vars);
+        bramble.SetPhysics(false, true, false, true);
+        return new Bramble(vars);
+    }
+
     public override EditorTEIndices[] GetEditorTEIndices()
     {
         return new EditorTEIndices[]

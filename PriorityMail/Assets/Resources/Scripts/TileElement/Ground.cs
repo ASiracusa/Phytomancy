@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Linq;
 
 public class Ground : Monocoord, IColorable
 {
@@ -32,6 +33,17 @@ public class Ground : Monocoord, IColorable
         return new Ground(vars);
     }
 
+    public override TileElement LoadTileElement(params object[] vars)
+    {
+        Ground g = new Ground(vars);
+        object[] s = ((IEnumerable)vars[1]).Cast<object>().Select(x => x == null? x : (Shade)x).ToArray();
+        for (int i = 0; i < 6; i++)
+        {
+            g.SetShade((Shade)s[i], i);
+        }
+        return g;
+    }
+
     public override EditorTEIndices[] GetEditorTEIndices()
     {
         return new EditorTEIndices[]
@@ -53,5 +65,13 @@ public class Ground : Monocoord, IColorable
     public Shade[] GetShades ()
     {
         return facets;
+    }
+
+    public void ColorFacets(Color32[] palette)
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            model.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = palette[(int)facets[i]];
+        }
     }
 }
