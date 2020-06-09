@@ -44,9 +44,9 @@ public abstract class TileElement
 
     public abstract string TileName();
 
-    public abstract void Move(TileElement[,,] board, Facet direction);
+    public abstract void Move(ref TileElement[,,] board, Facet direction);
 
-    public abstract bool Push(TileElement[,,] board, Facet direction);
+    public abstract bool Push(ref TileElement[,,] board, Facet direction);
 
-    public abstract void Fall(TileElement[,,] board);
+    public abstract void Fall(ref TileElement[,,] board);
 }

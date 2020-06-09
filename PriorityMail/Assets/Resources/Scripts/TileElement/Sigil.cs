@@ -48,5 +48,5 @@ public class Sigil : Monocoord, IMonoSpacious
 
     public void TileEnters (TileElement enterer) { }
 
-    public void TileLeaves (TileElement leaver) { }
+    public void TileLeaves () { }
 }

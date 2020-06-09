@@ -366,9 +366,9 @@ public class CreatorManager : MonoBehaviour
 
     public void ChangeMenu (int menu)
     {
-        CameraManager.current.onClick -= SetPrimarySelection;
-        CameraManager.current.onRelease -= ExecuteSelection;
-        CameraManager.current.onHold -= ColorMesh;
+        CameraManager.current.onClickBoth -= SetPrimarySelection;
+        CameraManager.current.onReleaseBoth -= ExecuteSelection;
+        CameraManager.current.onHoldBoth -= ColorMesh;
 
         if (menu == 0)
         {
@@ -376,17 +376,17 @@ public class CreatorManager : MonoBehaviour
         }
         else if (menu == 1)
         {
-            CameraManager.current.onClick += SetPrimarySelection;
-            CameraManager.current.onRelease += ExecuteSelection;
+            CameraManager.current.onClickBoth += SetPrimarySelection;
+            CameraManager.current.onReleaseBoth += ExecuteSelection;
         }
         else if (menu == 2)
         {
-            CameraManager.current.onClick += SetPrimarySelection;
-            CameraManager.current.onRelease += ExecuteSelection;
+            CameraManager.current.onClickBoth += SetPrimarySelection;
+            CameraManager.current.onReleaseBoth += ExecuteSelection;
         }
         else if (menu == 3)
         {
-            CameraManager.current.onHold += ColorMesh;
+            CameraManager.current.onHoldBoth += ColorMesh;
         }
     }
 

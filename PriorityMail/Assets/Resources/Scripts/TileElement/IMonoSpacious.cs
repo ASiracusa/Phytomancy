@@ -9,7 +9,7 @@ public interface IMonoSpacious
 
     void TileEnters(TileElement enterer);
 
-    void TileLeaves(TileElement leaver);
+    void TileLeaves();
 }
 
 public class MonoSpaciousHelper

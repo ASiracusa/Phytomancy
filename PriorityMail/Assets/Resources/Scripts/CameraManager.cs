@@ -25,25 +25,47 @@ public class CameraManager : MonoBehaviour
     {
         while (true)
         {
-            RaycastHit hit;
-            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out hit, 100, ~8))
+            RaycastHit hitGround;
+            Ray rayGround = cam.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(rayGround, out hitGround, 100, ~8))
             {
                 if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
                 {
-                    Click(Input.GetMouseButtonDown(0), hit);
+                    Click(Input.GetMouseButtonDown(0), hitGround);
                 }
                 else if (Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1))
                 {
-                    Release(Input.GetMouseButtonUp(0), hit);
+                    Release(Input.GetMouseButtonUp(0), hitGround);
                 }
                 else if (Input.GetMouseButton(0) || Input.GetMouseButton(1))
                 {
-                    Hold(Input.GetMouseButton(0), hit);
+                    Hold(Input.GetMouseButton(0), hitGround);
                 }
                 else
                 {
-                    Hover(hit);
+                    Hover(hitGround);
+                }
+            }
+
+            RaycastHit hitBoth;
+            Ray rayBoth = cam.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(rayBoth, out hitBoth, 100, ~(8|9)))
+            {
+                if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
+                {
+                    ClickBoth(Input.GetMouseButtonDown(0), hitBoth);
+                }
+                else if (Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1))
+                {
+                    ReleaseBoth(Input.GetMouseButtonUp(0), hitBoth);
+                }
+                else if (Input.GetMouseButton(0) || Input.GetMouseButton(1))
+                {
+                    HoldBoth(Input.GetMouseButton(0), hitBoth);
+                }
+                else
+                {
+                    HoverBoth(hitBoth);
                 }
             }
 
@@ -105,5 +127,29 @@ public class CameraManager : MonoBehaviour
     public void Release(bool left, RaycastHit hit)
     {
         onRelease?.Invoke(left, hit);
+    }
+
+    public event Action<RaycastHit> onHoverBoth;
+    public void HoverBoth(RaycastHit hit)
+    {
+        onHoverBoth?.Invoke(hit);
+    }
+
+    public event Action<bool, RaycastHit> onClickBoth;
+    public void ClickBoth(bool left, RaycastHit hit)
+    {
+        onClickBoth?.Invoke(left, hit);
+    }
+
+    public event Action<bool, RaycastHit> onHoldBoth;
+    public void HoldBoth(bool left, RaycastHit hit)
+    {
+        onHoldBoth?.Invoke(left, hit);
+    }
+
+    public event Action<bool, RaycastHit> onReleaseBoth;
+    public void ReleaseBoth(bool left, RaycastHit hit)
+    {
+        onReleaseBoth?.Invoke(left, hit);
     }
 }

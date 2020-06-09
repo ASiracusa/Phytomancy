@@ -10,6 +10,7 @@ public class LevelManager : MonoBehaviour
 
     private TileElement[,,] board;
     private Bramble bramble;
+    private int[] availableVines;
 
     private Color32[] palette = new Color32[]
     {
@@ -31,7 +32,13 @@ public class LevelManager : MonoBehaviour
     {
         current = this;
 
+        availableVines = new int[10] {
+            5, 0, 0, 0, 0, 0, 0, 0, 0, 3
+        };
+
         LoadLevel("auburn", "heights");
+        CameraManager.current.onClick += CreateVine;
+
         StartCoroutine(BrambleInput());
     }
 
@@ -82,32 +89,67 @@ public class LevelManager : MonoBehaviour
         board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]].MoveToPos();
     }
 
-    private void MoveBramble (Facet direction) 
-    {
-        bramble.Push(board, direction);
-    }
-
     private IEnumerator BrambleInput ()
     {
         while (true)
         {
             if (Input.GetKeyDown(KeyCode.W))
             {
-                MoveBramble(Facet.North);
+                bramble.Push(ref board, Facet.North);
+                ClearSpaciousTiles();
             }
             if (Input.GetKeyDown(KeyCode.S))
             {
-                MoveBramble(Facet.South);
+                bramble.Push(ref board, Facet.South);
+                ClearSpaciousTiles();
             }
             if (Input.GetKeyDown(KeyCode.A))
             {
-                MoveBramble(Facet.West);
+                bramble.Push(ref board, Facet.West);
+                ClearSpaciousTiles();
             }
             if (Input.GetKeyDown(KeyCode.D))
             {
-                MoveBramble(Facet.East);
+                bramble.Push(ref board, Facet.East);
+                ClearSpaciousTiles();
             }
             yield return null;
+        }
+    }
+
+    private void CreateVine (bool left, RaycastHit hit)
+    {
+        print("dsocs");
+        if (hit.transform.gameObject.GetComponent<ColoredMeshBridge>() != null)
+        {
+            int vinesOfColor = availableVines[(int)((Ground)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).GetShades()[hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index] - 1];
+            if (vinesOfColor > 0)
+            {
+                print(vinesOfColor);
+            }
+        }
+    }
+
+    private void ClearSpaciousTiles ()
+    {
+        for (int x = 0; x < board.GetLength(0); x++)
+        {
+            for (int y = 0; y < board.GetLength(1); y++)
+            {
+                for (int z = 0; z < board.GetLength(2); z++)
+                {
+                    if (board[x, y, z] is IMonoSpacious)
+                    {
+                        print(x + " " + y + " " + z);
+                        if (((IMonoSpacious)board[x, y, z]).Expecting)
+                        {
+                            ((IMonoSpacious)board[x, y, z]).TileLeaves();
+                            ((IMonoSpacious)board[x, y, z]).Helper.Inhabitant = null;
+                            ((IMonoSpacious)board[x, y, z]).Expecting = false;
+                        }
+                    }
+                }
+            }
         }
     }
 }
