@@ -11,14 +11,20 @@ public class Vine : Monocoord
 
     public Vine (params object[] vars)
     {
-        next = vars[0] as Vine;
+        SetCoords(new int[] {
+            ((Vector3Int)vars[0]).x,
+            ((Vector3Int)vars[0]).y,
+            ((Vector3Int)vars[0]).z
+        });
         color = (Shade)(vars[1]);
         origin = (Facet)(vars[2]);
     }
 
     public override TileElement GenerateTileElement(params object[] vars)
     {
-        return new Vine(vars);
+        Vine v = new Vine(vars);
+        v.SetPhysics(true, false, true, false);
+        return v;
     }
 
     public override TileElement LoadTileElement(params object[] vars)
@@ -34,8 +40,43 @@ public class Vine : Monocoord
         };
     }
 
+    public Vine GetVine ()
+    {
+        return next;
+    }
+
+    public void SetVine (Vine _next)
+    {
+        next = _next;
+    }
+
+    public Shade GetColor ()
+    {
+        return color;
+    }
+
+    public Facet GetOrigin ()
+    {
+        return origin;
+    }
+
     public override string TileName()
     {
         return "Vine";
+    }
+
+    public int RemoveVine (TileElement[,,] board)
+    {
+        if (next == null)
+        {
+            PlayerDeleteTileElement(board);
+            return 1;
+        }
+        else
+        {
+            int v = next.RemoveVine(board);
+            PlayerDeleteTileElement(board);
+            return v + 1;
+        }
     }
 }

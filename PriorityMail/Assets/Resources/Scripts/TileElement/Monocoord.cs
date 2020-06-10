@@ -22,10 +22,21 @@ public abstract class Monocoord : TileElement
         model.transform.position = pos;
     }
 
-    public override void DeleteTileElement(TileElement[,,] board)
+    public override void EditorDeleteTileElement(TileElement[,,] board)
     {
         if (board.GetLength(0) > pos.x && board.GetLength(1) > pos.y && board.GetLength(2) > pos.z) {
             board[pos.x, pos.y, pos.z] = null;
+        }
+        RemoveModel();
+    }
+
+    public override void PlayerDeleteTileElement(TileElement[,,] board)
+    {
+        if (board.GetLength(0) > pos.x && board.GetLength(1) > pos.y && board.GetLength(2) > pos.z)
+        {
+            TileElement temp = (pos.y == board.GetLength(1) - 1) ? null : board[pos.x, pos.y + 1, pos.z];
+            board[pos.x, pos.y, pos.z] = null;
+            temp?.Fall(ref board);
         }
         RemoveModel();
     }
@@ -43,44 +54,6 @@ public abstract class Monocoord : TileElement
         TileElement moveSubject = (board[pos.x, pos.y, pos.z] is IMonoSpacious) ?
             ((IMonoSpacious)board[pos.x, pos.y, pos.z]).Helper.GetSolidOccupant() :
             board[pos.x, pos.y, pos.z];
-
-        /*
-        if (board[pos.x, pos.y, pos.z] is IMonoSpacious)
-        {
-            IMonoSpacious carrier = (IMonoSpacious)board[pos.x, pos.y, pos.z];
-            moveSubject.Move(ref board, direction);
-            moveSubject.MoveToPos();
-            carrier.Expecting = true;
-        }
-        else
-        {
-            if (board[newPos.x, newPos.y, newPos.z] is IMonoSpacious)
-            {
-                Debug.Log("Attemping push onto Sigil");
-                IMonoSpacious carrier = (IMonoSpacious)board[newPos.x, newPos.y, newPos.z];
-
-                carrier.Helper.Inhabitant = this;
-                board[pos.x, pos.y, pos.z] = null;
-                pos = newPos;
-                MoveToPos();
-
-                if (!carrier.Expecting)
-                {
-                    carrier.TileEnters(this);
-                }
-
-                Debug.Log(carrier.Helper.Inhabitant.TileName());
-            }
-            else
-            {
-                board[pos.x, pos.y, pos.z] = null;
-                pos = newPos;
-                board[newPos.x, newPos.y, newPos.z] = this;
-                Debug.Log("uhhhh " + board[newPos.x, newPos.y, newPos.z].TileName());
-                MoveToPos();
-            }
-        }
-        */
 
         if (board[pos.x, pos.y, pos.z] is IMonoSpacious)
         {
@@ -107,7 +80,7 @@ public abstract class Monocoord : TileElement
         MoveToPos();
     }
 
-    public override bool Push(ref TileElement[,,] board, Facet direction)
+    public override bool Push(ref TileElement[,,] board, Facet direction, Monocoord newOccupant)
     {
         Vector3Int pushCoords = new Vector3Int(pos.x, pos.y, pos.z);
         if (direction == Facet.North) { pushCoords.x += 1; }
@@ -134,9 +107,17 @@ public abstract class Monocoord : TileElement
 
         if (pushSubject == null)
         {
+            if (newOccupant != null)
+            {
+                newOccupant.pos = pos;
+            }
             Move(ref board, direction);
+            if (newOccupant != null)
+            {
+                board[newOccupant.pos.x, newOccupant.pos.y, newOccupant.pos.z] = newOccupant;
+            }
             Fall(ref board);
-            temp?.Push(ref board, direction);
+            temp?.Push(ref board, direction, null);
             return true;
         }
 
@@ -145,17 +126,36 @@ public abstract class Monocoord : TileElement
             return false;
         }
 
-        if (pushSubject.Push(ref board, direction))
+        if (pushSubject.Push(ref board, direction, null))
         {
+            if (newOccupant != null)
+            {
+                newOccupant.pos = pos;
+            }
             Move(ref board, direction);
+            if (newOccupant != null)
+            {
+                board[newOccupant.pos.x, newOccupant.pos.y, newOccupant.pos.z] = newOccupant;
+            }
             Fall(ref board);
-            temp?.Push(ref board, direction);
+            temp?.Push(ref board, direction, null);
             return true;
         }
 
         if (pushSubject.Squishy)
         {
-            board[pushCoords.x, pushCoords.y, pushCoords.z].DeleteTileElement(board);
+            if (newOccupant != null)
+            {
+                newOccupant.MoveToPos();
+            }
+            board[pushCoords.x, pushCoords.y, pushCoords.z].EditorDeleteTileElement(board);
+            Move(ref board, direction);
+            if (newOccupant != null)
+            {
+                board[newOccupant.pos.x, newOccupant.pos.y, newOccupant.pos.z] = newOccupant;
+            }
+            Fall(ref board);
+            temp?.Push(ref board, direction, null);
             return true;
         }
 
@@ -208,7 +208,7 @@ public abstract class Monocoord : TileElement
             }
             else
             {
-                DeleteTileElement(board);
+                EditorDeleteTileElement(board);
             }
         }
         else

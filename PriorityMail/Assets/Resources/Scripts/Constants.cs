@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 public enum Facet
 {
@@ -7,7 +8,8 @@ public enum Facet
     North = 2,
     South = 3,
     West = 4,
-    East = 5
+    East = 5,
+    Unknown = 6
 }
 
 public enum Shade
@@ -59,5 +61,30 @@ public class Constants
         new Sigil(),
         new Ground()
     };
+
+    public static Facet VectorToFacet(Vector3Int vec)
+    {
+        if (vec.x == 1 && vec.y == 0 && vec.z == 0) { return Facet.North; }
+        if (vec.x == -1 && vec.y == 0 && vec.z == 0) { return Facet.South; }
+        if (vec.x == 0 && vec.y == 1 && vec.z == 0) { return Facet.Up; }
+        if (vec.x == 0 && vec.y == -1 && vec.z == 0) { return Facet.Down; }
+        if (vec.x == 0 && vec.y == 0 && vec.z == 1) { return Facet.West; }
+        if (vec.x == 0 && vec.y == 0 && vec.z == -1) { return Facet.East; }
+        return Facet.Unknown;
+    }
+
+    public static Vector3Int FacetToVector(Facet facet)
+    {
+        Vector3Int[] ftva = new Vector3Int[]
+        {
+            new Vector3Int(0, 1, 0),
+            new Vector3Int(0, -1, 0),
+            new Vector3Int(1, 0, 0),
+            new Vector3Int(-1, 0, 0),
+            new Vector3Int(0, 0, 1),
+            new Vector3Int(0, 0, -1)
+        };
+        return ftva[(int)facet];
+    }
 
 }

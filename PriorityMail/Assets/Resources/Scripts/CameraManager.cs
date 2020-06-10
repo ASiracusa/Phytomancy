@@ -27,7 +27,7 @@ public class CameraManager : MonoBehaviour
         {
             RaycastHit hitGround;
             Ray rayGround = cam.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(rayGround, out hitGround, 100, ~8))
+            if (Physics.Raycast(rayGround, out hitGround, 100, LayerMask.GetMask("Ground")))
             {
                 if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
                 {
@@ -103,6 +103,28 @@ public class CameraManager : MonoBehaviour
 
             yield return null;
         }
+    }
+
+    // Returns the coords of the tile next to a selected block depending on which facet was clicked.
+    public static Vector3Int GetAdjacentCoords(RaycastHit hit)
+    {
+        float xDist = hit.point.x - hit.transform.parent.position.x;
+        float yDist = hit.point.y - hit.transform.parent.position.y;
+        float zDist = hit.point.z - hit.transform.parent.position.z;
+
+        if (Mathf.Abs(xDist) > Mathf.Abs(yDist) && Mathf.Abs(xDist) > Mathf.Abs(zDist))
+        {
+            return new Vector3Int((int)(hit.transform.parent.position.x + (xDist > 0 ? 1 : -1)), (int)(hit.transform.parent.position.y), (int)(hit.transform.parent.position.z));
+        }
+        else if (Mathf.Abs(yDist) > Mathf.Abs(xDist) && Mathf.Abs(yDist) > Mathf.Abs(zDist))
+        {
+            return new Vector3Int((int)(hit.transform.parent.position.x), (int)(hit.transform.parent.position.y + (yDist > 0 ? 1 : -1)), (int)(hit.transform.parent.position.z));
+        }
+        else
+        {
+            return new Vector3Int((int)(hit.transform.parent.position.x), (int)(hit.transform.parent.position.y), (int)(hit.transform.parent.position.z + (zDist > 0 ? 1 : -1)));
+        }
+
     }
 
     public event Action<RaycastHit> onHover;

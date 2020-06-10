@@ -29,6 +29,7 @@ public class Sigil : Monocoord, IMonoSpacious
     public override TileElement LoadTileElement(params object[] vars)
     {
         Sigil s = new Sigil(vars);
+        s.SetPhysics(true, false, true, false);
         s.Helper = new MonoSpaciousHelper();
         return s;
     }

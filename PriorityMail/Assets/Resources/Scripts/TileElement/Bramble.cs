@@ -27,7 +27,7 @@ public class Bramble : Monocoord
     {
         Bramble bramble = new Bramble(vars);
         bramble.SetPhysics(false, true, false, true);
-        return new Bramble(vars);
+        return bramble;
     }
 
     public override EditorTEIndices[] GetEditorTEIndices()

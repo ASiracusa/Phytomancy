@@ -18,7 +18,7 @@ public abstract class Dicoord : TileElement
         model.transform.position = pos1;
     }
 
-    public override void DeleteTileElement(TileElement[,,] board)
+    public override void EditorDeleteTileElement(TileElement[,,] board)
     {
         for (int x = pos1.x; x <= pos2.x; x++)
         {

@@ -74,31 +74,6 @@ public class CreatorManager : MonoBehaviour
 
 
 
-    // Returns the coords of the tile next to a selected block depending on which facet was clicked.
-    private static Vector3Int GetAdjacentCoords (RaycastHit hit) 
-    {
-        print(hit.transform.position);
-        float xDist = hit.point.x - hit.transform.parent.position.x;
-        float yDist = hit.point.y - hit.transform.parent.position.y;
-        float zDist = hit.point.z - hit.transform.parent.position.z;
-
-        if (Mathf.Abs(xDist) > Mathf.Abs(yDist) && Mathf.Abs(xDist) > Mathf.Abs(zDist))
-        {
-            return new Vector3Int((int)(hit.transform.parent.position.x + (xDist > 0 ? 1 : -1)), (int)(hit.transform.parent.position.y), (int)(hit.transform.parent.position.z));
-        }
-        else if (Mathf.Abs(yDist) > Mathf.Abs(xDist) && Mathf.Abs(yDist) > Mathf.Abs(zDist))
-        {
-            return new Vector3Int((int)(hit.transform.parent.position.x), (int)(hit.transform.parent.position.y + (yDist > 0 ? 1 : -1)), (int)(hit.transform.parent.position.z));
-        }
-        else
-        {
-            return new Vector3Int((int)(hit.transform.parent.position.x), (int)(hit.transform.parent.position.y), (int)(hit.transform.parent.position.z + (zDist > 0 ? 1 : -1)));
-        }
-
-    }
-
-
-
     private void RemoveTile (int x, int y, int z)
     {
         board[x, y, z].RemoveModel();
@@ -122,7 +97,7 @@ public class CreatorManager : MonoBehaviour
     {
         if (left)
         {
-            primarySelection = GetAdjacentCoords(hit);
+            primarySelection = CameraManager.GetAdjacentCoords(hit);
         }
         else
         {
@@ -139,7 +114,7 @@ public class CreatorManager : MonoBehaviour
 
         if (left)
         {
-            secondarySelection = GetAdjacentCoords(hit);
+            secondarySelection = CameraManager.GetAdjacentCoords(hit);
             tsf = PlaceStandardTile;
         }
         else
@@ -174,7 +149,7 @@ public class CreatorManager : MonoBehaviour
                         {
                             sigil = null;
                         }
-                        board[x, y, z]?.DeleteTileElement(board);
+                        board[x, y, z]?.EditorDeleteTileElement(board);
                     }
                 }
             }
@@ -189,7 +164,7 @@ public class CreatorManager : MonoBehaviour
             {
                 if (bramble != null)
                 {
-                    board[bramble.GetPos().x, bramble.GetPos().y, bramble.GetPos().z].DeleteTileElement(board);
+                    board[bramble.GetPos().x, bramble.GetPos().y, bramble.GetPos().z].EditorDeleteTileElement(board);
                 }
 
                 EditorTEIndices[] etei = tileModel.GetEditorTEIndices();
@@ -211,7 +186,7 @@ public class CreatorManager : MonoBehaviour
             {
                 if (sigil != null)
                 {
-                    board[sigil.GetPos().x, sigil.GetPos().y, sigil.GetPos().z].DeleteTileElement(board);
+                    board[sigil.GetPos().x, sigil.GetPos().y, sigil.GetPos().z].EditorDeleteTileElement(board);
                 }
 
                 EditorTEIndices[] etei = tileModel.GetEditorTEIndices();
@@ -248,7 +223,7 @@ public class CreatorManager : MonoBehaviour
                         }
                         if (board[x, y, z] != null)
                         {
-                            board[x, y, z].DeleteTileElement(board);
+                            board[x, y, z].EditorDeleteTileElement(board);
                         }
                         constructorVals[0] = new Vector3Int(x, y, z);
                         for (int d = 0; d < data.Length; d++)
@@ -308,7 +283,7 @@ public class CreatorManager : MonoBehaviour
                 {
                     if (board[x, y, z] != null && (x >= _x || y >= _y || z >= _z))
                     {
-                        board[x, y, z].DeleteTileElement(_board);
+                        board[x, y, z].EditorDeleteTileElement(_board);
                     }
                 }
             }

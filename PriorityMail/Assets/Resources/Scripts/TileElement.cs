@@ -38,7 +38,9 @@ public abstract class TileElement
 
     public abstract TileElement LoadTileElement(params object[] vars);
 
-    public abstract void DeleteTileElement(TileElement[,,] board);
+    public abstract void EditorDeleteTileElement(TileElement[,,] board);
+
+    public abstract void PlayerDeleteTileElement(TileElement[,,] board);
 
     public abstract EditorTEIndices[] GetEditorTEIndices();
 
@@ -46,7 +48,7 @@ public abstract class TileElement
 
     public abstract void Move(ref TileElement[,,] board, Facet direction);
 
-    public abstract bool Push(ref TileElement[,,] board, Facet direction);
+    public abstract bool Push(ref TileElement[,,] board, Facet direction, Monocoord newOccupant);
 
     public abstract void Fall(ref TileElement[,,] board);
 }

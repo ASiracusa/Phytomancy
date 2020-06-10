@@ -36,6 +36,7 @@ public class Ground : Monocoord, IColorable
     public override TileElement LoadTileElement(params object[] vars)
     {
         Ground g = new Ground(vars);
+        g.SetPhysics(true, false, true, false);
         object[] s = ((IEnumerable)vars[1]).Cast<object>().Select(x => x == null? x : (Shade)x).ToArray();
         for (int i = 0; i < 6; i++)
         {
