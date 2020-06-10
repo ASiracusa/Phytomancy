@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using UnityEditor;
 
 public class LevelManager : MonoBehaviour
 {
@@ -14,17 +17,17 @@ public class LevelManager : MonoBehaviour
 
     private Color32[] palette = new Color32[]
     {
-        new Color32 (0x00, 0x00, 0x00, 0xFF),
-        new Color32 (0x11, 0x00, 0x00, 0xFF),
-        new Color32 (0x22, 0x00, 0x00, 0xFF),
-        new Color32 (0x33, 0x00, 0x00, 0xFF),
-        new Color32 (0x44, 0x00, 0x00, 0xFF),
-        new Color32 (0x55, 0x00, 0x00, 0xFF),
-        new Color32 (0x66, 0x00, 0x00, 0xFF),
-        new Color32 (0x77, 0x00, 0x00, 0xFF),
-        new Color32 (0x88, 0x00, 0x00, 0xFF),
-        new Color32 (0x99, 0x00, 0x00, 0xFF),
-        new Color32 (0xAA, 0x00, 0x00, 0xFF)
+        new Color32 (0x03, 0x02, 0x25, 0xFF),
+        new Color32 (0x21, 0x20, 0x51, 0xFF),
+        new Color32 (0xD9, 0x1E, 0x37, 0xFF),
+        new Color32 (0xD2, 0x72, 0x33, 0xFF),
+        new Color32 (0xDB, 0xCF, 0x34, 0xFF),
+        new Color32 (0x76, 0xD4, 0x35, 0xFF),
+        new Color32 (0x46, 0xD4, 0x95, 0xFF),
+        new Color32 (0x1E, 0xD9, 0xD9, 0xFF),
+        new Color32 (0x62, 0x4F, 0xCE, 0xFF),
+        new Color32 (0xB5, 0x35, 0xD4, 0xFF),
+        new Color32 (0xD4, 0x35, 0x89, 0xFF)
     };
 
     // Start is called before the first frame update
@@ -33,16 +36,17 @@ public class LevelManager : MonoBehaviour
         current = this;
 
         availableVines = new int[10] {
-            5, 0, 0, 0, 0, 0, 0, 0, 0, 3
+            5, 0, 0, 0, 7, 0, 0, 0, 0, 3
         };
 
         LoadLevel("auburn", "heights");
         CameraManager.current.onClick += CreateVine;
 
         StartCoroutine(BrambleInput());
+        GenerateAvailableVinesUI();
     }
 
-    private void LoadLevel (string worldName, string levelName)
+    private void LoadLevel(string worldName, string levelName)
     {
         levelData = (LevelData)SerializationManager.LoadLevel(Application.persistentDataPath + "/worlds/" + worldName + "/" + levelName + ".lvl");
         print(levelData.sigilCoords[0]);
@@ -51,7 +55,7 @@ public class LevelManager : MonoBehaviour
         board = new TileElement[levelData.grounds.GetLength(0), levelData.grounds.GetLength(1), levelData.grounds.GetLength(2)];
         for (int x = 0; x < board.GetLength(0); x++)
         {
-            for (int y = 0; y < board.GetLength(1); y ++)
+            for (int y = 0; y < board.GetLength(1); y++)
             {
                 for (int z = 0; z < board.GetLength(2); z++)
                 {
@@ -89,7 +93,7 @@ public class LevelManager : MonoBehaviour
         board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]].MoveToPos();
     }
 
-    private IEnumerator BrambleInput ()
+    private IEnumerator BrambleInput()
     {
         while (true)
         {
@@ -117,14 +121,15 @@ public class LevelManager : MonoBehaviour
         }
     }
 
-    private void CreateVine (bool left, RaycastHit hit)
+    private void CreateVine(bool left, RaycastHit hit)
     {
         if (hit.transform.gameObject.GetComponent<ColoredMeshBridge>() != null && hit.transform.gameObject.layer == 8)
         {
             if (left)
             {
                 Shade vineColor;
-                if (hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data is Ground) {
+                if (hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data is Ground)
+                {
                     vineColor = ((Ground)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).GetShades()[hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index];
                 }
                 else
@@ -164,6 +169,7 @@ public class LevelManager : MonoBehaviour
                     {
                         ((Vine)(board[stemCoords.x, stemCoords.y, stemCoords.z])).SetVine((Vine)board[vineCoords.x, vineCoords.y, vineCoords.z]);
                     }
+                    AdjustAvailableVinesUI(vineColor, -1);
                 }
             }
             else if (hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data is Vine)
@@ -171,7 +177,8 @@ public class LevelManager : MonoBehaviour
                 Vector3Int vineCoords = new Vector3Int((int)(hit.transform.position.x), (int)(hit.transform.position.y), (int)(hit.transform.position.z));
                 Vector3Int stemCoords = ((Vine)board[vineCoords.x, vineCoords.y, vineCoords.z]).GetPos() + Constants.FacetToVector(((Vine)board[vineCoords.x, vineCoords.y, vineCoords.z]).GetOrigin());
 
-                ((Vine)board[vineCoords.x, vineCoords.y, vineCoords.z]).RemoveVine(board);
+                Shade vineColor = ((Vine)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).GetColor();
+                AdjustAvailableVinesUI(vineColor, ((Vine)board[vineCoords.x, vineCoords.y, vineCoords.z]).RemoveVine(board));
                 if (board[stemCoords.x, stemCoords.y, stemCoords.z] is Vine)
                 {
                     ((Vine)board[stemCoords.x, stemCoords.y, stemCoords.z]).SetVine(null);
@@ -180,7 +187,7 @@ public class LevelManager : MonoBehaviour
         }
     }
 
-    private void ClearSpaciousTiles ()
+    private void ClearSpaciousTiles()
     {
         for (int x = 0; x < board.GetLength(0); x++)
         {
@@ -201,5 +208,68 @@ public class LevelManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void GenerateAvailableVinesUI()
+    {
+        GameObject avBase = GameObject.Find("PlayerCanvas/AvailableVinesMenu/AVAnchor");
+        GameObject avAnchor = avBase;
+        GameObject avIconResource = Resources.Load<GameObject>("Prefabs/AVIcon");
+
+        for (int i = 0; i < availableVines.Length; i++)
+        {
+            GameObject avIcon = Instantiate<GameObject>(avIconResource);
+            avIcon.transform.SetParent(avAnchor.transform);
+            if (availableVines[i] > 0)
+            {
+                avIcon.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = availableVines[i].ToString();
+                avIcon.transform.GetComponent<Image>().color = palette[i + 1];
+                avIcon.transform.localPosition = new Vector3(30, 0, 0);
+                avBase.transform.localPosition += new Vector3(-15, 0, 0);
+            }
+            else
+            {
+                avIcon.transform.GetComponent<Image>().color = Color.clear;
+                avIcon.transform.localPosition = new Vector3(0, 0, 0);
+            }
+            avAnchor = avIcon;
+        }
+    }
+
+    private void AdjustAvailableVinesUI(Shade color, int amount)
+    {
+        GameObject avBase = GameObject.Find("PlayerCanvas/AvailableVinesMenu/AVAnchor");
+        GameObject avIcon = avBase.transform.GetChild(0).gameObject;
+        for (int i = 0; i < (int)color - 1; i++)
+        {
+            avIcon = avIcon.transform.GetChild(1).gameObject;
+        }
+
+        if (availableVines[(int)color - 1] == 0)
+        {
+            availableVines[(int)color - 1] += amount;
+            avIcon.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = availableVines[(int)color - 1].ToString();
+            avIcon.transform.GetComponent<Image>().color = palette[(int)color];
+            avIcon.transform.localPosition = new Vector3(30, 0, 0);
+            avBase.transform.localPosition += new Vector3(-15, 0, 0);
+        }
+        else if (amount > 0)
+        {
+            availableVines[(int)color - 1] += amount;
+            avIcon.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = availableVines[(int)color - 1].ToString();
+        }
+        else
+        {
+            availableVines[(int)color - 1] += amount;
+            avIcon.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = availableVines[(int)color - 1].ToString();
+            if (availableVines[(int)color - 1] == 0)
+            {
+                avIcon.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "";
+                avIcon.transform.GetComponent<Image>().color = Color.clear;
+                avIcon.transform.localPosition = new Vector3(0, 0, 0);
+                avBase.transform.localPosition += new Vector3(15, 0, 0);
+            }
+        }
+        
     }
 }
