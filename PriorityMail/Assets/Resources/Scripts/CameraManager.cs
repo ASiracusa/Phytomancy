@@ -7,6 +7,7 @@ public class CameraManager : MonoBehaviour
 {
     public static CameraManager current;
 
+    private GameObject levelAnchor;
     private GameObject camAnchor;
     private Camera cam;
 
@@ -14,8 +15,9 @@ public class CameraManager : MonoBehaviour
     {
         current = this;
 
-        camAnchor = GameObject.Find("CameraAnchor");
-        cam = GameObject.Find("CameraAnchor/Camera").GetComponent<Camera>();
+        levelAnchor = GameObject.Find("LevelAnchor");
+        camAnchor = GameObject.Find("LevelAnchor/CameraAnchor");
+        cam = GameObject.Find("LevelAnchor/CameraAnchor/Camera").GetComponent<Camera>();
 
         StartCoroutine(CursorEvents());
         StartCoroutine(RotateBoard());
@@ -96,7 +98,7 @@ public class CameraManager : MonoBehaviour
 
             pos += velocity;
 
-            camAnchor.transform.position = new Vector3(17 * -Mathf.Sin(pos), 20, 17 * -Mathf.Cos(pos));
+            camAnchor.transform.localPosition = new Vector3(17 * -Mathf.Sin(pos), 20, 17 * -Mathf.Cos(pos));
             camAnchor.transform.eulerAngles = new Vector3(45, pos * 180 / Mathf.PI, 0);
 
             velocity *= 0.95f;
@@ -125,6 +127,20 @@ public class CameraManager : MonoBehaviour
             return new Vector3Int((int)(hit.transform.parent.position.x), (int)(hit.transform.parent.position.y), (int)(hit.transform.parent.position.z + (zDist > 0 ? 1 : -1)));
         }
 
+    }
+
+    public void CalibrateCamera (TileElement[,,] board)
+    {
+        levelAnchor.transform.localPosition = new Vector3(board.GetLength(0) / 2.0f, 0, board.GetLength(2) / 2.0f);
+    }
+
+    public Facet GetCameraOrientation ()
+    {
+        float y = camAnchor.transform.localEulerAngles.y;
+        if (45 < y && y < 135) { return Facet.North; }
+        if (135 < y && y < 225) { return Facet.East; }
+        if (225 < y && y < 315) { return Facet.South; }
+        return Facet.West;
     }
 
     public event Action<RaycastHit> onHover;

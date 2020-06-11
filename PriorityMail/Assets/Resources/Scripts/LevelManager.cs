@@ -19,15 +19,15 @@ public class LevelManager : MonoBehaviour
     {
         new Color32 (0x03, 0x02, 0x25, 0xFF),
         new Color32 (0x21, 0x20, 0x51, 0xFF),
+        new Color32 (0x62, 0x4F, 0xCE, 0xFF),
+        new Color32 (0xB5, 0x35, 0xD4, 0xFF),
+        new Color32 (0xD4, 0x35, 0x89, 0xFF),
         new Color32 (0xD9, 0x1E, 0x37, 0xFF),
         new Color32 (0xD2, 0x72, 0x33, 0xFF),
         new Color32 (0xDB, 0xCF, 0x34, 0xFF),
         new Color32 (0x76, 0xD4, 0x35, 0xFF),
         new Color32 (0x46, 0xD4, 0x95, 0xFF),
         new Color32 (0x1E, 0xD9, 0xD9, 0xFF),
-        new Color32 (0x62, 0x4F, 0xCE, 0xFF),
-        new Color32 (0xB5, 0x35, 0xD4, 0xFF),
-        new Color32 (0xD4, 0x35, 0x89, 0xFF)
     };
 
     // Start is called before the first frame update
@@ -44,12 +44,13 @@ public class LevelManager : MonoBehaviour
 
         StartCoroutine(BrambleInput());
         GenerateAvailableVinesUI();
+
+        CameraManager.current.CalibrateCamera(board);
     }
 
     private void LoadLevel(string worldName, string levelName)
     {
         levelData = (LevelData)SerializationManager.LoadLevel(Application.persistentDataPath + "/worlds/" + worldName + "/" + levelName + ".lvl");
-        print(levelData.sigilCoords[0]);
         TileElement tileModel = Constants.TILE_MODELS[(int)TileElementNames.Ground];
 
         board = new TileElement[levelData.grounds.GetLength(0), levelData.grounds.GetLength(1), levelData.grounds.GetLength(2)];
@@ -97,26 +98,28 @@ public class LevelManager : MonoBehaviour
     {
         while (true)
         {
+            Facet camDirection = CameraManager.current.GetCameraOrientation(); 
             if (Input.GetKeyDown(KeyCode.W))
             {
-                bramble.Push(ref board, Facet.North, null);
+                bramble.Push(ref board, (Facet)(((int)Facet.North + (int)camDirection) % 4), null);
                 ClearSpaciousTiles();
             }
             if (Input.GetKeyDown(KeyCode.S))
             {
-                bramble.Push(ref board, Facet.South, null);
+                bramble.Push(ref board, (Facet)(((int)Facet.South + (int)camDirection) % 4), null);
                 ClearSpaciousTiles();
             }
             if (Input.GetKeyDown(KeyCode.A))
             {
-                bramble.Push(ref board, Facet.West, null);
+                bramble.Push(ref board, (Facet)(((int)Facet.West + (int)camDirection) % 4), null);
                 ClearSpaciousTiles();
             }
             if (Input.GetKeyDown(KeyCode.D))
             {
-                bramble.Push(ref board, Facet.East, null);
+                bramble.Push(ref board, (Facet)(((int)Facet.East + (int)camDirection) % 4), null);
                 ClearSpaciousTiles();
             }
+            CameraManager.current.GetCameraOrientation();
             yield return null;
         }
     }

@@ -3,12 +3,12 @@ using UnityEngine;
 
 public enum Facet
 {
-    Up = 0,
-    Down = 1,
-    North = 2,
-    South = 3,
-    West = 4,
-    East = 5,
+    North = 0,
+    West = 1,
+    South = 2,
+    East = 3,
+    Up = 4,
+    Down = 5,
     Unknown = 6
 }
 
@@ -49,6 +49,14 @@ public enum EditorTEIndices
     Pos1,
     Pos2,
     Direction
+}
+
+public enum CardinalDirection
+{
+    North,
+    West,
+    South,
+    East
 }
 
 public delegate TileElement TileElementConstructor(params object[] vars);

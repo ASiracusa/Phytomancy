@@ -70,6 +70,7 @@ public class CreatorManager : MonoBehaviour
 
         GenerateTileMenu();
         StartCoroutine(ChangeDirection());
+        CameraManager.current.CalibrateCamera(board);
     }
 
 
@@ -290,6 +291,7 @@ public class CreatorManager : MonoBehaviour
         }
 
         board = _board;
+        CameraManager.current.CalibrateCamera(board);
     }
 
 
