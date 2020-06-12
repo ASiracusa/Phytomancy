@@ -2,17 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Sigil : Monocoord, IMonoSpacious
+public class Rock : Monocoord
 {
-    private MonoSpaciousHelper _msh;
-    private bool _expecting;
+    public Rock() { }
 
-    public MonoSpaciousHelper Helper { get => _msh; set => _msh = value; }
-    public bool Expecting { get => _expecting; set => _expecting = value; }
-
-    public Sigil() { }
-
-    public Sigil (params object[] vars)
+    private Rock(params object[] vars)
     {
         SetCoords(new int[] {
             ((Vector3Int)vars[0]).x,
@@ -23,46 +17,52 @@ public class Sigil : Monocoord, IMonoSpacious
 
     public override TileElement GenerateTileElement(params object[] vars)
     {
-        return new Sigil(vars);
+        return new Rock(vars);
     }
 
     public override TileElement LoadTileElement(params object[] vars)
     {
-        Sigil s = new Sigil(vars);
-        s.SetPhysics(true, false, true, false);
-        s.Helper = new MonoSpaciousHelper();
-        return s;
+        Rock rock = new Rock(vars);
+        rock.SetPhysics(false, true, false, true);
+        return rock;
     }
 
     public override void CompileTileElement(ref LinkedList<int> dataInts, ref LinkedList<Shade> dataShades)
     {
-
+        dataInts.AddLast(GetPos().x);
+        dataInts.AddLast(GetPos().y);
+        dataInts.AddLast(GetPos().z);
     }
 
     public override TileElement DecompileTileElement(ref Queue<int> dataInts, ref Queue<Shade> dataShades)
     {
-        return new Sigil();
+        Rock rock = new Rock();
+        rock.SetCoords(new int[]
+        {
+            dataInts.Dequeue(),
+            dataInts.Dequeue(),
+            dataInts.Dequeue()
+        });
+        rock.SetPhysics(false, true, false, true);
+        return rock;
     }
 
     public override EditorTEIndices[] GetEditorTEIndices()
     {
         return new EditorTEIndices[]
         {
-            EditorTEIndices.Pos1
+            EditorTEIndices.Pos1,
         };
     }
 
     public override string TileName()
     {
-        return "Sigil";
+        return "Rock";
     }
 
     public override TileElementNames TileID()
     {
-        return TileElementNames.Sigil;
+        return TileElementNames.Rock;
     }
 
-    public void TileEnters (TileElement enterer) { }
-
-    public void TileLeaves () { }
 }

@@ -39,9 +39,11 @@ public enum Direction
 
 public enum TileElementNames
 {
+    Vine,
     Bramble,
     Sigil,
-    Ground
+    Ground,
+    Rock
 }
 
 public enum EditorTEIndices
@@ -65,9 +67,11 @@ public class Constants
 {
 
     public static readonly TileElement[] TILE_MODELS = new TileElement[] {
+        new Vine(),
         new Bramble(),
         new Sigil(),
-        new Ground()
+        new Ground(),
+        new Rock()
     };
 
     public static Facet VectorToFacet(Vector3Int vec)

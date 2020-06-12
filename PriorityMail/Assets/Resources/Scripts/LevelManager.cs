@@ -92,6 +92,45 @@ public class LevelManager : MonoBehaviour
         board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]].model = Instantiate(Resources.Load("Models/Sigil")) as GameObject;
         board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]].BindDataToModel();
         board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]].MoveToPos();
+
+        Queue<int> intQueue = new Queue<int>();
+        for (int i = 0; i < levelData.dataInts.Length; i++)
+        {
+            intQueue.Enqueue(levelData.dataInts[i]);
+        }
+        Queue<Shade> shadeQueue = new Queue<Shade>();
+        for (int i = 0; i < levelData.dataShades.Length; i++)
+        {
+            shadeQueue.Enqueue(levelData.dataShades[i]);
+        }
+
+        for (int i = 0; i < levelData.tileTypes.Length; i++)
+        {
+            TileElement tileBase = Constants.TILE_MODELS[(int)levelData.tileTypes[i]];
+            TileElement decompiledTile = tileBase.DecompileTileElement(ref intQueue, ref shadeQueue);
+            decompiledTile.model = Instantiate(Resources.Load("Models/" + tileBase.TileName())) as GameObject;
+            decompiledTile.BindDataToModel();
+            decompiledTile.MoveToPos();
+            if (tileBase is Monocoord)
+            {
+                Monocoord monoTile = (Monocoord)decompiledTile;
+                board[monoTile.GetPos().x, monoTile.GetPos().y, monoTile.GetPos().z] = decompiledTile;
+            }
+            else
+            {
+                Dicoord diTile = (Dicoord)decompiledTile;
+                for (int x = diTile.GetPos1().x; x <= diTile.GetPos2().x; x++)
+                {
+                    for (int y = diTile.GetPos1().y; y <= diTile.GetPos2().y; y++)
+                    {
+                        for (int z = diTile.GetPos1().z; z <= diTile.GetPos2().z; z++)
+                        {
+                            board[x, y, z] = decompiledTile;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private IEnumerator BrambleInput()

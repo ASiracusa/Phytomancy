@@ -13,6 +13,16 @@ public abstract class Dicoord : TileElement
         pos2 = new Vector3Int(_pos2[0], _pos2[1], _pos2[2]);
     }
 
+    public Vector3Int GetPos1 ()
+    {
+        return pos1;
+    }
+
+    public Vector3Int GetPos2()
+    {
+        return pos2;
+    }
+
     public override void MoveToPos()
     {
         model.transform.position = pos1;

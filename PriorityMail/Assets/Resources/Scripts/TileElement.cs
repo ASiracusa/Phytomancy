@@ -6,6 +6,7 @@ public abstract class TileElement
 {
     public GameObject model;
     protected string tileName;
+    public bool Checked { get; set; }
 
     // PHYSICS VARIABLES
     public bool Massless { get; protected set; }
@@ -38,6 +39,10 @@ public abstract class TileElement
 
     public abstract TileElement LoadTileElement(params object[] vars);
 
+    public abstract void CompileTileElement(ref LinkedList<int> dataInts, ref LinkedList<Shade> dataShades);
+
+    public abstract TileElement DecompileTileElement(ref Queue<int> dataInts, ref Queue<Shade> dataShades);
+
     public abstract void EditorDeleteTileElement(TileElement[,,] board);
 
     public abstract void PlayerDeleteTileElement(TileElement[,,] board);
@@ -45,6 +50,8 @@ public abstract class TileElement
     public abstract EditorTEIndices[] GetEditorTEIndices();
 
     public abstract string TileName();
+
+    public abstract TileElementNames TileID();
 
     public abstract void Move(ref TileElement[,,] board, Facet direction);
 

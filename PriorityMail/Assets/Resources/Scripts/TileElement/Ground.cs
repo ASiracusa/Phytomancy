@@ -45,6 +45,16 @@ public class Ground : Monocoord, IColorable
         return g;
     }
 
+    public override void CompileTileElement(ref LinkedList<int> dataInts, ref LinkedList<Shade> dataShades)
+    {
+
+    }
+
+    public override TileElement DecompileTileElement(ref Queue<int> dataInts, ref Queue<Shade> dataShades)
+    {
+        return new Ground();
+    }
+
     public override EditorTEIndices[] GetEditorTEIndices()
     {
         return new EditorTEIndices[]
@@ -56,6 +66,11 @@ public class Ground : Monocoord, IColorable
     public override string TileName()
     {
         return "Ground";
+    }
+
+    public override TileElementNames TileID()
+    {
+        return TileElementNames.Ground;
     }
 
     public void SetShade (Shade shade, int index)

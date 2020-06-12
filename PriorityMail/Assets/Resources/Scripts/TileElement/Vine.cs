@@ -9,6 +9,8 @@ public class Vine : Monocoord
     private Shade color;
     private Facet origin;
 
+    public Vine () { }
+
     public Vine (params object[] vars)
     {
         SetCoords(new int[] {
@@ -30,6 +32,16 @@ public class Vine : Monocoord
     public override TileElement LoadTileElement(params object[] vars)
     {
         return new Vine(vars);
+    }
+
+    public override void CompileTileElement(ref LinkedList<int> dataInts, ref LinkedList<Shade> dataShades)
+    {
+
+    }
+
+    public override TileElement DecompileTileElement(ref Queue<int> dataInts, ref Queue<Shade> dataShades)
+    {
+        return new Vine();
     }
 
     public override EditorTEIndices[] GetEditorTEIndices()
@@ -63,6 +75,11 @@ public class Vine : Monocoord
     public override string TileName()
     {
         return "Vine";
+    }
+
+    public override TileElementNames TileID()
+    {
+        return TileElementNames.Vine;
     }
 
     public int RemoveVine (TileElement[,,] board)

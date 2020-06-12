@@ -30,6 +30,16 @@ public class Bramble : Monocoord
         return bramble;
     }
 
+    public override void CompileTileElement(ref LinkedList<int> dataInts, ref LinkedList<Shade> dataShades)
+    {
+
+    }
+
+    public override TileElement DecompileTileElement(ref Queue<int> dataInts, ref Queue<Shade> dataShades)
+    {
+        return new Bramble();
+    }
+
     public override EditorTEIndices[] GetEditorTEIndices()
     {
         return new EditorTEIndices[]
@@ -42,6 +52,11 @@ public class Bramble : Monocoord
     public override string TileName()
     {
         return "Bramble";
+    }
+
+    public override TileElementNames TileID ()
+    {
+        return TileElementNames.Bramble;
     }
 
     public Facet GetDirection ()

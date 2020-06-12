@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEngine.EventSystems;
 using TMPro;
 using System;
+using System.Linq;
 
 public class CreatorManager : MonoBehaviour
 {
@@ -65,8 +66,8 @@ public class CreatorManager : MonoBehaviour
             }
         }
 
-        CameraManager.current.onClick += SetPrimarySelection;
-        CameraManager.current.onRelease += ExecuteSelection;
+        CameraManager.current.onClickBoth += SetPrimarySelection;
+        CameraManager.current.onReleaseBoth += ExecuteSelection;
 
         GenerateTileMenu();
         StartCoroutine(ChangeDirection());
@@ -246,7 +247,7 @@ public class CreatorManager : MonoBehaviour
     public void GenerateTileMenu ()
     {
         GameObject tileMenu = GameObject.Find("EditorCanvas/LeftMenu/AddMenu/TEMenu");
-        for (int i = 0; i < Constants.TILE_MODELS.Length; i++)
+        for (int i = 1; i < Constants.TILE_MODELS.Length; i++)
         {
             GameObject icon = Instantiate(Resources.Load<GameObject>("Prefabs/TEIcon"), tileMenu.transform) as GameObject;
             icon.transform.localPosition = new Vector3(0, 135 - 55 * i, 0);
@@ -401,12 +402,24 @@ public class CreatorManager : MonoBehaviour
         print(sigil.GetPos());
 
         Shade[,,][] grounds = new Shade[board.GetLength(0), board.GetLength(1), board.GetLength(2)][];
+
+        LinkedList<TileElementNames> dataTypes = new LinkedList<TileElementNames>();
+        LinkedList<int> dataInts = new LinkedList<int>();
+        LinkedList<Shade> dataShades = new LinkedList<Shade>();
+
         for (int x = 0; x < board.GetLength(0); x++)
         {
             for (int y = 0; y < board.GetLength(1); y++)
             {
                 for (int z = 0; z < board.GetLength(2); z++)
                 {
+                    if (board[x, y, z] != null && !(board[x, y, z] is Ground) && !(board[x, y, z] is Bramble) && !(board[x, y, z] is Sigil) && !board[x, y, z].Checked)
+                    {
+                        board[x, y, z].Checked = true;
+                        dataTypes.AddLast(board[x, y, z].TileID());
+                        board[x, y, z].CompileTileElement(ref dataInts, ref dataShades);
+                        print(dataInts.Last.Value.ToString());
+                    }
                     if (board[x, y, z] is Ground)
                     {
                         grounds[x, y, z] = ((Ground)(board[x, y, z])).GetShades();
@@ -430,10 +443,11 @@ public class CreatorManager : MonoBehaviour
                 sigil.GetPos().y,
                 sigil.GetPos().z
             },
-            grounds
+            grounds,
+            dataTypes.ToArray(),
+            dataInts.ToArray(),
+            dataShades.ToArray()
         );
-        print("_ld:");
-        print(_ld.sigilCoords[0]);
 
         SerializationManager.SaveLevel("auburn", "heights", _ld);
 
