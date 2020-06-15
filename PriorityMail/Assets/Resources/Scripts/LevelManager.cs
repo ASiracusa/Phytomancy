@@ -111,6 +111,7 @@ public class LevelManager : MonoBehaviour
             decompiledTile.model = Instantiate(Resources.Load("Models/" + tileBase.TileName())) as GameObject;
             decompiledTile.BindDataToModel();
             decompiledTile.MoveToPos();
+            decompiledTile.AdjustRender();
             if (tileBase is Monocoord)
             {
                 Monocoord monoTile = (Monocoord)decompiledTile;
@@ -140,22 +141,22 @@ public class LevelManager : MonoBehaviour
             Facet camDirection = CameraManager.current.GetCameraOrientation(); 
             if (Input.GetKeyDown(KeyCode.W))
             {
-                bramble.Push(ref board, (Facet)(((int)Facet.North + (int)camDirection) % 4), null);
+                bramble.InitiatePush(board, (Facet)(((int)Facet.North + (int)camDirection) % 4), null);
                 ClearSpaciousTiles();
             }
             if (Input.GetKeyDown(KeyCode.S))
             {
-                bramble.Push(ref board, (Facet)(((int)Facet.South + (int)camDirection) % 4), null);
+                bramble.InitiatePush(board, (Facet)(((int)Facet.South + (int)camDirection) % 4), null);
                 ClearSpaciousTiles();
             }
             if (Input.GetKeyDown(KeyCode.A))
             {
-                bramble.Push(ref board, (Facet)(((int)Facet.West + (int)camDirection) % 4), null);
+                bramble.InitiatePush(board, (Facet)(((int)Facet.West + (int)camDirection) % 4), null);
                 ClearSpaciousTiles();
             }
             if (Input.GetKeyDown(KeyCode.D))
             {
-                bramble.Push(ref board, (Facet)(((int)Facet.East + (int)camDirection) % 4), null);
+                bramble.InitiatePush(board, (Facet)(((int)Facet.East + (int)camDirection) % 4), null);
                 ClearSpaciousTiles();
             }
             CameraManager.current.GetCameraOrientation();
@@ -169,6 +170,7 @@ public class LevelManager : MonoBehaviour
         {
             if (left)
             {
+                // Get the color of the new Vine based on where the player clicked
                 Shade vineColor;
                 if (hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data is Ground)
                 {
@@ -179,13 +181,16 @@ public class LevelManager : MonoBehaviour
                     vineColor = ((Vine)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).GetColor();
                 }
                 int vinesOfColor = availableVines[(int)vineColor - 1];
-                Vector3Int stemCoords = new Vector3Int((int)(hit.transform.position.x), (int)(hit.transform.position.y), (int)(hit.transform.position.z));
+                Vector3Int stemCoords = CameraManager.GetAdjacentCoords(hit, false);
 
                 if (vinesOfColor > 0 && (!(board[stemCoords.x, stemCoords.y, stemCoords.z] is Vine) || ((Vine)board[stemCoords.x, stemCoords.y, stemCoords.z]).GetVine() == null))
                 {
-                    Vector3Int vineCoords = CameraManager.GetAdjacentCoords(hit);
+                    Vector3Int vineCoords = CameraManager.GetAdjacentCoords(hit, true);
+                    Debug.Log(vineCoords.ToString());
                     TileElement tileAtPos = board[vineCoords.x, vineCoords.y, vineCoords.z];
+                    Debug.Log(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data.TileName());
                     Vector3Int direction = vineCoords - ((Monocoord)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).GetPos();
+
                     print(direction);
                     Vine vine = new Vine(new object[] {
                         vineCoords,
@@ -194,13 +199,16 @@ public class LevelManager : MonoBehaviour
                     });
                     if (tileAtPos != null && tileAtPos.Pushable && !tileAtPos.Weedblocked && !(tileAtPos is IMonoSpacious))
                     {
-                        if (!board[vineCoords.x, vineCoords.y, vineCoords.z].Push(ref board, Constants.VectorToFacet(direction), vine))
+                        if (!board[vineCoords.x, vineCoords.y, vineCoords.z].InitiatePush(board, Constants.VectorToFacet(direction), vine))
                         {
                             return;
                         }
+                        Debug.Log(stemCoords.ToString());
+                        //Debug.Log(board[stemCoords.x, stemCoords.y, stemCoords.z].TileName());
                     }
                     else
                     {
+                        Debug.Log("set to a vine");
                         board[vineCoords.x, vineCoords.y, vineCoords.z] = vine;
                     }
                     board[vineCoords.x, vineCoords.y, vineCoords.z].model = Instantiate(Resources.Load("Models/Vine")) as GameObject;
@@ -216,7 +224,7 @@ public class LevelManager : MonoBehaviour
             }
             else if (hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data is Vine)
             {
-                Vector3Int vineCoords = new Vector3Int((int)(hit.transform.position.x), (int)(hit.transform.position.y), (int)(hit.transform.position.z));
+                Vector3Int vineCoords = CameraManager.GetAdjacentCoords(hit, false);
                 Vector3Int stemCoords = ((Vine)board[vineCoords.x, vineCoords.y, vineCoords.z]).GetPos() + Constants.FacetToVector(((Vine)board[vineCoords.x, vineCoords.y, vineCoords.z]).GetOrigin());
 
                 Shade vineColor = ((Vine)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).GetColor();

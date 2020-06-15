@@ -97,34 +97,14 @@ public class CreatorManager : MonoBehaviour
 
     private void SetPrimarySelection (bool left, RaycastHit hit)
     {
-        if (left)
-        {
-            primarySelection = CameraManager.GetAdjacentCoords(hit);
-        }
-        else
-        {
-            primarySelection = new Vector3Int((int)(hit.transform.position.x), (int)(hit.transform.position.y), (int)(hit.transform.position.z));
-        }
+        primarySelection = CameraManager.GetAdjacentCoords(hit, left);
     }
 
 
 
     private void ExecuteSelection (bool left, RaycastHit hit)
     {
-        Vector3Int secondarySelection;
-        MonocoordFunction tsf;
-
-        if (left)
-        {
-            secondarySelection = CameraManager.GetAdjacentCoords(hit);
-            tsf = PlaceStandardTile;
-        }
-        else
-        {
-            secondarySelection = new Vector3Int((int)(hit.transform.position.x), (int)(hit.transform.position.y), (int)(hit.transform.position.z));
-            print(hit.transform.position);
-            tsf = RemoveTile;
-        }
+        Vector3Int secondarySelection = CameraManager.GetAdjacentCoords(hit, left);
 
         NormalizeCoords(ref primarySelection, ref secondarySelection);
 
@@ -158,7 +138,38 @@ public class CreatorManager : MonoBehaviour
         }
         else if (tileModel is Dicoord)
         {
-            
+            EditorTEIndices[] etei = tileModel.GetEditorTEIndices();
+            object[] data = new object[etei.Length];
+            for (int d = 0; d < data.Length; d++)
+            {
+                data[d] = constructorVals[(int)etei[d]];
+            }
+
+            Dicoord dicoord = (Dicoord)tileModel.GenerateTileElement(data);
+            dicoord.model = Instantiate(Resources.Load("Models/" + tileModel.TileName())) as GameObject;
+            dicoord.BindDataToModel();
+            dicoord.MoveToPos();
+            dicoord.AdjustRender();
+
+            for (int x = primarySelection.x; x <= secondarySelection.x; x++)
+            {
+                for (int y = primarySelection.y; y <= secondarySelection.y; y++)
+                {
+                    for (int z = primarySelection.z; z <= secondarySelection.z; z++)
+                    {
+                        if (board[x, y, z] != null && board[x, y, z] is Bramble)
+                        {
+                            bramble = null;
+                        }
+                        if (board[x, y, z] != null && board[x, y, z] is Sigil)
+                        {
+                            sigil = null;
+                        }
+                        board[x, y, z]?.EditorDeleteTileElement(board);
+                        board[x, y, z] = dicoord;
+                    }
+                }
+            }
         }
         else if (tileModel is Bramble)
         {

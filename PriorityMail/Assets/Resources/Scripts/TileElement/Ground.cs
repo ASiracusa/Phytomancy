@@ -28,6 +28,11 @@ public class Ground : Monocoord, IColorable
         };
     }
 
+    public override void AdjustRender()
+    {
+
+    }
+
     public override TileElement GenerateTileElement(params object[] vars)
     {
         return new Ground(vars);

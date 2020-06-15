@@ -21,6 +21,11 @@ public class Sigil : Monocoord, IMonoSpacious
         });
     }
 
+    public override void AdjustRender()
+    {
+
+    }
+
     public override TileElement GenerateTileElement(params object[] vars)
     {
         return new Sigil(vars);

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public abstract class Dicoord : TileElement
 {
@@ -25,7 +26,7 @@ public abstract class Dicoord : TileElement
 
     public override void MoveToPos()
     {
-        model.transform.position = pos1;
+        model.transform.GetChild(0).position = new Vector3((pos1.x + pos2.x) / 2.0f, (pos1.y + pos2.y) / 2.0f, (pos1.z + pos2.z) / 2.0f);
     }
 
     public override void EditorDeleteTileElement(TileElement[,,] board)
@@ -44,5 +45,386 @@ public abstract class Dicoord : TileElement
             }
         }
         RemoveModel();
+    }
+
+    public override void PlayerDeleteTileElement(TileElement[,,] board)
+    {
+        for (int x = pos1.x; x <= pos2.x; x++)
+        {
+            for (int y = pos1.y; y <= pos2.y; y++)
+            {
+                for (int z = pos1.z; z <= pos2.z; z++)
+                {
+                    if (board.GetLength(0) > x && board.GetLength(1) > y && board.GetLength(2) > z)
+                    {
+                        board[x, y, z] = null;
+                    }
+                }
+            }
+        }
+        RemoveModel();
+
+        if (GetPos2().y != board.GetLength(1))
+        {
+            PerformOnFacet(ref board, Facet.Up, true, (int x, int y, int z) => board[x, y, z].Fall(board));
+        }
+    }
+
+    public override bool Move(TileElement[,,] board, Facet direction)
+    {
+        Moving = true;
+
+        PerformOnFacet(ref board, Constants.FlipDirection(direction), false, (int x, int y, int z) =>
+        {
+            if (board[x, y, z] is IMonoSpacious) {
+                IMonoSpacious carrier = (IMonoSpacious)board[x, y, z];
+                carrier.Expecting = true;
+            }
+            else
+            {
+                Debug.Log("removing the area behind");
+                board[x, y, z] = null;
+            }
+            return true;
+        });
+
+        PerformOnFacet(ref board, direction, true, (int x, int y, int z) =>
+        {
+            if (board[x, y, z] is IMonoSpacious)
+            {
+                IMonoSpacious carrier = (IMonoSpacious)board[x, y, z];
+                carrier.Expecting = false;
+                carrier.Helper.Inhabitant = this;
+                carrier.TileEnters(this);
+            }
+            else
+            {
+                Debug.Log("Moving it over");
+                board[x, y, z] = this;
+            }
+            return true;
+        });
+
+        Vector3Int newPos1 = GetPos1() + Constants.FacetToVector(direction);
+        Vector3Int newPos2 = GetPos2() + Constants.FacetToVector(direction);
+        SetCoords(new int[] {
+            newPos1.x, newPos1.y, newPos1.z
+        }, new int[] {
+            newPos2.x, newPos2.y, newPos2.z
+        });
+        MoveToPos();
+        return true;
+    }
+
+    public override bool Push(TileElement[,,] board, Facet direction, LinkedList<TileElement> evaluatedTiles)
+    {
+        /*
+        LinkedList<bool> triedPush = PerformOnFacet(ref board, direction, true, (int x, int y, int z) =>
+        {
+            return board[x, y, z] == null ? true : board[x, y, z].TryPush(board, direction);
+        });
+        */
+
+        if (TryPush(board, direction, evaluatedTiles))
+        {
+            Debug.Log("MOVABLE WITH PUSH");
+            //LinkedList<TileElement> evaluatedTileElements = new LinkedList<TileElement>();
+            PerformOnFacet(ref board, direction, true, (int x, int y, int z) =>
+            {
+                if (board[x, y, z] == null)
+                {
+                    return true;
+                }
+                else if (board[x, y, z].Checked)
+                {
+                    //evaluatedTileElements.AddLast(board[x, y, z]);
+                    return board[x, y, z].Push(board, direction, evaluatedTiles);
+                }
+                return true;
+            });
+
+            //// Uncheck all of the TileElements before returning
+            //foreach (TileElement te in evaluatedTileElements)
+            //{
+            //    te.Fall(board);
+            //    te.Checked = false;
+            //}
+            //evaluatedTileElements.Clear();
+
+            if (pos2.y != board.GetLength(1) - 1)
+            {
+                for (int x = pos1.x; x <= pos2.x; x++)
+                {
+                    for (int z = pos1.z; z <= pos2.z; z++)
+                    {
+                        if (board[x, pos2.y + 1, z] != null && !board[x, pos2.y + 1, z].Checked)
+                        {
+                            //evaluatedTileElements.AddLast(board[x, pos2.y + 1, z]);
+                            board[x, pos2.y + 1, z].Push(board, direction, evaluatedTiles);
+                        }
+                    }
+                }
+            }
+
+            if (!Moving)
+            {
+                Move(board, direction);
+            }
+
+            //if (newOccupant != null)
+            //{
+            //    board[newOccupant.GetPos().x, newOccupant.GetPos().y, newOccupant.GetPos().z] = newOccupant;
+            //}
+            //Fall(board);
+
+            //foreach (TileElement te in evaluatedTileElements)
+            //{
+            //    te.Fall(board);
+            //    te.Checked = false;
+            //}
+            //evaluatedTileElements.Clear();
+
+            return true;
+        }
+
+        evaluatedTiles.AddFirst(this);
+        //Fall(board);
+        return false;
+    }
+
+    public override bool TryPush(TileElement[,,] board, Facet direction, LinkedList<TileElement> evaluatedTiles)
+    {
+        // Test if a push is possible
+        //LinkedList<TileElement> evaluatedTileElements = new LinkedList<TileElement>();
+        bool success = !PerformOnFacet(ref board, direction, true, (int x, int y, int z) =>
+        {
+            if (board[x, y, z] == null)
+            {
+                Debug.Log("its empty boys");
+                return true;
+            }
+            else if (!board[x, y, z].Pushable)
+            {
+                Debug.Log("stoped");
+                return false;
+            }
+            else if (!board[x, y, z].Checked)
+            {
+                return board[x, y, z].TryPush(board, direction, evaluatedTiles);
+            }
+            return true;
+        }).Contains(false);
+
+        // Uncheck all of the TileElements before returning
+        //foreach (TileElement te in evaluatedTiles)
+        //{
+        //    te.Checked = false;
+        //}
+        if (success)
+        {
+            evaluatedTiles.AddFirst(this);
+            Checked = true;
+        }
+        return success;
+    }
+
+    public override bool Fall(TileElement[,,] board)
+    {
+        if (Massless)
+        {
+            return false;
+        }
+
+        int yBelow;
+        for (yBelow = pos1.y - 1; yBelow >= 0; yBelow--)
+        {
+            bool canLand = PerformOnFacet(ref board, Facet.Down, true, (int x, int y, int z) =>
+            {
+                return !(board[x, yBelow, z] == null || (board[x, yBelow, z] is IMonoSpacious && ((IMonoSpacious)board[x, yBelow, z]).Helper.GetSolidOccupant() != null));
+            }).Contains(true);
+
+            if (canLand)
+            {
+                break;
+            }
+        }
+
+        int yAbove = GetPos2().y + 1;
+        
+        for (int x = pos1.x; x <= pos2.x; x++)
+        {
+            for (int y = pos1.y; y <= pos2.y; y++)
+            {
+                for (int z = pos1.z; z <= pos2.z; z++)
+                {
+                    if (board[x, y, z] is IMonoSpacious)
+                    {
+                        IMonoSpacious carrier = (IMonoSpacious)board[x, y, z];
+                        carrier.Expecting = true;
+                    }
+                    else
+                    {
+                        board[x, y, z] = null;
+                    }
+                }
+            }
+        }
+
+        if (yBelow == -1)
+        {
+            for (int x = pos1.x; x <= pos2.x; x++)
+            {
+                for (int y = pos1.y; y <= pos2.y; y++)
+                {
+                    for (int z = pos1.z; z <= pos2.z; z++)
+                    {
+                        if (board[x, y, z] is IMonoSpacious)
+                        {
+                            IMonoSpacious carrier = (IMonoSpacious)board[x, y, z];
+                            carrier.Helper.RemoveInhabitant();
+                            carrier.TileLeaves();
+                        }
+                        else
+                        {
+                            board[x, y, z] = null;
+                        }
+                    }
+                }
+            }
+
+            RemoveModel();
+        }
+        else
+        {
+            pos2.y = yBelow + 1 + (pos2.y - pos1.y);
+            pos1.y = yBelow + 1;
+            MoveToPos();
+
+            for (int x = pos1.x; x <= pos2.x; x++)
+            {
+                for (int y = pos1.y; y <= pos2.y; y++)
+                {
+                    for (int z = pos1.z; z <= pos2.z; z++)
+                    {
+                        if (board[x, y, z] == null)
+                        {
+                            board[x, y, z] = this;
+                        }
+                        else if (board[x, y, z] is IMonoSpacious)
+                        {
+                            IMonoSpacious carrier = (IMonoSpacious)board[x, y, z];
+                            carrier.Helper.Inhabitant = this;
+                            carrier.TileEnters(this);
+                        }
+                    }
+                }
+            }
+        }
+
+        LinkedList<TileElement> evaluatedTileElements = new LinkedList<TileElement>();
+        for (int x = pos1.x; x <= pos2.x; x++)
+        {
+            for (int z = pos1.z; z <= pos2.z; z++)
+            {
+                if (board[x, yAbove, z] != null && !board[x, yAbove, z].Checked)
+                {
+                    //board[x, yAbove, z].Checked = true;
+                    board[x, yAbove, z].Fall(board);
+                }
+            }
+        }
+        // Uncheck all of the TileElements before returning
+        foreach (TileElement te in evaluatedTileElements)
+        {
+            //te.Checked = false;
+        }
+
+        return true;
+    }
+
+    public LinkedList<OutType> PerformOnFacet<OutType> (ref TileElement[,,] board, Facet facet, bool adjacent, Func<int, int, int, OutType> func)
+    {
+        // Get the mins and maxes of the area of affected tiles on a given facet
+        // One side will always be one tile long and the other two will be the size of the Dicoord's lengths
+        int adjMod = adjacent ? 1 : 0;
+        int xMin =  (facet == Facet.North) ?
+                        GetPos2().x + adjMod :
+                    (facet == Facet.South) ?
+                        GetPos1().x - adjMod :
+                        GetPos1().x;
+        int xMax = (facet == Facet.North) ?
+                        GetPos2().x + adjMod :
+                    (facet == Facet.South) ?
+                        GetPos1().x - adjMod :
+                        GetPos2().x;
+        int yMin = (facet == Facet.Up) ?
+                        GetPos2().y + adjMod :
+                    (facet == Facet.Down) ?
+                        GetPos1().y - adjMod :
+                        GetPos1().y;
+        int yMax = (facet == Facet.Up) ?
+                        GetPos2().y + adjMod :
+                    (facet == Facet.Down) ?
+                        GetPos1().y - adjMod :
+                        GetPos2().y;
+        int zMin = (facet == Facet.West) ?
+                        GetPos2().z + adjMod :
+                    (facet == Facet.East) ?
+                        GetPos1().z - adjMod :
+                        GetPos1().z;
+        int zMax = (facet == Facet.West) ?
+                        GetPos2().z + adjMod :
+                    (facet == Facet.East) ?
+                        GetPos1().z - adjMod :
+                        GetPos2().z;
+
+        // Create array of results for each tile space
+        LinkedList<OutType> outs = new LinkedList<OutType>();
+
+        // Stop execution if the area is out of bounds
+        if (xMin < 0 || xMax >= board.GetLength(0) || yMin < 0 || yMax >= board.GetLength(1) || zMin < 0 || zMax >= board.GetLength(2))
+        {
+            return null;
+        }
+
+        // Perform function on each tile in the array and save their outputs
+        for (int x = xMin; x <= xMax; x++)
+        {
+            for (int y = yMin; y <= yMax; y++)
+            {
+                for (int z = zMin; z <= zMax; z++)
+                {
+                    Debug.Log("[ " + x + ", " + y + ", " + z + " ]");
+                    outs.AddLast(func.Invoke(x, y, z));
+                    Debug.Log(outs.Last.Value.ToString());
+                }
+            }
+        }
+
+        // Return the array of outputs
+        return outs;
+    }
+
+    public override bool InitiatePush(TileElement[,,] board, Facet direction, Monocoord newOccupant)
+    {
+        LinkedList<TileElement> evaluatedTiles = new LinkedList<TileElement>();
+        if (Push(board, direction, evaluatedTiles))
+        {
+            if (newOccupant != null)
+            {
+                board[newOccupant.GetPos().x, newOccupant.GetPos().y, newOccupant.GetPos().z] = newOccupant;
+            }
+
+            foreach (TileElement te in evaluatedTiles)
+            {
+                te.Fall(board);
+                te.Checked = false;
+                te.Moving = false;
+            }
+            evaluatedTiles.Clear();
+
+            return true;
+        }
+        return false;
     }
 }

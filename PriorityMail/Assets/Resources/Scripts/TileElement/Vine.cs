@@ -22,6 +22,11 @@ public class Vine : Monocoord
         origin = (Facet)(vars[2]);
     }
 
+    public override void AdjustRender()
+    {
+
+    }
+
     public override TileElement GenerateTileElement(params object[] vars)
     {
         Vine v = new Vine(vars);

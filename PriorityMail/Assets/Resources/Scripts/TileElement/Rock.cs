@@ -15,6 +15,11 @@ public class Rock : Monocoord
         });
     }
 
+    public override void AdjustRender()
+    {
+
+    }
+
     public override TileElement GenerateTileElement(params object[] vars)
     {
         return new Rock(vars);

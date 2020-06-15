@@ -43,7 +43,8 @@ public enum TileElementNames
     Bramble,
     Sigil,
     Ground,
-    Rock
+    Rock,
+    Boulder
 }
 
 public enum EditorTEIndices
@@ -71,7 +72,8 @@ public class Constants
         new Bramble(),
         new Sigil(),
         new Ground(),
-        new Rock()
+        new Rock(),
+        new Boulder()
     };
 
     public static Facet VectorToFacet(Vector3Int vec)
@@ -89,14 +91,28 @@ public class Constants
     {
         Vector3Int[] ftva = new Vector3Int[]
         {
-            new Vector3Int(0, 1, 0),
-            new Vector3Int(0, -1, 0),
             new Vector3Int(1, 0, 0),
-            new Vector3Int(-1, 0, 0),
             new Vector3Int(0, 0, 1),
-            new Vector3Int(0, 0, -1)
+            new Vector3Int(-1, 0, 0),
+            new Vector3Int(0, 0, -1),
+            new Vector3Int(0, 1, 0),
+            new Vector3Int(0, -1, 0)
         };
         return ftva[(int)facet];
+    }
+
+    public static Facet FlipDirection(Facet facet)
+    {
+        Facet[] flips = new Facet[]
+        {
+            Facet.South,
+            Facet.East,
+            Facet.North,
+            Facet.West,
+            Facet.Down,
+            Facet.Up
+        };
+        return flips[(int)facet];
     }
 
 }

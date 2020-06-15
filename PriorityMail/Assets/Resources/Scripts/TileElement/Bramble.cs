@@ -18,6 +18,11 @@ public class Bramble : Monocoord
         facing = (Facet)vars[1];
     }
 
+    public override void AdjustRender ()
+    {
+
+    }
+
     public override TileElement GenerateTileElement(params object[] vars)
     {
         return new Bramble(vars);
