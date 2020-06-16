@@ -17,9 +17,22 @@ public abstract class Monocoord : TileElement
         return pos;
     }
     
-    public override void MoveToPos ()
+    public override void WarpToPos ()
     {
         model.transform.position = pos;
+    }
+
+    public override void MoveToPos(bool accelerate)
+    {
+        //model.transform.position = pos;
+        if (accelerate)
+        {
+            LevelManager.current.fallAnims.AddLast(new TileAnimationFall(this, new Vector3(pos.x, pos.y, pos.z)));
+        }
+        else
+        {
+            LevelManager.current.movementAnims.AddLast(new TileAnimationMovement(this, new Vector3(pos.x, pos.y, pos.z)));
+        }
     }
 
     public override void EditorDeleteTileElement(TileElement[,,] board)
@@ -81,7 +94,7 @@ public abstract class Monocoord : TileElement
             board[newPos.x, newPos.y, newPos.z] = this;
         }
         pos = newPos;
-        MoveToPos();
+        MoveToPos(false);
         return true;
     }
 
@@ -97,9 +110,9 @@ public abstract class Monocoord : TileElement
 
         TileElement temp = (pos.y == board.GetLength(1) - 1) ? null : board[pos.x, pos.y + 1, pos.z];
         
-        if (pushCoords.x < 0 || pushCoords.x > board.GetLength(0) ||
-            pushCoords.y < 0 || pushCoords.y > board.GetLength(1) ||
-            pushCoords.z < 0 || pushCoords.z > board.GetLength(2))
+        if (pushCoords.x < 0 || pushCoords.x >= board.GetLength(0) ||
+            pushCoords.y < 0 || pushCoords.y >= board.GetLength(1) ||
+            pushCoords.z < 0 || pushCoords.z >= board.GetLength(2))
         {
             return false;
         }
@@ -113,79 +126,16 @@ public abstract class Monocoord : TileElement
         if (TryPush(board, direction, evaluatedTiles))
         {
             pushSubject?.Push(board, direction, evaluatedTiles);
-            //if (newOccupant != null)
-            //{
-            //    newOccupant.pos = pos;
-            //}
+
             temp?.Push(board, direction, evaluatedTiles);
 
             if (!Moving)
             {
                 Move(board, direction);
             }
-            //if (newOccupant != null)
-            //{
-            //    board[newOccupant.pos.x, newOccupant.pos.y, newOccupant.pos.z] = newOccupant;
-            //}
-            //Fall(board);
+
             return true;
         }
-
-        /*
-        if (pushSubject == null)
-        {
-            if (newOccupant != null)
-            {
-                newOccupant.pos = pos;
-            }
-            Move(board, direction);
-            if (newOccupant != null)
-            {
-                board[newOccupant.pos.x, newOccupant.pos.y, newOccupant.pos.z] = newOccupant;
-            }
-            Fall(board);
-            temp?.Push(board, direction, null);
-            return true;
-        }
-
-        if (!pushSubject.Pushable)
-        {
-            return false;
-        }
-
-        if (pushSubject.Push(board, direction, null))
-        {
-            if (newOccupant != null)
-            {
-                newOccupant.pos = pos;
-            }
-            Move(board, direction);
-            if (newOccupant != null)
-            {
-                board[newOccupant.pos.x, newOccupant.pos.y, newOccupant.pos.z] = newOccupant;
-            }
-            Fall(board);
-            temp?.Push(board, direction, null);
-            return true;
-        }
-
-        if (pushSubject.Squishy)
-        {
-            if (newOccupant != null)
-            {
-                newOccupant.MoveToPos();
-            }
-            board[pushCoords.x, pushCoords.y, pushCoords.z].EditorDeleteTileElement(board);
-            Move(board, direction);
-            if (newOccupant != null)
-            {
-                board[newOccupant.pos.x, newOccupant.pos.y, newOccupant.pos.z] = newOccupant;
-            }
-            Fall(board);
-            temp?.Push(board, direction, null);
-            return true;
-        }
-        */
 
         return false;
     }
@@ -264,6 +214,12 @@ public abstract class Monocoord : TileElement
             }
         }
 
+        if (y == pos.y - 1)
+        {
+            Debug.Log("it doesnt need to fall");
+            return false;
+        }
+
         TileElement temp = (pos.y == board.GetLength(1) - 1) ? null : board[pos.x, pos.y + 1, pos.z];
 
 
@@ -294,18 +250,21 @@ public abstract class Monocoord : TileElement
         }
         else
         {
-            pos.y = y + 1;
-            MoveToPos();
+            if (pos.y != y + 1)
+            {
+                pos.y = y + 1;
+                MoveToPos(true);
 
-            if (board[pos.x, pos.y, pos.z] == null)
-            {
-                board[pos.x, pos.y, pos.z] = this;
-            }
-            else if (board[pos.x, y, pos.z] is IMonoSpacious)
-            {
-                IMonoSpacious carrier = (IMonoSpacious)board[pos.x, pos.y, pos.z];
-                carrier.Helper.Inhabitant = this;
-                carrier.TileEnters(this);
+                if (board[pos.x, pos.y, pos.z] == null)
+                {
+                    board[pos.x, pos.y, pos.z] = this;
+                }
+                else if (board[pos.x, y, pos.z] is IMonoSpacious)
+                {
+                    IMonoSpacious carrier = (IMonoSpacious)board[pos.x, pos.y, pos.z];
+                    carrier.Helper.Inhabitant = this;
+                    carrier.TileEnters(this);
+                }
             }
         }
         temp?.Fall(board);
@@ -329,6 +288,8 @@ public abstract class Monocoord : TileElement
                 te.Moving = false;
             }
             evaluatedTiles.Clear();
+
+            LevelManager.current.StartCoroutine(LevelManager.current.AnimateTileStateChange());
 
             return true;
         }

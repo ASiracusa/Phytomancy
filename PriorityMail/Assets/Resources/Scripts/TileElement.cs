@@ -34,7 +34,9 @@ public abstract class TileElement
         Squishy = squishy;
     }
 
-    public abstract void MoveToPos();
+    public abstract void WarpToPos();
+
+    public abstract void MoveToPos(bool accelerate);
 
     public abstract void AdjustRender();
 

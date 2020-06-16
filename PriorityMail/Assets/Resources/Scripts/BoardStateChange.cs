@@ -104,7 +104,7 @@ public class BoardMovementState : BoardStateChange
                 }
             }
         }
-        tileElement.MoveToPos();
+        tileElement.WarpToPos();
     }
 }
 
@@ -132,7 +132,7 @@ public class BoardDeletionState : BoardStateChange
     {
         tileElement.model = GameObject.Instantiate(Resources.Load("Models/" + tileElement.TileName())) as GameObject;
         tileElement.BindDataToModel();
-        tileElement.MoveToPos();
+        tileElement.WarpToPos();
         tileElement.AdjustRender();
         if (tileElement is Monocoord)
         {

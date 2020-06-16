@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using UnityEditor;
 
 public class LevelManager : MonoBehaviour
 {
@@ -15,6 +14,9 @@ public class LevelManager : MonoBehaviour
     private Stack<Stack<BoardStateChange>> undoData;
     private Bramble bramble;
     private int[] availableVines;
+
+    public LinkedList<TileAnimationMovement> movementAnims;
+    public LinkedList<TileAnimationFall> fallAnims;
 
     public Color32[] palette = new Color32[]
     {
@@ -54,6 +56,8 @@ public class LevelManager : MonoBehaviour
         levelData = (LevelData)SerializationManager.LoadLevel(Application.persistentDataPath + "/worlds/" + worldName + "/" + levelName + ".lvl");
         TileElement tileModel = Constants.TILE_MODELS[(int)TileElementNames.Ground];
         undoData = new Stack<Stack<BoardStateChange>>();
+        movementAnims = new LinkedList<TileAnimationMovement>();
+        fallAnims = new LinkedList<TileAnimationFall>();
 
         board = new TileElement[levelData.grounds.GetLength(0), levelData.grounds.GetLength(1), levelData.grounds.GetLength(2)];
         for (int x = 0; x < board.GetLength(0); x++)
@@ -70,7 +74,7 @@ public class LevelManager : MonoBehaviour
                         });
                         board[x, y, z].model = Instantiate(Resources.Load("Models/Ground")) as GameObject;
                         board[x, y, z].BindDataToModel();
-                        board[x, y, z].MoveToPos();
+                        board[x, y, z].WarpToPos();
                         ((Ground)board[x, y, z]).ColorFacets(palette);
                     }
                 }
@@ -84,7 +88,7 @@ public class LevelManager : MonoBehaviour
         });
         bramble.model = Instantiate(Resources.Load("Models/Bramble")) as GameObject;
         bramble.BindDataToModel();
-        bramble.MoveToPos();
+        bramble.WarpToPos();
         board[bramble.GetPos().x, bramble.GetPos().y, bramble.GetPos().z] = bramble;
 
         board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]] = (Sigil)Constants.TILE_MODELS[(int)TileElementNames.Sigil].LoadTileElement(new object[]
@@ -93,7 +97,7 @@ public class LevelManager : MonoBehaviour
         });
         board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]].model = Instantiate(Resources.Load("Models/Sigil")) as GameObject;
         board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]].BindDataToModel();
-        board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]].MoveToPos();
+        board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]].WarpToPos();
 
         Queue<int> intQueue = new Queue<int>();
         for (int i = 0; i < levelData.dataInts.Length; i++)
@@ -112,7 +116,7 @@ public class LevelManager : MonoBehaviour
             TileElement decompiledTile = tileBase.DecompileTileElement(ref intQueue, ref shadeQueue);
             decompiledTile.model = Instantiate(Resources.Load("Models/" + tileBase.TileName())) as GameObject;
             decompiledTile.BindDataToModel();
-            decompiledTile.MoveToPos();
+            decompiledTile.WarpToPos();
             decompiledTile.AdjustRender();
             if (tileBase is Monocoord)
             {
@@ -140,42 +144,46 @@ public class LevelManager : MonoBehaviour
     {
         while (true)
         {
-            Facet camDirection = CameraManager.current.GetCameraOrientation(); 
-            if (Input.GetKeyDown(KeyCode.W))
+            if (movementAnims.Count == 0 && fallAnims.Count == 0)
             {
-                undoData.Push(new Stack<BoardStateChange>());
-                bramble.InitiatePush(board, (Facet)(((int)Facet.North + (int)camDirection) % 4), null);
-                ClearSpaciousTiles();
-            }
-            if (Input.GetKeyDown(KeyCode.S))
-            {
-                undoData.Push(new Stack<BoardStateChange>());
-                bramble.InitiatePush(board, (Facet)(((int)Facet.South + (int)camDirection) % 4), null);
-                ClearSpaciousTiles();
-            }
-            if (Input.GetKeyDown(KeyCode.A))
-            {
-                undoData.Push(new Stack<BoardStateChange>());
-                bramble.InitiatePush(board, (Facet)(((int)Facet.West + (int)camDirection) % 4), null);
-                ClearSpaciousTiles();
-            }
-            if (Input.GetKeyDown(KeyCode.D))
-            {
-                undoData.Push(new Stack<BoardStateChange>());
-                bramble.InitiatePush(board, (Facet)(((int)Facet.East + (int)camDirection) % 4), null);
-                ClearSpaciousTiles();
-            }
+                Facet camDirection = CameraManager.current.GetCameraOrientation();
+                if (Input.GetKey(KeyCode.W))
+                {
+                    undoData.Push(new Stack<BoardStateChange>());
+                    bramble.InitiatePush(board, (Facet)(((int)Facet.North + (int)camDirection) % 4), null);
+                    ClearSpaciousTiles();
+                }
+                if (Input.GetKey(KeyCode.S))
+                {
+                    undoData.Push(new Stack<BoardStateChange>());
+                    bramble.InitiatePush(board, (Facet)(((int)Facet.South + (int)camDirection) % 4), null);
+                    ClearSpaciousTiles();
+                }
+                if (Input.GetKey(KeyCode.A))
+                {
+                    undoData.Push(new Stack<BoardStateChange>());
+                    bramble.InitiatePush(board, (Facet)(((int)Facet.West + (int)camDirection) % 4), null);
+                    ClearSpaciousTiles();
+                }
+                if (Input.GetKey(KeyCode.D))
+                {
+                    undoData.Push(new Stack<BoardStateChange>());
+                    bramble.InitiatePush(board, (Facet)(((int)Facet.East + (int)camDirection) % 4), null);
+                    ClearSpaciousTiles();
+                }
 
-            if (Input.GetKeyDown(KeyCode.Z))
-            {
-                UndoTurn();
+                if (Input.GetKeyDown(KeyCode.Z))
+                {
+                    UndoTurn();
+                }
+                if (Input.GetKeyDown(KeyCode.R))
+                {
+                    RemoveBoard();
+                    LoadLevel("auburn", "heights");
+                }
+                CameraManager.current.GetCameraOrientation();
+
             }
-            if (Input.GetKeyDown(KeyCode.R))
-            {
-                RemoveBoard();
-                LoadLevel("auburn", "heights");
-            }
-            CameraManager.current.GetCameraOrientation();
             yield return null;
         }
     }
@@ -228,7 +236,7 @@ public class LevelManager : MonoBehaviour
                     board[vineCoords.x, vineCoords.y, vineCoords.z].model = Instantiate(Resources.Load("Models/Vine")) as GameObject;
                     board[vineCoords.x, vineCoords.y, vineCoords.z].model.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material.color = palette[(int)vine.GetColor()];
                     board[vineCoords.x, vineCoords.y, vineCoords.z].BindDataToModel();
-                    board[vineCoords.x, vineCoords.y, vineCoords.z].MoveToPos();
+                    board[vineCoords.x, vineCoords.y, vineCoords.z].WarpToPos();
 
                     AddUndoData(new BoardCreationState(vine));
 
@@ -252,6 +260,7 @@ public class LevelManager : MonoBehaviour
                 {
                     ((Vine)board[stemCoords.x, stemCoords.y, stemCoords.z]).SetVine(null);
                 }
+                StartCoroutine(AnimateTileStateChange());
             }
         }
     }
@@ -374,5 +383,57 @@ public class LevelManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    public IEnumerator AnimateTileStateChange()
+    {
+        Debug.Log("is it even called?");
+        if (movementAnims.Count > 0)
+        {
+            Debug.Log("atsc is called and things exist");
+            float startTime = Time.time;
+            while (Time.time - startTime < 0.1f)
+            {
+                foreach (TileAnimation tileAnim in movementAnims)
+                {
+                    tileAnim.Animate();
+                }
+                yield return null;
+            }
+
+            foreach (TileAnimation tileAnim in movementAnims)
+            {
+                tileAnim.Complete();
+            }
+            movementAnims.Clear();
+        }
+
+        if (fallAnims.Count > 0)
+        {
+            foreach (TileAnimationFall tileAnim in fallAnims)
+            {
+                tileAnim.SetStartPos();
+            }
+
+            Debug.Log("atsc is called and things exist");
+            float startTime = Time.time;
+            
+            while (Time.time - startTime < 0.2f)
+            {
+                foreach (TileAnimation tileAnim in fallAnims)
+                {
+                    tileAnim.Animate();
+                }
+                yield return null;
+            }
+
+            foreach (TileAnimation tileAnim in fallAnims)
+            {
+                tileAnim.Complete();
+            }
+            fallAnims.Clear();
+        }
+
+        yield return null;
     }
 }

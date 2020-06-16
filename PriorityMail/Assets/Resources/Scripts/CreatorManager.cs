@@ -62,7 +62,7 @@ public class CreatorManager : MonoBehaviour
                 board[x, 0, z] = bottom;
                 bottom.model = Instantiate(Resources.Load("Models/" + tileModel.TileName())) as GameObject;
                 board[x, 0, z].BindDataToModel();
-                bottom.MoveToPos();
+                bottom.WarpToPos();
             }
         }
 
@@ -148,7 +148,7 @@ public class CreatorManager : MonoBehaviour
             Dicoord dicoord = (Dicoord)tileModel.GenerateTileElement(data);
             dicoord.model = Instantiate(Resources.Load("Models/" + tileModel.TileName())) as GameObject;
             dicoord.BindDataToModel();
-            dicoord.MoveToPos();
+            dicoord.WarpToPos();
             dicoord.AdjustRender();
 
             for (int x = primarySelection.x; x <= secondarySelection.x; x++)
@@ -189,7 +189,7 @@ public class CreatorManager : MonoBehaviour
                 board[primarySelection.x, primarySelection.y, primarySelection.z] = tileModel.GenerateTileElement(data);
                 board[primarySelection.x, primarySelection.y, primarySelection.z].model = Instantiate(Resources.Load("Models/Bramble")) as GameObject;
                 board[primarySelection.x, primarySelection.y, primarySelection.z].BindDataToModel();
-                board[primarySelection.x, primarySelection.y, primarySelection.z].MoveToPos();
+                board[primarySelection.x, primarySelection.y, primarySelection.z].WarpToPos();
                 bramble = (Bramble)board[primarySelection.x, primarySelection.y, primarySelection.z];
             }
         }
@@ -211,7 +211,7 @@ public class CreatorManager : MonoBehaviour
                 board[primarySelection.x, primarySelection.y, primarySelection.z] = tileModel.GenerateTileElement(data);
                 board[primarySelection.x, primarySelection.y, primarySelection.z].model = Instantiate(Resources.Load("Models/Sigil")) as GameObject;
                 board[primarySelection.x, primarySelection.y, primarySelection.z].BindDataToModel();
-                board[primarySelection.x, primarySelection.y, primarySelection.z].MoveToPos();
+                board[primarySelection.x, primarySelection.y, primarySelection.z].WarpToPos();
                 sigil = (Sigil)board[primarySelection.x, primarySelection.y, primarySelection.z];
             }
         }
@@ -246,7 +246,7 @@ public class CreatorManager : MonoBehaviour
                         board[x, y, z] = tileModel.GenerateTileElement(data);
                         board[x, y, z].model = Instantiate(Resources.Load("Models/" + tileModel.TileName())) as GameObject;
                         board[x, y, z].BindDataToModel();
-                        board[x, y, z].MoveToPos();
+                        board[x, y, z].WarpToPos();
                     }
                 }
             }

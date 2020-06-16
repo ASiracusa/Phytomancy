@@ -24,9 +24,22 @@ public abstract class Dicoord : TileElement
         return pos2;
     }
 
-    public override void MoveToPos()
+    public override void WarpToPos()
     {
         model.transform.position = new Vector3((pos1.x + pos2.x) / 2.0f, (pos1.y + pos2.y) / 2.0f, (pos1.z + pos2.z) / 2.0f);
+    }
+
+    public override void MoveToPos(bool accelerate)
+    {
+        //model.transform.position = new Vector3((pos1.x + pos2.x) / 2.0f, (pos1.y + pos2.y) / 2.0f, (pos1.z + pos2.z) / 2.0f);
+        if (accelerate)
+        {
+            LevelManager.current.fallAnims.AddLast(new TileAnimationFall(this, new Vector3((pos1.x + pos2.x) / 2.0f, (pos1.y + pos2.y) / 2.0f, (pos1.z + pos2.z) / 2.0f)));
+        }
+        else
+        {
+            LevelManager.current.movementAnims.AddLast(new TileAnimationMovement(this, new Vector3((pos1.x + pos2.x) / 2.0f, (pos1.y + pos2.y) / 2.0f, (pos1.z + pos2.z) / 2.0f)));
+        }
     }
 
     public override void EditorDeleteTileElement(TileElement[,,] board)
@@ -84,7 +97,6 @@ public abstract class Dicoord : TileElement
             }
             else
             {
-                Debug.Log("removing the area behind");
                 board[x, y, z] = null;
             }
             return true;
@@ -101,7 +113,6 @@ public abstract class Dicoord : TileElement
             }
             else
             {
-                Debug.Log("Moving it over");
                 board[x, y, z] = this;
             }
             return true;
@@ -114,23 +125,14 @@ public abstract class Dicoord : TileElement
         }, new int[] {
             newPos2.x, newPos2.y, newPos2.z
         });
-        MoveToPos();
+        MoveToPos(false);
         return true;
     }
 
     public override bool Push(TileElement[,,] board, Facet direction, LinkedList<TileElement> evaluatedTiles)
     {
-        /*
-        LinkedList<bool> triedPush = PerformOnFacet(ref board, direction, true, (int x, int y, int z) =>
-        {
-            return board[x, y, z] == null ? true : board[x, y, z].TryPush(board, direction);
-        });
-        */
-
         if (TryPush(board, direction, evaluatedTiles))
         {
-            Debug.Log("MOVABLE WITH PUSH");
-            //LinkedList<TileElement> evaluatedTileElements = new LinkedList<TileElement>();
             PerformOnFacet(ref board, direction, true, (int x, int y, int z) =>
             {
                 if (board[x, y, z] == null)
@@ -139,19 +141,10 @@ public abstract class Dicoord : TileElement
                 }
                 else if (board[x, y, z].Checked)
                 {
-                    //evaluatedTileElements.AddLast(board[x, y, z]);
                     return board[x, y, z].Push(board, direction, evaluatedTiles);
                 }
                 return true;
             });
-
-            //// Uncheck all of the TileElements before returning
-            //foreach (TileElement te in evaluatedTileElements)
-            //{
-            //    te.Fall(board);
-            //    te.Checked = false;
-            //}
-            //evaluatedTileElements.Clear();
 
             if (pos2.y != board.GetLength(1) - 1)
             {
@@ -161,7 +154,6 @@ public abstract class Dicoord : TileElement
                     {
                         if (board[x, pos2.y + 1, z] != null && !board[x, pos2.y + 1, z].Checked)
                         {
-                            //evaluatedTileElements.AddLast(board[x, pos2.y + 1, z]);
                             board[x, pos2.y + 1, z].Push(board, direction, evaluatedTiles);
                         }
                     }
@@ -172,19 +164,6 @@ public abstract class Dicoord : TileElement
             {
                 Move(board, direction);
             }
-
-            //if (newOccupant != null)
-            //{
-            //    board[newOccupant.GetPos().x, newOccupant.GetPos().y, newOccupant.GetPos().z] = newOccupant;
-            //}
-            //Fall(board);
-
-            //foreach (TileElement te in evaluatedTileElements)
-            //{
-            //    te.Fall(board);
-            //    te.Checked = false;
-            //}
-            //evaluatedTileElements.Clear();
 
             return true;
         }
@@ -197,9 +176,13 @@ public abstract class Dicoord : TileElement
     public override bool TryPush(TileElement[,,] board, Facet direction, LinkedList<TileElement> evaluatedTiles)
     {
         // Test if a push is possible
-        bool success = !PerformOnFacet(ref board, direction, true, (int x, int y, int z) =>
+        LinkedList<Boolean> tryPushAttempt = PerformOnFacet(ref board, direction, true, (int x, int y, int z) =>
         {
-            if (board[x, y, z] == null)
+            if (x < 0 || y < 0 || z < 0 || x >= board.GetLength(0) || y >= board.GetLength(1) || z >= board.GetLength(2))
+            {
+                return false;
+            }
+            else if (board[x, y, z] == null)
             {
                 return true;
             }
@@ -212,14 +195,14 @@ public abstract class Dicoord : TileElement
                 return board[x, y, z].TryPush(board, direction, evaluatedTiles);
             }
             return true;
-        }).Contains(false);
+        });
         
-        if (success)
+        if (tryPushAttempt != null && !tryPushAttempt.Contains(false))
         {
             evaluatedTiles.AddFirst(this);
             Checked = true;
         }
-        return success;
+        return (tryPushAttempt != null && !tryPushAttempt.Contains(false));
     }
 
     public override bool Fall(TileElement[,,] board)
@@ -243,6 +226,11 @@ public abstract class Dicoord : TileElement
             {
                 break;
             }
+        }
+
+        if (yBelow == pos1.y - 1)
+        {
+            return false;
         }
 
         int yAbove = GetPos2().y + 1;
@@ -294,7 +282,7 @@ public abstract class Dicoord : TileElement
         {
             pos2.y = yBelow + 1 + (pos2.y - pos1.y);
             pos1.y = yBelow + 1;
-            MoveToPos();
+            MoveToPos(true);
 
             for (int x = pos1.x; x <= pos2.x; x++)
             {
@@ -390,9 +378,7 @@ public abstract class Dicoord : TileElement
             {
                 for (int z = zMin; z <= zMax; z++)
                 {
-                    Debug.Log("[ " + x + ", " + y + ", " + z + " ]");
                     outs.AddLast(func.Invoke(x, y, z));
-                    Debug.Log(outs.Last.Value.ToString());
                 }
             }
         }
@@ -418,6 +404,8 @@ public abstract class Dicoord : TileElement
                 te.Moving = false;
             }
             evaluatedTiles.Clear();
+
+            LevelManager.current.StartCoroutine(LevelManager.current.AnimateTileStateChange());
 
             return true;
         }
