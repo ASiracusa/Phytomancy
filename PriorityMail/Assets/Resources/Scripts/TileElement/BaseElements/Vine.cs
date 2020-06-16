@@ -24,7 +24,7 @@ public class Vine : Monocoord
 
     public override void AdjustRender()
     {
-
+        model.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material.color = LevelManager.current.palette[(int)color];
     }
 
     public override TileElement GenerateTileElement(params object[] vars)

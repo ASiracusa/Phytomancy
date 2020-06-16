@@ -8,7 +8,7 @@ public abstract class Dicoord : TileElement
     private Vector3Int pos1;
     private Vector3Int pos2;
 
-    protected void SetCoords(int[] _pos1, int[] _pos2)
+    public void SetCoords(int[] _pos1, int[] _pos2)
     {
         pos1 = new Vector3Int(_pos1[0], _pos1[1], _pos1[2]);
         pos2 = new Vector3Int(_pos2[0], _pos2[1], _pos2[2]);
@@ -62,6 +62,7 @@ public abstract class Dicoord : TileElement
                 }
             }
         }
+        LevelManager.current.AddUndoData(new BoardDeletionState(this));
         RemoveModel();
 
         if (GetPos2().y != board.GetLength(1))
@@ -73,6 +74,7 @@ public abstract class Dicoord : TileElement
     public override bool Move(TileElement[,,] board, Facet direction)
     {
         Moving = true;
+        LevelManager.current.AddUndoData(new BoardMovementState(this, pos1));
 
         PerformOnFacet(ref board, Constants.FlipDirection(direction), false, (int x, int y, int z) =>
         {
@@ -195,17 +197,14 @@ public abstract class Dicoord : TileElement
     public override bool TryPush(TileElement[,,] board, Facet direction, LinkedList<TileElement> evaluatedTiles)
     {
         // Test if a push is possible
-        //LinkedList<TileElement> evaluatedTileElements = new LinkedList<TileElement>();
         bool success = !PerformOnFacet(ref board, direction, true, (int x, int y, int z) =>
         {
             if (board[x, y, z] == null)
             {
-                Debug.Log("its empty boys");
                 return true;
             }
             else if (!board[x, y, z].Pushable)
             {
-                Debug.Log("stoped");
                 return false;
             }
             else if (!board[x, y, z].Checked)
@@ -214,12 +213,7 @@ public abstract class Dicoord : TileElement
             }
             return true;
         }).Contains(false);
-
-        // Uncheck all of the TileElements before returning
-        //foreach (TileElement te in evaluatedTiles)
-        //{
-        //    te.Checked = false;
-        //}
+        
         if (success)
         {
             evaluatedTiles.AddFirst(this);
@@ -234,6 +228,8 @@ public abstract class Dicoord : TileElement
         {
             return false;
         }
+
+        LevelManager.current.AddUndoData(new BoardMovementState(this, pos1));
 
         int yBelow;
         for (yBelow = pos1.y - 1; yBelow >= 0; yBelow--)

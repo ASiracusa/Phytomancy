@@ -7,7 +7,7 @@ public abstract class Monocoord : TileElement
 {
     private Vector3Int pos;
 
-    protected void SetCoords(int[] _pos)
+    public void SetCoords(int[] _pos)
     {
         pos = new Vector3Int(_pos[0], _pos[1], _pos[2]);
     }
@@ -38,12 +38,14 @@ public abstract class Monocoord : TileElement
             board[pos.x, pos.y, pos.z] = null;
             temp?.Fall(board);
         }
+        LevelManager.current.AddUndoData(new BoardDeletionState(this));
         RemoveModel();
     }
 
     public override bool Move(TileElement[,,] board, Facet direction)
     {
         Moving = true;
+        LevelManager.current.AddUndoData(new BoardMovementState(this, pos));
 
         Vector3Int newPos = new Vector3Int(pos.x, pos.y, pos.z);
         if (direction == Facet.North) { newPos.x += 1; }
@@ -250,6 +252,8 @@ public abstract class Monocoord : TileElement
         {
             return false;
         }
+
+        LevelManager.current.AddUndoData(new BoardMovementState(this, pos));
 
         int y;
         for (y = pos.y - 1; y >= 0; y--)

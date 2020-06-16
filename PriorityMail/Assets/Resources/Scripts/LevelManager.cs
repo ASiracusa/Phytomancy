@@ -12,10 +12,11 @@ public class LevelManager : MonoBehaviour
     private LevelData levelData;
 
     private TileElement[,,] board;
+    private Stack<Stack<BoardStateChange>> undoData;
     private Bramble bramble;
     private int[] availableVines;
 
-    private Color32[] palette = new Color32[]
+    public Color32[] palette = new Color32[]
     {
         new Color32 (0x03, 0x02, 0x25, 0xFF),
         new Color32 (0x21, 0x20, 0x51, 0xFF),
@@ -52,6 +53,7 @@ public class LevelManager : MonoBehaviour
     {
         levelData = (LevelData)SerializationManager.LoadLevel(Application.persistentDataPath + "/worlds/" + worldName + "/" + levelName + ".lvl");
         TileElement tileModel = Constants.TILE_MODELS[(int)TileElementNames.Ground];
+        undoData = new Stack<Stack<BoardStateChange>>();
 
         board = new TileElement[levelData.grounds.GetLength(0), levelData.grounds.GetLength(1), levelData.grounds.GetLength(2)];
         for (int x = 0; x < board.GetLength(0); x++)
@@ -141,23 +143,32 @@ public class LevelManager : MonoBehaviour
             Facet camDirection = CameraManager.current.GetCameraOrientation(); 
             if (Input.GetKeyDown(KeyCode.W))
             {
+                undoData.Push(new Stack<BoardStateChange>());
                 bramble.InitiatePush(board, (Facet)(((int)Facet.North + (int)camDirection) % 4), null);
                 ClearSpaciousTiles();
             }
             if (Input.GetKeyDown(KeyCode.S))
             {
+                undoData.Push(new Stack<BoardStateChange>());
                 bramble.InitiatePush(board, (Facet)(((int)Facet.South + (int)camDirection) % 4), null);
                 ClearSpaciousTiles();
             }
             if (Input.GetKeyDown(KeyCode.A))
             {
+                undoData.Push(new Stack<BoardStateChange>());
                 bramble.InitiatePush(board, (Facet)(((int)Facet.West + (int)camDirection) % 4), null);
                 ClearSpaciousTiles();
             }
             if (Input.GetKeyDown(KeyCode.D))
             {
+                undoData.Push(new Stack<BoardStateChange>());
                 bramble.InitiatePush(board, (Facet)(((int)Facet.East + (int)camDirection) % 4), null);
                 ClearSpaciousTiles();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Z))
+            {
+                UndoTurn();
             }
             CameraManager.current.GetCameraOrientation();
             yield return null;
@@ -186,39 +197,41 @@ public class LevelManager : MonoBehaviour
                 if (vinesOfColor > 0 && (!(board[stemCoords.x, stemCoords.y, stemCoords.z] is Vine) || ((Vine)board[stemCoords.x, stemCoords.y, stemCoords.z]).GetVine() == null))
                 {
                     Vector3Int vineCoords = CameraManager.GetAdjacentCoords(hit, true);
-                    Debug.Log(vineCoords.ToString());
                     TileElement tileAtPos = board[vineCoords.x, vineCoords.y, vineCoords.z];
-                    Debug.Log(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data.TileName());
                     Vector3Int direction = vineCoords - ((Monocoord)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).GetPos();
 
-                    print(direction);
                     Vine vine = new Vine(new object[] {
                         vineCoords,
                         vineColor,
                         Constants.VectorToFacet(-direction)
                     });
+
+                    undoData.Push(new Stack<BoardStateChange>());
                     if (tileAtPos != null && tileAtPos.Pushable && !tileAtPos.Weedblocked && !(tileAtPos is IMonoSpacious))
                     {
                         if (!board[vineCoords.x, vineCoords.y, vineCoords.z].InitiatePush(board, Constants.VectorToFacet(direction), vine))
                         {
+                            undoData.Pop();
                             return;
                         }
-                        Debug.Log(stemCoords.ToString());
-                        //Debug.Log(board[stemCoords.x, stemCoords.y, stemCoords.z].TileName());
                     }
                     else
                     {
-                        Debug.Log("set to a vine");
                         board[vineCoords.x, vineCoords.y, vineCoords.z] = vine;
                     }
+
                     board[vineCoords.x, vineCoords.y, vineCoords.z].model = Instantiate(Resources.Load("Models/Vine")) as GameObject;
                     board[vineCoords.x, vineCoords.y, vineCoords.z].model.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material.color = palette[(int)vine.GetColor()];
                     board[vineCoords.x, vineCoords.y, vineCoords.z].BindDataToModel();
                     board[vineCoords.x, vineCoords.y, vineCoords.z].MoveToPos();
+
+                    AddUndoData(new BoardCreationState(vine));
+
                     if (hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data is Vine)
                     {
                         ((Vine)(board[stemCoords.x, stemCoords.y, stemCoords.z])).SetVine((Vine)board[vineCoords.x, vineCoords.y, vineCoords.z]);
                     }
+
                     AdjustAvailableVinesUI(vineColor, -1);
                 }
             }
@@ -226,8 +239,9 @@ public class LevelManager : MonoBehaviour
             {
                 Vector3Int vineCoords = CameraManager.GetAdjacentCoords(hit, false);
                 Vector3Int stemCoords = ((Vine)board[vineCoords.x, vineCoords.y, vineCoords.z]).GetPos() + Constants.FacetToVector(((Vine)board[vineCoords.x, vineCoords.y, vineCoords.z]).GetOrigin());
-
                 Shade vineColor = ((Vine)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).GetColor();
+
+                undoData.Push(new Stack<BoardStateChange>());
                 AdjustAvailableVinesUI(vineColor, ((Vine)board[vineCoords.x, vineCoords.y, vineCoords.z]).RemoveVine(board));
                 if (board[stemCoords.x, stemCoords.y, stemCoords.z] is Vine)
                 {
@@ -321,5 +335,22 @@ public class LevelManager : MonoBehaviour
             }
         }
         
+    }
+
+    private void UndoTurn ()
+    {
+        if (undoData.Count > 0)
+        {
+            Stack<BoardStateChange> undos = undoData.Pop();
+            while (undos.Count > 0)
+            {
+                undos.Pop().Revert(board);
+            }
+        }
+    }
+
+    public void AddUndoData (BoardStateChange stateChange)
+    {
+        undoData.Peek().Push(stateChange);
     }
 }
