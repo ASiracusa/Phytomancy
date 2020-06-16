@@ -316,6 +316,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 633c7cc6a869a1145a3726994042369c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  palette:
+  - serializedVersion: 2
+    rgba: 4280615427
+  - serializedVersion: 2
+    rgba: 4283506721
+  - serializedVersion: 2
+    rgba: 4291710818
+  - serializedVersion: 2
+    rgba: 4292097461
+  - serializedVersion: 2
+    rgba: 4287182292
+  - serializedVersion: 2
+    rgba: 4281802457
+  - serializedVersion: 2
+    rgba: 4281561810
+  - serializedVersion: 2
+    rgba: 4281651163
+  - serializedVersion: 2
+    rgba: 4281717878
+  - serializedVersion: 2
+    rgba: 4288009286
+  - serializedVersion: 2
+    rgba: 4292466974
 --- !u!4 &1314063556
 Transform:
   m_ObjectHideFlags: 0

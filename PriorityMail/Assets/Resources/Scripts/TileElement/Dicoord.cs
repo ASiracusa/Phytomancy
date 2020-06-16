@@ -26,7 +26,7 @@ public abstract class Dicoord : TileElement
 
     public override void MoveToPos()
     {
-        model.transform.GetChild(0).position = new Vector3((pos1.x + pos2.x) / 2.0f, (pos1.y + pos2.y) / 2.0f, (pos1.z + pos2.z) / 2.0f);
+        model.transform.position = new Vector3((pos1.x + pos2.x) / 2.0f, (pos1.y + pos2.y) / 2.0f, (pos1.z + pos2.z) / 2.0f);
     }
 
     public override void EditorDeleteTileElement(TileElement[,,] board)

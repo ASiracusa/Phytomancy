@@ -23,7 +23,17 @@ public class Boulder : Dicoord
 
     public override void AdjustRender()
     {
-        model.transform.GetChild(0).localScale = GetPos2() - GetPos1() + new Vector3(1, 1, 1);
+        model.transform.GetChild(0).localScale = GetPos2() - GetPos1() + new Vector3(0.6f, 1, 1);
+        model.transform.GetChild(1).localScale = GetPos2() - GetPos1() + new Vector3(1, 0.6f, 1);
+        model.transform.GetChild(2).localScale = GetPos2() - GetPos1() + new Vector3(1, 1, 0.6f);
+        model.transform.GetChild(3).localPosition = new Vector3((GetPos2().x - GetPos1().x) / 2.0f + 0.4f, (GetPos2().y - GetPos1().y) / 2.0f + 0.4f, (GetPos2().z - GetPos1().z) / 2.0f + 0.4f);
+        model.transform.GetChild(4).localPosition = new Vector3((GetPos2().x - GetPos1().x) / 2.0f + 0.4f, -((GetPos2().y - GetPos1().y) / 2.0f + 0.4f), (GetPos2().z - GetPos1().z) / 2.0f + 0.4f);
+        model.transform.GetChild(5).localPosition = new Vector3(-((GetPos2().x - GetPos1().x) / 2.0f + 0.4f), (GetPos2().y - GetPos1().y) / 2.0f + 0.4f, (GetPos2().z - GetPos1().z) / 2.0f + 0.4f);
+        model.transform.GetChild(6).localPosition = new Vector3(-((GetPos2().x - GetPos1().x) / 2.0f + 0.4f), -((GetPos2().y - GetPos1().y) / 2.0f + 0.4f), (GetPos2().z - GetPos1().z) / 2.0f + 0.4f);
+        model.transform.GetChild(7).localPosition = new Vector3(-((GetPos2().x - GetPos1().x) / 2.0f + 0.4f), (GetPos2().y - GetPos1().y) / 2.0f + 0.4f, -((GetPos2().z - GetPos1().z) / 2.0f + 0.4f));
+        model.transform.GetChild(8).localPosition = new Vector3(-((GetPos2().x - GetPos1().x) / 2.0f + 0.4f), -((GetPos2().y - GetPos1().y) / 2.0f + 0.4f), -((GetPos2().z - GetPos1().z) / 2.0f + 0.4f));
+        model.transform.GetChild(9).localPosition = new Vector3((GetPos2().x - GetPos1().x) / 2.0f + 0.4f, (GetPos2().y - GetPos1().y) / 2.0f + 0.4f, -((GetPos2().z - GetPos1().z) / 2.0f + 0.4f));
+        model.transform.GetChild(10).localPosition = new Vector3((GetPos2().x - GetPos1().x) / 2.0f + 0.4f, -((GetPos2().y - GetPos1().y) / 2.0f + 0.4f), -((GetPos2().z - GetPos1().z) / 2.0f + 0.4f));
     }
 
     public override TileElement GenerateTileElement(params object[] vars)

@@ -170,6 +170,11 @@ public class LevelManager : MonoBehaviour
             {
                 UndoTurn();
             }
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                RemoveBoard();
+                LoadLevel("auburn", "heights");
+            }
             CameraManager.current.GetCameraOrientation();
             yield return null;
         }
@@ -352,5 +357,22 @@ public class LevelManager : MonoBehaviour
     public void AddUndoData (BoardStateChange stateChange)
     {
         undoData.Peek().Push(stateChange);
+    }
+
+    public void RemoveBoard ()
+    {
+        for(int x = 0; x < board.GetLength(0); x++)
+        {
+            for (int y = 0; y < board.GetLength(1); y++)
+            {
+                for (int z = 0; z < board.GetLength(2); z++)
+                {
+                    if (board[x, y, z] != null)
+                    {
+                        board[x, y, z].EditorDeleteTileElement(board);
+                    }
+                }
+            }
+        }
     }
 }
