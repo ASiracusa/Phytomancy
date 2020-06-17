@@ -51,7 +51,7 @@ public class CameraManager : MonoBehaviour
 
             RaycastHit hitBoth;
             Ray rayBoth = cam.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(rayBoth, out hitBoth, 100, ~(8|9)))
+            if (Physics.Raycast(rayBoth, out hitBoth, 100, LayerMask.GetMask("Ground", "NotGround")))
             {
                 if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
                 {

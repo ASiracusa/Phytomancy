@@ -88,10 +88,11 @@ public class Ground : Monocoord, IColorable
         return facets;
     }
 
-    public void ColorFacets(Color32[] palette)
+    public void ColorFacets(Color[] palette)
     {
         for (int i = 0; i < 6; i++)
         {
+            Debug.Log(facets.Length);
             model.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = palette[(int)facets[i]];
         }
     }

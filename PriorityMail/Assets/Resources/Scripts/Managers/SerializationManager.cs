@@ -31,10 +31,31 @@ public class SerializationManager
         return true;
     }
 
-    public static object LoadLevel (string path)
+    public static bool SaveWorld(string worldName, object levelData)
+    {
+        BinaryFormatter formatter = GetBinaryFormatter();
+
+        if (!Directory.Exists(Application.persistentDataPath + "/worlds"))
+        {
+            Directory.CreateDirectory(Application.persistentDataPath + "/worlds");
+        }
+
+        string path = Application.persistentDataPath + "/worlds/" + worldName + "/worldData.wld";
+
+        FileStream file = File.Create(path);
+
+        formatter.Serialize(file, levelData);
+
+        file.Close();
+
+        return true;
+    }
+
+    public static object LoadData (string path)
     {
         if (!File.Exists(path))
         {
+            Debug.Log("cant find it");
             return null;
         }
 

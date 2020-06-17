@@ -9,6 +9,7 @@ public class LevelManager : MonoBehaviour
     public static LevelManager current;
 
     private LevelData levelData;
+    private string levelPath;
 
     private TileElement[,,] board;
     private Stack<Stack<BoardStateChange>> undoData;
@@ -18,19 +19,19 @@ public class LevelManager : MonoBehaviour
     public LinkedList<TileAnimationMovement> movementAnims;
     public LinkedList<TileAnimationFall> fallAnims;
 
-    public Color32[] palette = new Color32[]
+    public Color[] palette = new Color[]
     {
-        new Color32 (0x03, 0x02, 0x25, 0xFF),
-        new Color32 (0x21, 0x20, 0x51, 0xFF),
-        new Color32 (0x62, 0x4F, 0xCE, 0xFF),
-        new Color32 (0xB5, 0x35, 0xD4, 0xFF),
-        new Color32 (0xD4, 0x35, 0x89, 0xFF),
-        new Color32 (0xD9, 0x1E, 0x37, 0xFF),
-        new Color32 (0xD2, 0x72, 0x33, 0xFF),
-        new Color32 (0xDB, 0xCF, 0x34, 0xFF),
-        new Color32 (0x76, 0xD4, 0x35, 0xFF),
-        new Color32 (0x46, 0xD4, 0x95, 0xFF),
-        new Color32 (0x1E, 0xD9, 0xD9, 0xFF),
+        Color.black,
+        Color.red,
+        Color.blue,
+        Color.yellow,
+        Color.green,
+        Color.magenta,
+        Color.cyan,
+        Color.white,
+        Color.gray,
+        Color.black,
+        Color.magenta,
     };
 
     // Start is called before the first frame update
@@ -42,18 +43,13 @@ public class LevelManager : MonoBehaviour
             5, 0, 0, 0, 7, 0, 0, 0, 0, 3
         };
 
-        LoadLevel("auburn", "heights");
-        CameraManager.current.onClick += CreateVine;
-
-        StartCoroutine(BrambleInput());
-        GenerateAvailableVinesUI();
-
-        CameraManager.current.CalibrateCamera(board);
+        //LoadLevel("auburn");
+        
     }
 
-    private void LoadLevel(string worldName, string levelName)
+    private void LoadLevel(string levelPath)
     {
-        levelData = (LevelData)SerializationManager.LoadLevel(Application.persistentDataPath + "/worlds/" + worldName + "/" + levelName + ".lvl");
+        levelData = (LevelData)SerializationManager.LoadData(levelPath);
         TileElement tileModel = Constants.TILE_MODELS[(int)TileElementNames.Ground];
         undoData = new Stack<Stack<BoardStateChange>>();
         movementAnims = new LinkedList<TileAnimationMovement>();
@@ -179,7 +175,11 @@ public class LevelManager : MonoBehaviour
                 if (Input.GetKeyDown(KeyCode.R))
                 {
                     RemoveBoard();
-                    LoadLevel("auburn", "heights");
+                    LoadLevel(levelPath);
+                }
+                if (Input.GetKeyDown(KeyCode.Escape))
+                {
+                    LeaveLevel();
                 }
                 CameraManager.current.GetCameraOrientation();
 
@@ -435,5 +435,60 @@ public class LevelManager : MonoBehaviour
         }
 
         yield return null;
+    }
+
+    public void OpenLevel(WorldData worldData, string _levelPath)
+    {
+        levelPath = _levelPath;
+        palette = new Color[]
+        {
+            new Color(worldData.reds[0], worldData.greens[0], worldData.blues[0]),
+            new Color(worldData.reds[1], worldData.greens[1], worldData.blues[1]),
+            new Color(worldData.reds[2], worldData.greens[2], worldData.blues[2]),
+            new Color(worldData.reds[3], worldData.greens[3], worldData.blues[3]),
+            new Color(worldData.reds[4], worldData.greens[4], worldData.blues[4]),
+            new Color(worldData.reds[5], worldData.greens[5], worldData.blues[5]),
+            new Color(worldData.reds[6], worldData.greens[6], worldData.blues[6]),
+            new Color(worldData.reds[7], worldData.greens[7], worldData.blues[7]),
+            new Color(worldData.reds[8], worldData.greens[8], worldData.blues[8]),
+            new Color(worldData.reds[9], worldData.greens[9], worldData.blues[9]),
+            new Color(worldData.reds[10], worldData.greens[10], worldData.blues[10])
+        };
+        LoadLevel(levelPath);
+
+        CameraManager.current.onClick += CreateVine;
+
+        StartCoroutine(BrambleInput());
+        GenerateAvailableVinesUI();
+
+        CameraManager.current.CalibrateCamera(board);
+    }
+
+    public void DeleteAVUI (GameObject avui)
+    {
+        if (avui.transform.childCount != 1)
+        {
+            DeleteAVUI(avui.transform.GetChild(1).gameObject);
+        }
+        Destroy(avui.transform.GetChild(0).gameObject);
+        Destroy(avui);
+    }
+
+    public void LeaveLevel()
+    {
+        RemoveBoard();
+
+        CameraManager.current.onClick -= CreateVine;
+
+        StopCoroutine(BrambleInput());
+
+        GameObject avBase = GameObject.Find("PlayerCanvas/AvailableVinesMenu/AVAnchor");
+        DeleteAVUI(avBase.transform.GetChild(0).gameObject);
+        
+        //Destroy(avBase.transform.GetChild(0));
+
+        avBase.transform.localPosition = new Vector3(-37.5f, 0, 0);
+
+        PlayerMenuManager.current.ReturnToLevelSelector();
     }
 }
