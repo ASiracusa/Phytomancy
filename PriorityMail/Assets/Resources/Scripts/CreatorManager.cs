@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEditor;
 using UnityEngine.EventSystems;
 using TMPro;
 using System;
@@ -79,6 +78,12 @@ public class CreatorManager : MonoBehaviour
         Vector3Int secondarySelection = CameraManager.GetAdjacentCoords(hit, left);
 
         NormalizeCoords(ref primarySelection, ref secondarySelection);
+
+        if (primarySelection.x < 0 || primarySelection.y < 0 || primarySelection.z < 0 ||
+            secondarySelection.x >= board.GetLength(0) || secondarySelection.y >= board.GetLength(1) || secondarySelection.z >= board.GetLength(2))
+        {
+            return;
+        }
 
         object[] constructorVals = new object[]
         {
@@ -259,7 +264,7 @@ public class CreatorManager : MonoBehaviour
             button.transform.localPosition = new Vector3(-120 + (60 * (i % 5)), 130 - (80 * (i / 5)), 1);
             int _i = i;
             button.GetComponent<Button>().onClick.AddListener(delegate { ChangeColor(_i + 1); });
-            button.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "0";
+            button.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = levelData == null ? "0" : levelData.availableVines[i].ToString();
             button.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(delegate { EditAvailableVines(_i, true); });
             button.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(delegate { EditAvailableVines(_i, false); });
             button.GetComponent<Image>().color = palette[i + 1];
@@ -403,24 +408,25 @@ public class CreatorManager : MonoBehaviour
 
     public void SaveLevel()
     {
+        // Don't save if the vital components are missing or if the level is unnamed
         if (bramble == null || sigil == null)
         {
-            print("needs vital tiles");
             return;
         }
 
         if (GameObject.Find("EditorCanvas/LeftMenu/InfoMenu/LevelName").GetComponent<TMP_InputField>().text.Length == 0)
         {
-            print("unnamed level");
             return;
         }
 
+        // Initialize arrays and lists
         Shade[,,][] grounds = new Shade[board.GetLength(0), board.GetLength(1), board.GetLength(2)][];
 
         LinkedList<TileElementNames> dataTypes = new LinkedList<TileElementNames>();
         LinkedList<int> dataInts = new LinkedList<int>();
         LinkedList<Shade> dataShades = new LinkedList<Shade>();
 
+        // Compile the non-essential elements and grounds in their respective lists/arrays
         for (int x = 0; x < board.GetLength(0); x++)
         {
             for (int y = 0; y < board.GetLength(1); y++)
@@ -442,6 +448,7 @@ public class CreatorManager : MonoBehaviour
             }
         }
 
+        // Create the LevelData
         LevelData _ld = new LevelData(
             GameObject.Find("EditorCanvas/LeftMenu/InfoMenu/LevelName").GetComponent<TMP_InputField>().text,
             new int[]
@@ -464,10 +471,10 @@ public class CreatorManager : MonoBehaviour
             dataShades.ToArray()
         );
 
+        // Create the file for the level
         SerializationManager.SaveLevel(EditorMenuManager.current.GetWorldName(), _ld.levelName, _ld);
 
         LevelData ld = (LevelData)SerializationManager.LoadData(Application.persistentDataPath + "/worlds/" + EditorMenuManager.current.GetWorldName() + "/" + _ld.levelName + ".lvl");
-        print(ld.sigilCoords);
     }
 
 
@@ -494,7 +501,8 @@ public class CreatorManager : MonoBehaviour
         }
 
         GameObject.Find("EditorCanvas/LeftMenu/InfoMenu/LevelName").GetComponent<TMP_InputField>().text = "";
-
+        availableVines = new int[10];
+        
         CameraManager.current.CalibrateCamera(board);
     }
 
@@ -502,9 +510,9 @@ public class CreatorManager : MonoBehaviour
     {
         CameraManager.current.onClickBoth += SetPrimarySelection;
         CameraManager.current.onReleaseBoth += ExecuteSelection;
-
-        availableVines = new int[10];
+        
         GeneratePaletteMenu();
+        GameObject.Find("LevelAnchor/CameraAnchor/Camera").GetComponent<Camera>().backgroundColor = palette[0];
 
         StartCoroutine(ShowAndHideEditorMenu());
     }
@@ -516,6 +524,10 @@ public class CreatorManager : MonoBehaviour
 
         availableVines = null;
         RemoveBoard();
+        foreach (Transform t in GameObject.Find("EditorCanvas/LeftMenu/ColorMenu").transform)
+        {
+            Destroy(t.gameObject);
+        }
 
         StopCoroutine(ShowAndHideEditorMenu());
     }
@@ -580,6 +592,8 @@ public class CreatorManager : MonoBehaviour
     {
         levelData = (LevelData)SerializationManager.LoadData(levelPath);
         TileElement tileModel = Constants.TILE_MODELS[(int)TileElementNames.Ground];
+
+        availableVines = levelData.availableVines;
 
         board = new TileElement[levelData.grounds.GetLength(0), levelData.grounds.GetLength(1), levelData.grounds.GetLength(2)];
         for (int x = 0; x < board.GetLength(0); x++)

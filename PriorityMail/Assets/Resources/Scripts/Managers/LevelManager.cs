@@ -19,6 +19,8 @@ public class LevelManager : MonoBehaviour
     public LinkedList<TileAnimationMovement> movementAnims;
     public LinkedList<TileAnimationFall> fallAnims;
 
+    private Coroutine brambleInput;
+
     public Color[] palette = new Color[]
     {
         Color.black,
@@ -33,6 +35,7 @@ public class LevelManager : MonoBehaviour
         Color.black,
         Color.magenta,
     };
+    public Material[] materials;
 
     // Start is called before the first frame update
     void Start()
@@ -49,12 +52,16 @@ public class LevelManager : MonoBehaviour
 
     private void LoadLevel(string levelPath)
     {
+        // Load LevelData and initialize the lists
         levelData = (LevelData)SerializationManager.LoadData(levelPath);
         TileElement tileModel = Constants.TILE_MODELS[(int)TileElementNames.Ground];
         undoData = new Stack<Stack<BoardStateChange>>();
         movementAnims = new LinkedList<TileAnimationMovement>();
         fallAnims = new LinkedList<TileAnimationFall>();
 
+        availableVines = levelData.availableVines;
+
+        // Create the Grounds
         board = new TileElement[levelData.grounds.GetLength(0), levelData.grounds.GetLength(1), levelData.grounds.GetLength(2)];
         for (int x = 0; x < board.GetLength(0); x++)
         {
@@ -71,22 +78,25 @@ public class LevelManager : MonoBehaviour
                         board[x, y, z].model = Instantiate(Resources.Load("Models/Ground")) as GameObject;
                         board[x, y, z].BindDataToModel();
                         board[x, y, z].WarpToPos();
-                        ((Ground)board[x, y, z]).ColorFacets(palette);
+                        ((Ground)board[x, y, z]).ColorFacets(materials);
                     }
                 }
             }
         }
 
+        // Create Bramble and save his position
         bramble = (Bramble)Constants.TILE_MODELS[(int)TileElementNames.Bramble].LoadTileElement(new object[]
         {
             new Vector3Int(levelData.brambleCoords[0], levelData.brambleCoords[1], levelData.brambleCoords[2]),
             levelData.brambleDirection
         });
         bramble.model = Instantiate(Resources.Load("Models/Bramble")) as GameObject;
+        print(bramble.model == null);
         bramble.BindDataToModel();
         bramble.WarpToPos();
         board[bramble.GetPos().x, bramble.GetPos().y, bramble.GetPos().z] = bramble;
 
+        // Create the Sigil
         board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]] = (Sigil)Constants.TILE_MODELS[(int)TileElementNames.Sigil].LoadTileElement(new object[]
         {
             new Vector3Int(levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]),
@@ -95,6 +105,7 @@ public class LevelManager : MonoBehaviour
         board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]].BindDataToModel();
         board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]].WarpToPos();
 
+        // Convert the data arrays to Queues
         Queue<int> intQueue = new Queue<int>();
         for (int i = 0; i < levelData.dataInts.Length; i++)
         {
@@ -106,6 +117,7 @@ public class LevelManager : MonoBehaviour
             shadeQueue.Enqueue(levelData.dataShades[i]);
         }
 
+        // Decompile all of the non-essential elements
         for (int i = 0; i < levelData.tileTypes.Length; i++)
         {
             TileElement tileBase = Constants.TILE_MODELS[(int)levelData.tileTypes[i]];
@@ -143,29 +155,37 @@ public class LevelManager : MonoBehaviour
             if (movementAnims.Count == 0 && fallAnims.Count == 0)
             {
                 Facet camDirection = CameraManager.current.GetCameraOrientation();
-                if (Input.GetKey(KeyCode.W))
+
+                if (bramble.model != null)
                 {
-                    undoData.Push(new Stack<BoardStateChange>());
-                    bramble.InitiatePush(board, (Facet)(((int)Facet.North + (int)camDirection) % 4), null);
-                    ClearSpaciousTiles();
-                }
-                if (Input.GetKey(KeyCode.S))
-                {
-                    undoData.Push(new Stack<BoardStateChange>());
-                    bramble.InitiatePush(board, (Facet)(((int)Facet.South + (int)camDirection) % 4), null);
-                    ClearSpaciousTiles();
-                }
-                if (Input.GetKey(KeyCode.A))
-                {
-                    undoData.Push(new Stack<BoardStateChange>());
-                    bramble.InitiatePush(board, (Facet)(((int)Facet.West + (int)camDirection) % 4), null);
-                    ClearSpaciousTiles();
-                }
-                if (Input.GetKey(KeyCode.D))
-                {
-                    undoData.Push(new Stack<BoardStateChange>());
-                    bramble.InitiatePush(board, (Facet)(((int)Facet.East + (int)camDirection) % 4), null);
-                    ClearSpaciousTiles();
+                    if (Input.GetKey(KeyCode.W))
+                    {
+                        undoData.Push(new Stack<BoardStateChange>());
+                        bramble.InitiatePush(board, (Facet)(((int)Facet.North + (int)camDirection) % 4), null);
+                        bramble.model.transform.localEulerAngles = new Vector3(0, 90 - 90 * (int)camDirection, 0);
+                        ClearSpaciousTiles();
+                    }
+                    if (Input.GetKey(KeyCode.S))
+                    {
+                        undoData.Push(new Stack<BoardStateChange>());
+                        bramble.InitiatePush(board, (Facet)(((int)Facet.South + (int)camDirection) % 4), null);
+                        bramble.model.transform.localEulerAngles = new Vector3(0, 270 - 90 * (int)camDirection, 0);
+                        ClearSpaciousTiles();
+                    }
+                    if (Input.GetKey(KeyCode.A))
+                    {
+                        undoData.Push(new Stack<BoardStateChange>());
+                        bramble.InitiatePush(board, (Facet)(((int)Facet.West + (int)camDirection) % 4), null);
+                        bramble.model.transform.localEulerAngles = new Vector3(0, 0 - 90 * (int)camDirection, 0);
+                        ClearSpaciousTiles();
+                    }
+                    if (Input.GetKey(KeyCode.D))
+                    {
+                        undoData.Push(new Stack<BoardStateChange>());
+                        bramble.InitiatePush(board, (Facet)(((int)Facet.East + (int)camDirection) % 4), null);
+                        bramble.model.transform.localEulerAngles = new Vector3(0, 180 - 90 * (int)camDirection, 0);
+                        ClearSpaciousTiles();
+                    }
                 }
 
                 if (Input.GetKeyDown(KeyCode.Z))
@@ -176,6 +196,12 @@ public class LevelManager : MonoBehaviour
                 {
                     RemoveBoard();
                     LoadLevel(levelPath);
+
+                    GameObject avBase = GameObject.Find("PlayerCanvas/AvailableVinesMenu/AVAnchor");
+                    DeleteAVUI(avBase.transform.GetChild(0).gameObject);
+                    avBase.transform.localPosition = new Vector3(-37.5f, 0, 0);
+
+                    GenerateAvailableVinesUI();
                 }
                 if (Input.GetKeyDown(KeyCode.Escape))
                 {
@@ -210,6 +236,12 @@ public class LevelManager : MonoBehaviour
                 if (vinesOfColor > 0 && (!(board[stemCoords.x, stemCoords.y, stemCoords.z] is Vine) || ((Vine)board[stemCoords.x, stemCoords.y, stemCoords.z]).GetVine() == null))
                 {
                     Vector3Int vineCoords = CameraManager.GetAdjacentCoords(hit, true);
+                    if (vineCoords.x < 0 || vineCoords.y < 0 || vineCoords.z < 0 ||
+                    vineCoords.x >= board.GetLength(0) || vineCoords.y >= board.GetLength(1) || vineCoords.z >= board.GetLength(2))
+                    {
+                        return;
+                    }
+
                     TileElement tileAtPos = board[vineCoords.x, vineCoords.y, vineCoords.z];
                     Vector3Int direction = vineCoords - ((Monocoord)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).GetPos();
 
@@ -236,6 +268,7 @@ public class LevelManager : MonoBehaviour
                     board[vineCoords.x, vineCoords.y, vineCoords.z].model = Instantiate(Resources.Load("Models/Vine")) as GameObject;
                     board[vineCoords.x, vineCoords.y, vineCoords.z].model.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material.color = palette[(int)vine.GetColor()];
                     board[vineCoords.x, vineCoords.y, vineCoords.z].BindDataToModel();
+                    board[vineCoords.x, vineCoords.y, vineCoords.z].AdjustRender();
                     board[vineCoords.x, vineCoords.y, vineCoords.z].WarpToPos();
 
                     AddUndoData(new BoardCreationState(vine));
@@ -314,7 +347,7 @@ public class LevelManager : MonoBehaviour
         }
     }
 
-    private void AdjustAvailableVinesUI(Shade color, int amount)
+    public void AdjustAvailableVinesUI(Shade color, int amount)
     {
         GameObject avBase = GameObject.Find("PlayerCanvas/AvailableVinesMenu/AVAnchor");
         GameObject avIcon = avBase.transform.GetChild(0).gameObject;
@@ -351,7 +384,7 @@ public class LevelManager : MonoBehaviour
         
     }
 
-    private void UndoTurn ()
+    public void UndoTurn ()
     {
         if (undoData.Count > 0)
         {
@@ -387,10 +420,8 @@ public class LevelManager : MonoBehaviour
 
     public IEnumerator AnimateTileStateChange()
     {
-        Debug.Log("is it even called?");
         if (movementAnims.Count > 0)
         {
-            Debug.Log("atsc is called and things exist");
             float startTime = Time.time;
             while (Time.time - startTime < 0.1f)
             {
@@ -414,8 +445,7 @@ public class LevelManager : MonoBehaviour
             {
                 tileAnim.SetStartPos();
             }
-
-            Debug.Log("atsc is called and things exist");
+            
             float startTime = Time.time;
             
             while (Time.time - startTime < 0.2f)
@@ -454,13 +484,21 @@ public class LevelManager : MonoBehaviour
             new Color(worldData.reds[9], worldData.greens[9], worldData.blues[9]),
             new Color(worldData.reds[10], worldData.greens[10], worldData.blues[10])
         };
+        materials = new Material[11];
+        for (int i = 0; i < 11; i++)
+        {
+            materials[i] = new Material(Resources.Load<Material>("Materials/BasicTexture"));
+            materials[i].color = palette[i];
+        }
+
         LoadLevel(levelPath);
 
         CameraManager.current.onClick += CreateVine;
-
-        StartCoroutine(BrambleInput());
+        
+        brambleInput = StartCoroutine(BrambleInput());
         GenerateAvailableVinesUI();
 
+        GameObject.Find("LevelAnchor/CameraAnchor/Camera").GetComponent<Camera>().backgroundColor = palette[0];
         CameraManager.current.CalibrateCamera(board);
     }
 
@@ -477,10 +515,11 @@ public class LevelManager : MonoBehaviour
     public void LeaveLevel()
     {
         RemoveBoard();
+        Destroy(bramble.model);
 
         CameraManager.current.onClick -= CreateVine;
 
-        StopCoroutine(BrambleInput());
+        StopCoroutine(brambleInput);
 
         GameObject avBase = GameObject.Find("PlayerCanvas/AvailableVinesMenu/AVAnchor");
         DeleteAVUI(avBase.transform.GetChild(0).gameObject);
@@ -490,5 +529,10 @@ public class LevelManager : MonoBehaviour
         avBase.transform.localPosition = new Vector3(-37.5f, 0, 0);
 
         PlayerMenuManager.current.ReturnToLevelSelector();
+    }
+
+    public void WinLevel ()
+    {
+        LeaveLevel();
     }
 }

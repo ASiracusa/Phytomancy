@@ -84,11 +84,15 @@ public abstract class Dicoord : TileElement
         }
     }
 
+    // Moves the TileElement in the given direction one space
+    // This should only be called if all spaces in the given direction are emptys
     public override bool Move(TileElement[,,] board, Facet direction)
     {
+        // Adds the undo data for movement
         Moving = true;
         LevelManager.current.AddUndoData(new BoardMovementState(this, pos1));
 
+        // Removes the pointers to this object in the area it leaves
         PerformOnFacet(ref board, Constants.FlipDirection(direction), false, (int x, int y, int z) =>
         {
             if (board[x, y, z] is IMonoSpacious) {
@@ -102,6 +106,7 @@ public abstract class Dicoord : TileElement
             return true;
         });
 
+        // Adds the pointers to this object in the area it enters
         PerformOnFacet(ref board, direction, true, (int x, int y, int z) =>
         {
             if (board[x, y, z] is IMonoSpacious)
@@ -118,6 +123,7 @@ public abstract class Dicoord : TileElement
             return true;
         });
 
+        // Sets its new position and adds it to the animation list
         Vector3Int newPos1 = GetPos1() + Constants.FacetToVector(direction);
         Vector3Int newPos2 = GetPos2() + Constants.FacetToVector(direction);
         SetCoords(new int[] {
@@ -131,8 +137,10 @@ public abstract class Dicoord : TileElement
 
     public override bool Push(TileElement[,,] board, Facet direction, LinkedList<TileElement> evaluatedTiles)
     {
+        // Checks if a push is even possible
         if (TryPush(board, direction, evaluatedTiles))
         {
+            // Executes Push() on each TileElement on the given facet
             PerformOnFacet(ref board, direction, true, (int x, int y, int z) =>
             {
                 if (board[x, y, z] == null)
@@ -146,6 +154,7 @@ public abstract class Dicoord : TileElement
                 return true;
             });
 
+            // Moves the TileElements on top of this object if there are any
             if (pos2.y != board.GetLength(1) - 1)
             {
                 for (int x = pos1.x; x <= pos2.x; x++)
@@ -160,6 +169,7 @@ public abstract class Dicoord : TileElement
                 }
             }
 
+            // Moves the object if it hasn't yet this turn
             if (!Moving)
             {
                 Move(board, direction);
@@ -169,7 +179,6 @@ public abstract class Dicoord : TileElement
         }
 
         evaluatedTiles.AddFirst(this);
-        //Fall(board);
         return false;
     }
 
@@ -197,6 +206,7 @@ public abstract class Dicoord : TileElement
             return true;
         });
         
+        // Adds TileElement to the list of pushable TileElements if necessary
         if (tryPushAttempt != null && !tryPushAttempt.Contains(false))
         {
             evaluatedTiles.AddFirst(this);
@@ -207,13 +217,16 @@ public abstract class Dicoord : TileElement
 
     public override bool Fall(TileElement[,,] board)
     {
+        // Massless objects can't fall
         if (Massless)
         {
             return false;
         }
 
+        // Add undo data since the only condition for not falling is being massless
         LevelManager.current.AddUndoData(new BoardMovementState(this, pos1));
 
+        // Find the tile underneath it that is solid
         int yBelow;
         for (yBelow = pos1.y - 1; yBelow >= 0; yBelow--)
         {
@@ -228,13 +241,16 @@ public abstract class Dicoord : TileElement
             }
         }
 
+        // If falling is unnecessary, stop execution
         if (yBelow == pos1.y - 1)
         {
             return false;
         }
 
+        // Save the top of the object for later
         int yAbove = GetPos2().y + 1;
-        
+
+        // Clear the space that the object takes up
         for (int x = pos1.x; x <= pos2.x; x++)
         {
             for (int y = pos1.y; y <= pos2.y; y++)
@@ -254,6 +270,7 @@ public abstract class Dicoord : TileElement
             }
         }
 
+        // Delete the object entirely if there is nothing to land on
         if (yBelow == -1)
         {
             for (int x = pos1.x; x <= pos2.x; x++)
@@ -278,6 +295,7 @@ public abstract class Dicoord : TileElement
 
             RemoveModel();
         }
+        // Otherwise, place the object in its new location
         else
         {
             pos2.y = yBelow + 1 + (pos2.y - pos1.y);
@@ -305,6 +323,7 @@ public abstract class Dicoord : TileElement
             }
         }
 
+        // Make objects above this object fall as well
         LinkedList<TileElement> evaluatedTileElements = new LinkedList<TileElement>();
         for (int x = pos1.x; x <= pos2.x; x++)
         {
@@ -312,15 +331,9 @@ public abstract class Dicoord : TileElement
             {
                 if (board[x, yAbove, z] != null && !board[x, yAbove, z].Checked)
                 {
-                    //board[x, yAbove, z].Checked = true;
                     board[x, yAbove, z].Fall(board);
                 }
             }
-        }
-        // Uncheck all of the TileElements before returning
-        foreach (TileElement te in evaluatedTileElements)
-        {
-            //te.Checked = false;
         }
 
         return true;
@@ -387,16 +400,19 @@ public abstract class Dicoord : TileElement
         return outs;
     }
 
+    // Starts a push chain
     public override bool InitiatePush(TileElement[,,] board, Facet direction, Monocoord newOccupant)
     {
         LinkedList<TileElement> evaluatedTiles = new LinkedList<TileElement>();
         if (Push(board, direction, evaluatedTiles))
         {
+            // Sets the newOccupant to its position if push is successful
             if (newOccupant != null)
             {
                 board[newOccupant.GetPos().x, newOccupant.GetPos().y, newOccupant.GetPos().z] = newOccupant;
             }
 
+            // All pushed elements are dropped and their physics helper properties are reset
             foreach (TileElement te in evaluatedTiles)
             {
                 te.Fall(board);
@@ -405,6 +421,7 @@ public abstract class Dicoord : TileElement
             }
             evaluatedTiles.Clear();
 
+            // Executes movement animation
             LevelManager.current.StartCoroutine(LevelManager.current.AnimateTileStateChange());
 
             return true;

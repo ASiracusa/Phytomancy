@@ -38,7 +38,7 @@ public class PlayerMenuManager : MonoBehaviour
 
         string[] worldNames = Directory.GetDirectories(Application.persistentDataPath + "/worlds");
 
-        GameObject worldAssetModel = Resources.Load<GameObject>("Prefabs/WorldEditorUIElement");
+        GameObject worldAssetModel = Resources.Load<GameObject>("Prefabs/LevelPlayerUIElement");
         for (int i = 0; i < worldNames.Length; i++)
         {
             GameObject worldAsset = Instantiate(worldAssetModel, GameObject.Find("LevelMenuCanvas/WorldSelectorMenu/WorldsPanel").transform);
@@ -69,7 +69,7 @@ public class PlayerMenuManager : MonoBehaviour
         
         string[] levelNames = Directory.GetFiles(Application.persistentDataPath + "/worlds\\" + worldData.worldName);
 
-        GameObject levelAssetModel = Resources.Load<GameObject>("Prefabs/WorldEditorUIElement");
+        GameObject levelAssetModel = Resources.Load<GameObject>("Prefabs/LevelPlayerUIElement");
         int levelNameOffset = -1;
         for (int i = 0; i < levelNames.Length; i++)
         {

@@ -115,4 +115,24 @@ public class Constants
         return flips[(int)facet];
     }
 
+    public static readonly Vector3[] VINE_STRETCHES = new Vector3[]
+    {
+        new Vector3(1, 0.8f, 0.8f),
+        new Vector3(0.8f, 0.8f, 1),
+        new Vector3(1, 0.8f, 0.8f),
+        new Vector3(0.8f, 0.8f, 1),
+        new Vector3(0.8f, 1, 0.8f),
+        new Vector3(0.8f, 1, 0.8f)
+    };
+
+    public static readonly Vector3[] VINE_ANCHORS = new Vector3[]
+    {
+        new Vector3(0.1f, 0.1f, 0),
+        new Vector3(0, 0.1f, 0.1f),
+        new Vector3(-0.1f, 0.1f, 0),
+        new Vector3(0, 0.1f, -0.1f),
+        new Vector3(0, 0, 0),
+        new Vector3(0, 0, 0)
+    };
+
 }

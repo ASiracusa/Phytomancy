@@ -1,8 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using TMPro;
 using UnityEngine.UI;
@@ -108,11 +106,10 @@ public class EditorMenuManager : MonoBehaviour
         }
 
         GameObject.Find("EditorMenuCanvas/WorldEditorMenu/Levels/WorldName").GetComponent<TMP_InputField>().text = worldData.worldName;
+        worldName = worldData.worldName;
         GameObject.Find("EditorMenuCanvas/WorldEditorMenu/Levels/WorldName").GetComponent<TMP_InputField>().onValueChanged.AddListener(delegate { ChangeWorldName(GameObject.Find("EditorMenuCanvas/WorldEditorMenu/Levels/WorldName").GetComponent<TMP_InputField>()); });
-
-        print(worldData.worldName);
+        
         string[] levelNames = Directory.GetFiles(Application.persistentDataPath + "/worlds\\" + worldData.worldName);
-        print(levelNames.Length);
 
         GameObject levelAssetModel = Resources.Load<GameObject>("Prefabs/WorldEditorUIElement");
         int levelNameOffset = -1;
@@ -169,9 +166,8 @@ public class EditorMenuManager : MonoBehaviour
             new Color(worldData.reds[9], worldData.greens[9], worldData.blues[9]),
             new Color(worldData.reds[10], worldData.greens[10], worldData.blues[10])
         };
-        print(CreatorManager.current.palette[0].ToString());
-        CreatorManager.current.OpenLevel();
         CreatorManager.current.GenerateNewLevel();
+        CreatorManager.current.OpenLevel();
     }
 
     public void ChangePaletteColor (GameObject paletteBox, int index)
@@ -207,7 +203,7 @@ public class EditorMenuManager : MonoBehaviour
                 string ending = backslashed[backslashed.Length - 1];
                 File.Move(filePath, Application.persistentDataPath + "/worlds/" + worldName + "/" + ending);
             }
-            FileUtil.DeleteFileOrDirectory(Application.persistentDataPath + "/worlds/" + worldData.worldName);
+            Directory.Delete(Application.persistentDataPath + "/worlds/" + worldData.worldName);
             worldData.worldName = worldName;
         }
 
@@ -238,9 +234,8 @@ public class EditorMenuManager : MonoBehaviour
             new Color(worldData.reds[9], worldData.greens[9], worldData.blues[9]),
             new Color(worldData.reds[10], worldData.greens[10], worldData.blues[10])
         };
-
-        CreatorManager.current.OpenLevel();
         CreatorManager.current.LoadLevel(levelPath);
+        CreatorManager.current.OpenLevel();
     }
 
     public void ReturnToTitleScene()

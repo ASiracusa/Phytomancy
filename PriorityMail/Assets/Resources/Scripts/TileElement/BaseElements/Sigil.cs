@@ -19,6 +19,7 @@ public class Sigil : Monocoord, IMonoSpacious
             ((Vector3Int)vars[0]).y,
             ((Vector3Int)vars[0]).z
         });
+        SetPhysics(true, false, true, false);
     }
 
     public override void AdjustRender()
@@ -67,7 +68,13 @@ public class Sigil : Monocoord, IMonoSpacious
         return TileElementNames.Sigil;
     }
 
-    public void TileEnters (TileElement enterer) { }
+    public void TileEnters (TileElement enterer)
+    {
+        if (enterer is Bramble)
+        {
+            LevelManager.current.WinLevel();
+        }
+    }
 
     public void TileLeaves () { }
 }

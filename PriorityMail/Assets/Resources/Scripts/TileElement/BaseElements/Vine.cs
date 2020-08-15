@@ -24,7 +24,10 @@ public class Vine : Monocoord
 
     public override void AdjustRender()
     {
-        model.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material.color = LevelManager.current.palette[(int)color];
+        model.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material.color = Color.Lerp(LevelManager.current.palette[(int)color], Color.black, 0.3f);
+
+        model.transform.GetChild(0).localPosition = Constants.VINE_ANCHORS[(int)origin];
+        model.transform.GetChild(0).localScale = Constants.VINE_STRETCHES[(int)origin];
     }
 
     public override TileElement GenerateTileElement(params object[] vars)

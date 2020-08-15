@@ -96,4 +96,13 @@ public class Ground : Monocoord, IColorable
             model.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = palette[(int)facets[i]];
         }
     }
+
+    public void ColorFacets(Material[] materials)
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            Debug.Log(facets.Length);
+            model.transform.GetChild(i).GetComponent<MeshRenderer>().material = materials[(int)facets[i]];
+        }
+    }
 }

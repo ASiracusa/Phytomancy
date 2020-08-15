@@ -118,6 +118,10 @@ public class BoardCreationState : BoardStateChange
     public override void Revert(TileElement[,,] board)
     {
         tileElement.EditorDeleteTileElement(board);
+        if (tileElement is Vine)
+        {
+            LevelManager.current.AdjustAvailableVinesUI(((Vine)tileElement).GetColor(), 1);
+        }
     }
 }
 
@@ -138,6 +142,10 @@ public class BoardDeletionState : BoardStateChange
         {
             Monocoord monoTile = (Monocoord)tileElement;
             board[monoTile.GetPos().x, monoTile.GetPos().y, monoTile.GetPos().z] = tileElement;
+            if (tileElement is Vine)
+            {
+                LevelManager.current.AdjustAvailableVinesUI(((Vine)tileElement).GetColor(), -1);
+            }
         }
         else
         {

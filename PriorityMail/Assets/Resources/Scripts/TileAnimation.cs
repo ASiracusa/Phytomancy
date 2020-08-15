@@ -23,12 +23,18 @@ public class TileAnimationMovement : TileAnimation
 
     public override void Animate()
     {
-        tileElement.model.transform.position = Vector3.Lerp(tileElement.model.transform.position, targetPos, 0.4f);
+        if (tileElement.model != null)
+        {
+            tileElement.model.transform.position = Vector3.Lerp(tileElement.model.transform.position, targetPos, 0.4f);
+        }
     }
 
     public override void Complete()
     {
-        tileElement.model.transform.position = targetPos;
+        if (tileElement.model != null)
+        {
+            tileElement.model.transform.position = targetPos;
+        }
     }
 }
 

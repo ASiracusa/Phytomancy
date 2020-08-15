@@ -19,6 +19,12 @@ public abstract class Monocoord : TileElement
     
     public override void WarpToPos ()
     {
+        if (model == null)
+        {
+            model = GameObject.Instantiate(Resources.Load("Models/" + TileName())) as GameObject;
+            BindDataToModel();
+            AdjustRender();
+        }
         model.transform.position = pos;
     }
 
@@ -198,7 +204,7 @@ public abstract class Monocoord : TileElement
             ((IMonoSpacious)board[pos.x, pos.y, pos.z]).Helper.GetSolidOccupant() :
             board[pos.x, pos.y, pos.z];
 
-        if (fallSubject.Massless)
+        if (fallSubject == null || fallSubject.Massless)
         {
             return false;
         }
@@ -271,16 +277,19 @@ public abstract class Monocoord : TileElement
         return true;
     }
 
+    // Starts a push chain
     public override bool InitiatePush(TileElement[,,] board, Facet direction, Monocoord newOccupant)
     {
         LinkedList<TileElement> evaluatedTiles = new LinkedList<TileElement>();
         if (Push(board, direction, evaluatedTiles))
         {
+            // Sets the newOccupant to its position if push is successful
             if (newOccupant != null)
             {
                 board[newOccupant.pos.x, newOccupant.pos.y, newOccupant.pos.z] = newOccupant;
             }
 
+            // All pushed elements are dropped and their physics helper properties are reset
             foreach (TileElement te in evaluatedTiles)
             {
                 te.Fall(board);
@@ -289,6 +298,7 @@ public abstract class Monocoord : TileElement
             }
             evaluatedTiles.Clear();
 
+            // Executes movement animation
             LevelManager.current.StartCoroutine(LevelManager.current.AnimateTileStateChange());
 
             return true;
