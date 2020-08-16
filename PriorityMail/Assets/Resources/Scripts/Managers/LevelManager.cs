@@ -241,7 +241,7 @@ public class LevelManager : MonoBehaviour
                     TileElement tileAtPos = board[vineCoords.x, vineCoords.y, vineCoords.z];
                     Vector3Int direction = vineCoords - ((Monocoord)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).GetPos();
 
-                    Vine vine = new Vine(new object[] {
+                    Vine vine = (Vine)Constants.TILE_MODELS[(int)TileElementNames.Vine].GenerateTileElement(new object[] {
                         vineCoords,
                         vineColor,
                         Constants.VectorToFacet(-direction)

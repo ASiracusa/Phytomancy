@@ -204,6 +204,12 @@ public abstract class Monocoord : TileElement
 
     public override bool Fall (TileElement[,,] board)
     {
+        // Massless objects can't fall
+        if (Massless)
+        { 
+            return false;
+        }
+
         TileElement fallSubject = (board[pos.x, pos.y, pos.z] is IMonoSpacious) ?
             ((IMonoSpacious)board[pos.x, pos.y, pos.z]).Helper.GetSolidOccupant() :
             board[pos.x, pos.y, pos.z];
@@ -277,6 +283,7 @@ public abstract class Monocoord : TileElement
                 }
             }
         }
+
         temp?.Fall(board);
         return true;
     }
