@@ -51,6 +51,7 @@ public class TileAnimationFall : TileAnimation
 
     public override void Animate()
     {
+        Debug.Log(tileElement.TileName());
         if (tileElement.model.transform.position.Equals(targetPos))
         {
             return;
@@ -63,7 +64,7 @@ public class TileAnimationFall : TileAnimation
         }
         else
         {
-            tileElement.model.transform.localScale = new Vector3(6.0f / (startPos.y - tileElement.model.transform.position.y + 6), 3.0f - 2.0f / (startPos.y - tileElement.model.transform.position.y + 1), 6.0f / (startPos.y - tileElement.model.transform.position.y + 6));
+            //tileElement.model.transform.localScale = new Vector3(6.0f / (startPos.y - tileElement.model.transform.position.y + 6), 3.0f - 2.0f / (startPos.y - tileElement.model.transform.position.y + 1), 6.0f / (startPos.y - tileElement.model.transform.position.y + 6));
         }
     }
 

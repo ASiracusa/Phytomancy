@@ -300,6 +300,7 @@ public abstract class Dicoord : TileElement
         {
             pos2.y = yBelow + 1 + (pos2.y - pos1.y);
             pos1.y = yBelow + 1;
+            Debug.Log("calls MoveToPos(true);");
             MoveToPos(true);
 
             for (int x = pos1.x; x <= pos2.x; x++)

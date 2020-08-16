@@ -443,9 +443,11 @@ public class LevelManager : MonoBehaviour
             }
             
             float startTime = Time.time;
-            
+
+            Debug.Log(fallAnims.Count);
             while (Time.time - startTime < 0.2f)
             {
+                Debug.Log("it iterated");
                 foreach (TileAnimation tileAnim in fallAnims)
                 {
                     tileAnim.Animate();
@@ -485,8 +487,8 @@ public class LevelManager : MonoBehaviour
         {
             materials[i] = new Material(Resources.Load<Material>("Materials/TwotoneMat"));
             materials[i].SetColor("_TopColor", palette[i]);
-            materials[i].SetColor("_FrontColor", Color.Lerp(palette[i], palette[0], 0.2f));
-            materials[i].SetColor("_SideColor", Color.Lerp(palette[i], palette[0], 0.3f));
+            materials[i].SetColor("_FrontColor", Color.Lerp(palette[i], palette[0], 0.45f));
+            materials[i].SetColor("_SideColor", Color.Lerp(palette[i], palette[0], 0.6f));
         }
 
         LoadLevel(levelPath);
