@@ -52,7 +52,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4a1034d54bfd1a947ae3338dccf8daf0, type: 2}
+  - {fileID: 2100000, guid: 31a2b0d6b44a5f44394fa0142e4e9f5c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -160,7 +160,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4a1034d54bfd1a947ae3338dccf8daf0, type: 2}
+  - {fileID: 2100000, guid: 31a2b0d6b44a5f44394fa0142e4e9f5c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -268,7 +268,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4a1034d54bfd1a947ae3338dccf8daf0, type: 2}
+  - {fileID: 2100000, guid: 31a2b0d6b44a5f44394fa0142e4e9f5c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -376,7 +376,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4a1034d54bfd1a947ae3338dccf8daf0, type: 2}
+  - {fileID: 2100000, guid: 31a2b0d6b44a5f44394fa0142e4e9f5c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -484,7 +484,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4a1034d54bfd1a947ae3338dccf8daf0, type: 2}
+  - {fileID: 2100000, guid: 31a2b0d6b44a5f44394fa0142e4e9f5c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -551,7 +551,7 @@ GameObject:
   - component: {fileID: 2881292711424800322}
   - component: {fileID: 8854943989707748972}
   m_Layer: 0
-  m_Name: Ground 1
+  m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -641,7 +641,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4a1034d54bfd1a947ae3338dccf8daf0, type: 2}
+  - {fileID: 2100000, guid: 31a2b0d6b44a5f44394fa0142e4e9f5c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

@@ -25,6 +25,7 @@ public class CreatorManager : MonoBehaviour
     private Sigil sigil;
 
     public Color[] palette;
+    public Material[] materials;
     public int[] availableVines;
 
     private delegate void MonocoordFunction(int x, int y, int z);
@@ -230,7 +231,7 @@ public class CreatorManager : MonoBehaviour
                         board[x, y, z].WarpToPos();
                         if (board[x, y, z] is IColorable)
                         {
-                            ((IColorable)board[x, y, z]).ColorFacets(palette);
+                            ((IColorable)board[x, y, z]).ColorFacets(materials);
                         }
                     }
                 }
@@ -383,7 +384,7 @@ public class CreatorManager : MonoBehaviour
     {
         if (hit.transform.gameObject.GetComponent<ColoredMeshBridge>() != null)
         {
-            hit.transform.gameObject.GetComponent<MeshRenderer>().material.color = palette[(int)paintColor];
+            hit.transform.gameObject.GetComponent<MeshRenderer>().material = materials[(int)paintColor];
             ((IColorable)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).SetShade(paintColor,
                 hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index);
         }
@@ -494,7 +495,7 @@ public class CreatorManager : MonoBehaviour
                 );
                 board[x, 0, z] = bottom;
                 bottom.model = Instantiate(Resources.Load("Models/" + tileModel.TileName())) as GameObject;
-                bottom.ColorFacets(palette);
+                bottom.ColorFacets(materials);
                 board[x, 0, z].BindDataToModel();
                 bottom.WarpToPos();
             }

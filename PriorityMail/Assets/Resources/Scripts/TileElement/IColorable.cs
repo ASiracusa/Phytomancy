@@ -7,4 +7,6 @@ public interface IColorable
     void SetShade(Shade shade, int index);
 
     void ColorFacets(Color[] palette);
+
+    void ColorFacets(Material[] materials);
 }

@@ -166,6 +166,14 @@ public class EditorMenuManager : MonoBehaviour
             new Color(worldData.reds[9], worldData.greens[9], worldData.blues[9]),
             new Color(worldData.reds[10], worldData.greens[10], worldData.blues[10])
         };
+        CreatorManager.current.materials = new Material[11];
+        for (int i = 0; i < 11; i++)
+        {
+            CreatorManager.current.materials[i] = new Material(Resources.Load<Material>("Materials/TwotoneMat"));
+            CreatorManager.current.materials[i].SetColor("_TopColor", CreatorManager.current.palette[i]);
+            CreatorManager.current.materials[i].SetColor("_FrontColor", Color.Lerp(CreatorManager.current.palette[i], CreatorManager.current.palette[0], 0.45f));
+            CreatorManager.current.materials[i].SetColor("_SideColor", Color.Lerp(CreatorManager.current.palette[i], CreatorManager.current.palette[0], 0.6f));
+        }
         CreatorManager.current.GenerateNewLevel();
         CreatorManager.current.OpenLevel();
     }
