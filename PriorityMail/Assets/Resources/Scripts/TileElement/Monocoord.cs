@@ -133,7 +133,11 @@ public abstract class Monocoord : TileElement
         {
             pushSubject?.Push(board, direction, evaluatedTiles);
 
-            temp?.Push(board, direction, evaluatedTiles);
+            //temp?.Push(board, direction, evaluatedTiles);
+            if (temp != null && temp.Pushable)
+            {
+                temp.Push(board, direction, evaluatedTiles);
+            }
 
             if (!Moving)
             {

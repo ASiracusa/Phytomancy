@@ -45,9 +45,6 @@ public class LevelManager : MonoBehaviour
         availableVines = new int[10] {
             5, 0, 0, 0, 7, 0, 0, 0, 0, 3
         };
-
-        //LoadLevel("auburn");
-        
     }
 
     private void LoadLevel(string levelPath)
@@ -91,7 +88,6 @@ public class LevelManager : MonoBehaviour
             levelData.brambleDirection
         });
         bramble.model = Instantiate(Resources.Load("Models/Bramble")) as GameObject;
-        print(bramble.model == null);
         bramble.BindDataToModel();
         bramble.WarpToPos();
         board[bramble.GetPos().x, bramble.GetPos().y, bramble.GetPos().z] = bramble;

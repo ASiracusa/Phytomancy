@@ -161,7 +161,7 @@ public abstract class Dicoord : TileElement
                 {
                     for (int z = pos1.z; z <= pos2.z; z++)
                     {
-                        if (board[x, pos2.y + 1, z] != null && !board[x, pos2.y + 1, z].Checked)
+                        if (board[x, pos2.y + 1, z] != null && board[x, pos2.y + 1, z].Pushable && !board[x, pos2.y + 1, z].Checked)
                         {
                             board[x, pos2.y + 1, z].Push(board, direction, evaluatedTiles);
                         }
