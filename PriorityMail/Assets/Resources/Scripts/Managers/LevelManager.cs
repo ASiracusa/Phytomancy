@@ -487,8 +487,10 @@ public class LevelManager : MonoBehaviour
         materials = new Material[11];
         for (int i = 0; i < 11; i++)
         {
-            materials[i] = new Material(Resources.Load<Material>("Materials/BasicTexture"));
-            materials[i].color = palette[i];
+            materials[i] = new Material(Resources.Load<Material>("Materials/TwotoneMat"));
+            materials[i].SetColor("_TopColor", palette[i]);
+            materials[i].SetColor("_FrontColor", Color.Lerp(palette[i], palette[0], 0.2f));
+            materials[i].SetColor("_SideColor", Color.Lerp(palette[i], palette[0], 0.3f));
         }
 
         LoadLevel(levelPath);
