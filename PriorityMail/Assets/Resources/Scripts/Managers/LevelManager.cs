@@ -210,6 +210,34 @@ public class LevelManager : MonoBehaviour
         }
     }
 
+
+
+    private void MainVineControlHelper (bool left, RaycastHit hit)
+    {
+        StartCoroutine(MainVineControl(left, hit));
+    }
+
+    private IEnumerator MainVineControl(bool left, RaycastHit hit)
+    {
+        if (left) {
+            float t = Time.time;
+            while (Input.GetMouseButton(0))
+            {
+                yield return null;
+            }
+            if (Time.time - t < 0.2f)
+            {
+                CreateVine(left, hit);
+            }
+        }
+        else
+        {
+            CreateVine(left, hit);
+        }
+    }
+
+
+
     private void CreateVine(bool left, RaycastHit hit)
     {
         if (hit.transform.gameObject.GetComponent<ColoredMeshBridge>() != null && hit.transform.gameObject.layer == 8)
@@ -493,8 +521,9 @@ public class LevelManager : MonoBehaviour
 
         LoadLevel(levelPath);
 
-        CameraManager.current.onClick += CreateVine;
-        
+        //CameraManager.current.onClick += CreateVine;
+        CameraManager.current.onClick += MainVineControlHelper;
+
         brambleInput = StartCoroutine(BrambleInput());
         GenerateAvailableVinesUI();
 
@@ -517,7 +546,8 @@ public class LevelManager : MonoBehaviour
         RemoveBoard();
         Destroy(bramble.model);
 
-        CameraManager.current.onClick -= CreateVine;
+        //CameraManager.current.onClick -= CreateVine;
+        CameraManager.current.onClick -= MainVineControlHelper;
 
         StopCoroutine(brambleInput);
 
