@@ -20,6 +20,7 @@ public class LevelManager : MonoBehaviour
     public LinkedList<TileAnimationFall> fallAnims;
 
     private Coroutine brambleInput;
+    private RaycastHit lastHit;
 
     public Color[] palette = new Color[]
     {
@@ -233,6 +234,30 @@ public class LevelManager : MonoBehaviour
         else
         {
             CreateVine(left, hit);
+        }
+    }
+
+    private void PreTraceVine(bool left, RaycastHit hit)
+    {
+        if (left)
+        {
+            lastHit = hit;
+            CameraManager.current.onHover += TraceVine;
+        }
+    }
+
+    private void TraceVine(RaycastHit hit)
+    {
+        if (lastHit.distance != 100 && (hit.distance == 0 || hit.transform != lastHit.transform))
+        {
+            Debug.Log("It be different!");
+            CreateVine(true, lastHit);
+            lastHit = hit;
+            lastHit.distance = 100;
+        }
+        else
+        {
+            lastHit = hit;
         }
     }
 
@@ -523,6 +548,8 @@ public class LevelManager : MonoBehaviour
 
         //CameraManager.current.onClick += CreateVine;
         CameraManager.current.onClick += MainVineControlHelper;
+        CameraManager.current.onClick += PreTraceVine;
+        CameraManager.current.onRelease += delegate { CameraManager.current.onHover -= TraceVine; };
 
         brambleInput = StartCoroutine(BrambleInput());
         GenerateAvailableVinesUI();
@@ -548,6 +575,8 @@ public class LevelManager : MonoBehaviour
 
         //CameraManager.current.onClick -= CreateVine;
         CameraManager.current.onClick -= MainVineControlHelper;
+        CameraManager.current.onClick -= PreTraceVine;
+        CameraManager.current.onRelease -= delegate { CameraManager.current.onHover -= TraceVine; };
 
         StopCoroutine(brambleInput);
 

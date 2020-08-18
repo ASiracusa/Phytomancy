@@ -43,11 +43,8 @@ public class CameraManager : MonoBehaviour
                 {
                     Hold(Input.GetMouseButton(0), hitGround);
                 }
-                else
-                {
-                    Hover(hitGround);
-                }
             }
+            Hover(hitGround);
 
             RaycastHit hitBoth;
             Ray rayBoth = cam.ScreenPointToRay(Input.mousePosition);
