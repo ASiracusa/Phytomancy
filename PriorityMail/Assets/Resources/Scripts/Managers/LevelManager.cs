@@ -263,7 +263,7 @@ public class LevelManager : MonoBehaviour
 
 
 
-    private void CreateVine(bool left, RaycastHit hit)
+    private void CreateVine(bool left, RaycastHit hit, Vector3Int? givenDirection = null)
     {
         if (hit.transform.gameObject.GetComponent<ColoredMeshBridge>() != null && hit.transform.gameObject.layer == 8)
         {
@@ -292,7 +292,8 @@ public class LevelManager : MonoBehaviour
                     }
 
                     TileElement tileAtPos = board[vineCoords.x, vineCoords.y, vineCoords.z];
-                    Vector3Int direction = vineCoords - ((Monocoord)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).GetPos();
+
+                    Vector3Int direction = (givenDirection == null) ? vineCoords - ((Monocoord)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).GetPos() : (Vector3Int)givenDirection;
 
                     Vine vine = (Vine)Constants.TILE_MODELS[(int)TileElementNames.Vine].GenerateTileElement(new object[] {
                         vineCoords,
@@ -345,6 +346,11 @@ public class LevelManager : MonoBehaviour
                 StartCoroutine(AnimateTileStateChange());
             }
         }
+    }
+
+    private void CreateVine ()
+    {
+
     }
 
     private void ClearSpaciousTiles()
