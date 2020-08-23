@@ -100,10 +100,8 @@ public class CameraManager : MonoBehaviour
             camAnchor.transform.eulerAngles = new Vector3(45, pos * 180 / Mathf.PI, 0);
 
             velocity *= 0.95f;
-
-            zoom -= Input.mouseScrollDelta.y;
-            zoom = Mathf.Clamp(zoom, 2, 14);
-
+            
+            zoom = Mathf.Clamp(zoom - Input.mouseScrollDelta.y, 2, 14);
             cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, zoom, 0.1f);
 
             yield return null;
