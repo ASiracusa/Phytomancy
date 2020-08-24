@@ -259,6 +259,32 @@ public class LevelManager : MonoBehaviour
         {
             lastHit = hit;
         }
+
+        float deltaX = Input.mousePosition.x - CameraManager.current.cam.WorldToScreenPoint(hit.transform.position).x;
+        float deltaY = Input.mousePosition.y - CameraManager.current.cam.WorldToScreenPoint(hit.transform.position).y;
+        float theta = Mathf.Atan(deltaY / deltaX) * Mathf.Rad2Deg + (deltaX < 0 ? 180 : (deltaY < 0 ? 360 : 0));
+        Debug.Log(theta);
+
+        if (Mathf.Abs(Mathf.DeltaAngle(theta, 90)) < 20)
+        {
+            Debug.Log("UP");
+        }
+        else if (Mathf.Abs(Mathf.DeltaAngle(theta, 0)) < 45)
+        {
+            Debug.Log("EAST");
+        }
+        else if (Mathf.Abs(Mathf.DeltaAngle(theta, 90)) < 45)
+        {
+            Debug.Log("NORTH");
+        }
+        else if (Mathf.Abs(Mathf.DeltaAngle(theta, 180)) < 45)
+        {
+            Debug.Log("WEST");
+        }
+        else if (Mathf.Abs(Mathf.DeltaAngle(theta, 270)) < 45)
+        {
+            Debug.Log("SOUTH");
+        }
     }
 
 

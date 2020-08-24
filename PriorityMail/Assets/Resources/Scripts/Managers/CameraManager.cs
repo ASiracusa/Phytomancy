@@ -9,7 +9,7 @@ public class CameraManager : MonoBehaviour
 
     private GameObject levelAnchor;
     private GameObject camAnchor;
-    private Camera cam;
+    public Camera cam;
 
     void Start()
     {
