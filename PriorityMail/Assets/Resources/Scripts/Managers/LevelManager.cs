@@ -38,6 +38,7 @@ public class LevelManager : MonoBehaviour
         Color.magenta,
     };
     public Material[] materials;
+    public Material darkener;
 
     // Start is called before the first frame update
     void Start()
@@ -662,6 +663,8 @@ public class LevelManager : MonoBehaviour
             materials[i].SetColor("_FrontColor", Color.Lerp(palette[i], palette[0], 0.45f));
             materials[i].SetColor("_SideColor", Color.Lerp(palette[i], palette[0], 0.6f));
         }
+        darkener = new Material(Resources.Load<Material>("Materials/DarkenMat"));
+        darkener.SetColor("_BlendColor", palette[0]);
 
         LoadLevel(levelPath);
 
