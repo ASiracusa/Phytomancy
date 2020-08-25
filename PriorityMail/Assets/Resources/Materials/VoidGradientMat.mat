@@ -72,8 +72,8 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _HighVal: 1
-    - _LowVal: -1
+    - _HighVal: -0.5
+    - _LowVal: -5.5
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _QueueOffset: 0

@@ -837,6 +837,7 @@ MonoBehaviour:
   - {r: 1.977374e+33, g: 4.75e-43, b: 1.977379e+33, a: 4.75e-43}
   materials: []
   darkener: {fileID: 0}
+  voidGradient: {fileID: 0}
 --- !u!4 &1314063556
 Transform:
   m_ObjectHideFlags: 0

@@ -39,6 +39,7 @@ public class LevelManager : MonoBehaviour
     };
     public Material[] materials;
     public Material darkener;
+    public Material voidGradient;
 
     // Start is called before the first frame update
     void Start()
@@ -61,6 +62,8 @@ public class LevelManager : MonoBehaviour
 
         availableVines = levelData.availableVines;
 
+        GameObject voidPlane = Resources.Load<GameObject>("Models/VoidEdge");
+
         // Create the Grounds
         board = new TileElement[levelData.grounds.GetLength(0), levelData.grounds.GetLength(1), levelData.grounds.GetLength(2)];
         for (int x = 0; x < board.GetLength(0); x++)
@@ -79,6 +82,34 @@ public class LevelManager : MonoBehaviour
                         board[x, y, z].BindDataToModel();
                         board[x, y, z].WarpToPos();
                         ((Ground)board[x, y, z]).ColorFacets(materials);
+
+                        if (y == 0)
+                        {
+                            GameObject northEdge = Instantiate(voidPlane, new Vector3(x, -3, z + 0.5f), Quaternion.identity);
+                            northEdge.transform.eulerAngles = new Vector3(90, 0, 0);
+                            northEdge.GetComponent<MeshRenderer>().materials = new Material[] {
+                                materials[(int)(levelData.grounds[x, y, z][2])],
+                                voidGradient
+                            };
+                            GameObject eastEdge = Instantiate(voidPlane, new Vector3(x - 0.5f, -3, z), Quaternion.identity);
+                            eastEdge.transform.eulerAngles = new Vector3(90, 0, 90);
+                            eastEdge.GetComponent<MeshRenderer>().materials = new Material[] {
+                                materials[(int)(levelData.grounds[x, y, z][5])],
+                                voidGradient
+                            };
+                            GameObject southEdge = Instantiate(voidPlane, new Vector3(x, -3, z - 0.5f), Quaternion.identity);
+                            southEdge.transform.eulerAngles = new Vector3(90, 0, 180);
+                            southEdge.GetComponent<MeshRenderer>().materials = new Material[] {
+                                materials[(int)(levelData.grounds[x, y, z][3])],
+                                voidGradient
+                            };
+                            GameObject westEdge = Instantiate(voidPlane, new Vector3(x + 0.5f, -3, z), Quaternion.identity);
+                            westEdge.transform.eulerAngles = new Vector3(90, 0, 270);
+                            westEdge.GetComponent<MeshRenderer>().materials = new Material[] {
+                                materials[(int)(levelData.grounds[x, y, z][4])],
+                                voidGradient
+                            };
+                        }
                     }
                 }
             }
@@ -665,6 +696,8 @@ public class LevelManager : MonoBehaviour
         }
         darkener = new Material(Resources.Load<Material>("Materials/DarkenMat"));
         darkener.SetColor("_BlendColor", palette[0]);
+        voidGradient = new Material(Resources.Load<Material>("Materials/VoidGradientMat"));
+        voidGradient.SetColor("_GradientColor", palette[0]);
 
         LoadLevel(levelPath);
 
