@@ -39,6 +39,8 @@ public class LevelManager : MonoBehaviour
     };
     public Material[] materials;
     public Material darkener;
+
+    private GameObject edges;
     public Material voidGradient;
 
     // Start is called before the first frame update
@@ -49,6 +51,8 @@ public class LevelManager : MonoBehaviour
         availableVines = new int[10] {
             5, 0, 0, 0, 7, 0, 0, 0, 0, 3
         };
+
+        edges = GameObject.Find("Edges");
     }
 
     private void LoadLevel(string levelPath)
@@ -85,25 +89,25 @@ public class LevelManager : MonoBehaviour
 
                         if (y == 0)
                         {
-                            GameObject northEdge = Instantiate(voidPlane, new Vector3(x, -3, z + 0.5f), Quaternion.identity);
+                            GameObject northEdge = Instantiate(voidPlane, new Vector3(x, -3, z + 0.5f), Quaternion.identity, edges.transform);
                             northEdge.transform.eulerAngles = new Vector3(90, 0, 0);
                             northEdge.GetComponent<MeshRenderer>().materials = new Material[] {
                                 materials[(int)(levelData.grounds[x, y, z][2])],
                                 voidGradient
                             };
-                            GameObject eastEdge = Instantiate(voidPlane, new Vector3(x - 0.5f, -3, z), Quaternion.identity);
+                            GameObject eastEdge = Instantiate(voidPlane, new Vector3(x - 0.5f, -3, z), Quaternion.identity, edges.transform);
                             eastEdge.transform.eulerAngles = new Vector3(90, 0, 90);
                             eastEdge.GetComponent<MeshRenderer>().materials = new Material[] {
                                 materials[(int)(levelData.grounds[x, y, z][5])],
                                 voidGradient
                             };
-                            GameObject southEdge = Instantiate(voidPlane, new Vector3(x, -3, z - 0.5f), Quaternion.identity);
+                            GameObject southEdge = Instantiate(voidPlane, new Vector3(x, -3, z - 0.5f), Quaternion.identity, edges.transform);
                             southEdge.transform.eulerAngles = new Vector3(90, 0, 180);
                             southEdge.GetComponent<MeshRenderer>().materials = new Material[] {
                                 materials[(int)(levelData.grounds[x, y, z][3])],
                                 voidGradient
                             };
-                            GameObject westEdge = Instantiate(voidPlane, new Vector3(x + 0.5f, -3, z), Quaternion.identity);
+                            GameObject westEdge = Instantiate(voidPlane, new Vector3(x + 0.5f, -3, z), Quaternion.identity, edges.transform);
                             westEdge.transform.eulerAngles = new Vector3(90, 0, 270);
                             westEdge.GetComponent<MeshRenderer>().materials = new Material[] {
                                 materials[(int)(levelData.grounds[x, y, z][4])],
@@ -433,7 +437,9 @@ public class LevelManager : MonoBehaviour
         Shade vineColor;
         if (tracedVine.gameObject.GetComponent<ColoredMeshBridge>().data is Ground)
         {
-            vineColor = ((Ground)(tracedVine.gameObject.GetComponent<ColoredMeshBridge>().data)).GetShades()[tracedVine.gameObject.GetComponent<ColoredMeshBridge>().index];
+            //vineColor = ((Ground)(tracedVine.gameObject.GetComponent<ColoredMeshBridge>().data)).GetShades()[tracedVine.gameObject.GetComponent<ColoredMeshBridge>().index];
+            Debug.Log(Constants.VectorToFacet(givenDirection));
+            vineColor = ((Ground)(tracedVine.transform.parent.GetComponent<ModelTileBridge>().Data)).GetShades()[(int)Constants.FacetToModel(Constants.VectorToFacet(givenDirection))];
         }
         else
         {
@@ -741,6 +747,11 @@ public class LevelManager : MonoBehaviour
         //Destroy(avBase.transform.GetChild(0));
 
         avBase.transform.localPosition = new Vector3(-37.5f, 0, 0);
+
+        for (int i = 0; i < edges.transform.childCount; i++)
+        {
+            Destroy(edges.transform.GetChild(i).gameObject);
+        }
 
         PlayerMenuManager.current.ReturnToLevelSelector();
     }

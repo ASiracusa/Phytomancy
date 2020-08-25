@@ -101,6 +101,20 @@ public class Constants
         return ftva[(int)facet];
     }
 
+    public static Facet FacetToModel(Facet facet)
+    {
+        Facet[] ftma = new Facet[]
+        {
+            Facet.Up,
+            Facet.South,
+            Facet.Down,
+            Facet.East,
+            Facet.North,
+            Facet.West,
+        };
+        return ftma[(int)facet];
+    }
+
     public static Facet FlipDirection(Facet facet)
     {
         Facet[] flips = new Facet[]
