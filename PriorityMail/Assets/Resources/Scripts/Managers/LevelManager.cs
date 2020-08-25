@@ -286,20 +286,6 @@ public class LevelManager : MonoBehaviour
 
     private void TraceVine(RaycastHit hit)
     {
-        /*
-        if (lastHit.distance != 100 && (hit.distance == 0 || hit.transform != lastHit.transform))
-        {
-            Debug.Log("It be different!");
-            CreateVine(true, lastHit);
-            lastHit = hit;
-            lastHit.distance = 100;
-        }
-        else
-        {
-            lastHit = hit;
-        }
-        */
-
         float deltaX = Input.mousePosition.x - CameraManager.current.cam.WorldToScreenPoint(tracedVine.position).x;
         float deltaY = Input.mousePosition.y - CameraManager.current.cam.WorldToScreenPoint(tracedVine.position).y;
         float theta = Mathf.Atan(deltaY / deltaX) * Mathf.Rad2Deg + (deltaX < 0 ? 180 : (deltaY < 0 ? 360 : 0));
@@ -710,7 +696,7 @@ public class LevelManager : MonoBehaviour
         //CameraManager.current.onClick += CreateVine;
         CameraManager.current.onClick += MainVineControlHelper;
         CameraManager.current.onClick += PreTraceVine;
-        CameraManager.current.onRelease += delegate { CameraManager.current.onHover -= TraceVine; };
+        CameraManager.current.onReleaseAny += delegate { CameraManager.current.onHover -= TraceVine; };
 
         brambleInput = StartCoroutine(BrambleInput());
         GenerateAvailableVinesUI();
@@ -737,7 +723,7 @@ public class LevelManager : MonoBehaviour
         //CameraManager.current.onClick -= CreateVine;
         CameraManager.current.onClick -= MainVineControlHelper;
         CameraManager.current.onClick -= PreTraceVine;
-        CameraManager.current.onRelease -= delegate { CameraManager.current.onHover -= TraceVine; };
+        CameraManager.current.onReleaseAny -= delegate { CameraManager.current.onHover -= TraceVine; };
 
         StopCoroutine(brambleInput);
 

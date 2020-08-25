@@ -68,6 +68,11 @@ public class CameraManager : MonoBehaviour
                 }
             }
 
+            if (Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1))
+            {
+                ReleaseAny(Input.GetMouseButtonUp(0));
+            }
+
             yield return null;
         }
     }
@@ -233,5 +238,11 @@ public class CameraManager : MonoBehaviour
     public void ReleaseBoth(bool left, RaycastHit hit)
     {
         onReleaseBoth?.Invoke(left, hit);
+    }
+
+    public event Action<bool> onReleaseAny;
+    public void ReleaseAny(bool left)
+    {
+        onReleaseAny?.Invoke(left);
     }
 }
