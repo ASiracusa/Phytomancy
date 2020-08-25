@@ -388,7 +388,6 @@ public class LevelManager : MonoBehaviour
                     board[vineCoords.x, vineCoords.y, vineCoords.z].BindDataToModel();
                     board[vineCoords.x, vineCoords.y, vineCoords.z].AdjustRender();
                     board[vineCoords.x, vineCoords.y, vineCoords.z].WarpToPos();
-                    tracedVine = board[vineCoords.x, vineCoords.y, vineCoords.z].model.transform;
 
                     AddUndoData(new BoardCreationState(vine));
 
