@@ -190,34 +190,46 @@ public class LevelManager : MonoBehaviour
             {
                 Facet camDirection = CameraManager.current.GetCameraOrientation();
 
-                if (bramble.model != null)
+                if (bramble != null && bramble.model != null)
                 {
                     if (Input.GetKey(KeyCode.W))
                     {
                         undoData.Push(new Stack<BoardStateChange>());
                         bramble.InitiatePush(board, (Facet)(((int)Facet.North + (int)camDirection) % 4), null);
-                        bramble.model.transform.localEulerAngles = new Vector3(0, 90 - 90 * (int)camDirection, 0);
+                        if (bramble.model != null)
+                        {
+                            bramble.model.transform.localEulerAngles = new Vector3(0, 90 - 90 * (int)camDirection, 0);
+                        }
                         ClearSpaciousTiles();
                     }
                     if (Input.GetKey(KeyCode.S))
                     {
                         undoData.Push(new Stack<BoardStateChange>());
                         bramble.InitiatePush(board, (Facet)(((int)Facet.South + (int)camDirection) % 4), null);
-                        bramble.model.transform.localEulerAngles = new Vector3(0, 270 - 90 * (int)camDirection, 0);
+                        if (bramble.model != null)
+                        {
+                            bramble.model.transform.localEulerAngles = new Vector3(0, 270 - 90 * (int)camDirection, 0);
+                        }
                         ClearSpaciousTiles();
                     }
                     if (Input.GetKey(KeyCode.A))
                     {
                         undoData.Push(new Stack<BoardStateChange>());
                         bramble.InitiatePush(board, (Facet)(((int)Facet.West + (int)camDirection) % 4), null);
-                        bramble.model.transform.localEulerAngles = new Vector3(0, 0 - 90 * (int)camDirection, 0);
+                        if (bramble.model != null)
+                        {
+                            bramble.model.transform.localEulerAngles = new Vector3(0, 0 - 90 * (int)camDirection, 0);
+                        }
                         ClearSpaciousTiles();
                     }
                     if (Input.GetKey(KeyCode.D))
                     {
                         undoData.Push(new Stack<BoardStateChange>());
                         bramble.InitiatePush(board, (Facet)(((int)Facet.East + (int)camDirection) % 4), null);
-                        bramble.model.transform.localEulerAngles = new Vector3(0, 180 - 90 * (int)camDirection, 0);
+                        if (bramble.model != null)
+                        {
+                            bramble.model.transform.localEulerAngles = new Vector3(0, 180 - 90 * (int)camDirection, 0);
+                        }
                         ClearSpaciousTiles();
                     }
                 }
