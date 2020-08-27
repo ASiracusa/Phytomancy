@@ -180,7 +180,7 @@ public class CameraManager : MonoBehaviour
 
     public void CalibrateCamera (TileElement[,,] board)
     {
-        levelAnchor.transform.localPosition = new Vector3(board.GetLength(0) / 2.0f, 0, board.GetLength(2) / 2.0f);
+        levelAnchor.transform.localPosition = new Vector3((board.GetLength(0) - 1) / 2.0f, 0, (board.GetLength(2) - 1) / 2.0f);
     }
 
     public Facet GetCameraOrientation ()

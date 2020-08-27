@@ -528,22 +528,23 @@ public class LevelManager : MonoBehaviour
     {
         GameObject avBase = GameObject.Find("PlayerCanvas/AvailableVinesMenu/AVAnchor");
         GameObject avAnchor = avBase;
-        GameObject avIconResource = Resources.Load<GameObject>("Prefabs/AVIcon");
+        GameObject avIconResource = Resources.Load<GameObject>("Prefabs/AVIcon2");
 
         for (int i = 0; i < availableVines.Length; i++)
         {
-            GameObject avIcon = Instantiate<GameObject>(avIconResource);
+            GameObject avIcon = Instantiate<GameObject>(avIconResource, Vector3.zero, Quaternion.identity);
             avIcon.transform.SetParent(avAnchor.transform);
             if (availableVines[i] > 0)
             {
-                avIcon.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = availableVines[i].ToString();
-                avIcon.transform.GetComponent<Image>().color = palette[i + 1];
-                avIcon.transform.localPosition = new Vector3(30, 0, 0);
+                avIcon.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = availableVines[i].ToString();
+                avIcon.transform.GetChild(0).GetComponent<Image>().color = palette[i + 1];
+                avIcon.transform.localPosition = Vector3.zero;
+                avIcon.transform.position += new Vector3(30, 0, 0);
                 avBase.transform.localPosition += new Vector3(-15, 0, 0);
             }
             else
             {
-                avIcon.transform.GetComponent<Image>().color = Color.clear;
+                avIcon.transform.GetChild(0).GetComponent<Image>().color = Color.clear;
                 avIcon.transform.localPosition = new Vector3(0, 0, 0);
             }
             avAnchor = avIcon;
@@ -556,30 +557,31 @@ public class LevelManager : MonoBehaviour
         GameObject avIcon = avBase.transform.GetChild(0).gameObject;
         for (int i = 0; i < (int)color - 1; i++)
         {
-            avIcon = avIcon.transform.GetChild(1).gameObject;
+            avIcon = avIcon.transform.GetChild(2).gameObject;
         }
 
         if (availableVines[(int)color - 1] == 0)
         {
             availableVines[(int)color - 1] += amount;
-            avIcon.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = availableVines[(int)color - 1].ToString();
-            avIcon.transform.GetComponent<Image>().color = palette[(int)color];
-            avIcon.transform.localPosition = new Vector3(30, 0, 0);
+            avIcon.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = availableVines[(int)color - 1].ToString();
+            avIcon.transform.GetChild(0).GetComponent<Image>().color = palette[(int)color];
+            avIcon.transform.localPosition = Vector3.zero;
+            avIcon.transform.position += new Vector3(30, 0, 0);
             avBase.transform.localPosition += new Vector3(-15, 0, 0);
         }
         else if (amount > 0)
         {
             availableVines[(int)color - 1] += amount;
-            avIcon.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = availableVines[(int)color - 1].ToString();
+            avIcon.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = availableVines[(int)color - 1].ToString();
         }
         else
         {
             availableVines[(int)color - 1] += amount;
-            avIcon.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = availableVines[(int)color - 1].ToString();
+            avIcon.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = availableVines[(int)color - 1].ToString();
             if (availableVines[(int)color - 1] == 0)
             {
-                avIcon.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "";
-                avIcon.transform.GetComponent<Image>().color = Color.clear;
+                avIcon.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
+                avIcon.transform.GetChild(0).GetComponent<Image>().color = Color.clear;
                 avIcon.transform.localPosition = new Vector3(0, 0, 0);
                 avBase.transform.localPosition += new Vector3(15, 0, 0);
             }
@@ -743,7 +745,7 @@ public class LevelManager : MonoBehaviour
         
         //Destroy(avBase.transform.GetChild(0));
 
-        avBase.transform.localPosition = new Vector3(-37.5f, 0, 0);
+        avBase.transform.localPosition = new Vector3(-15f, 0, 0);
 
         for (int i = 0; i < edges.transform.childCount; i++)
         {
