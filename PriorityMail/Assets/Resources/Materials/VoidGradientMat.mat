@@ -73,7 +73,7 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _HighVal: -0.5
-    - _LowVal: -5.5
+    - _LowVal: -9.5
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _QueueOffset: 0
