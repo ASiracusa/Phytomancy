@@ -527,66 +527,47 @@ public class LevelManager : MonoBehaviour
     private void GenerateAvailableVinesUI()
     {
         GameObject avBase = GameObject.Find("PlayerCanvas/AvailableVinesMenu/AVAnchor");
-        GameObject avAnchor = avBase;
         GameObject avIconResource = Resources.Load<GameObject>("Prefabs/AVIcon2");
 
         for (int i = 0; i < availableVines.Length; i++)
         {
             GameObject avIcon = Instantiate<GameObject>(avIconResource, Vector3.zero, Quaternion.identity);
-            avIcon.transform.SetParent(avAnchor.transform);
+            avIcon.transform.SetParent(avBase.transform);
+            avIcon.transform.GetChild(0).GetComponent<Image>().color = palette[i + 1];
+        }
+
+        int total = 0;
+        for (int i = 0; i < 10; i++)
+        {
             if (availableVines[i] > 0)
             {
-                avIcon.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = availableVines[i].ToString();
-                avIcon.transform.GetChild(0).GetComponent<Image>().color = palette[i + 1];
-                avIcon.transform.localPosition = Vector3.zero;
-                avIcon.transform.position += new Vector3(30 / avIcon.transform.lossyScale.x, 0, 0);
-                avBase.transform.localPosition += new Vector3(-15, 0, 0);
+                total++;
+            }
+        }
+
+        int pos = 0;
+        for (int i = 0; i < 10; i++)
+        {
+            GameObject avIcon = avBase.transform.GetChild(i).gameObject;
+            if (availableVines[i] > 0)
+            {
+                avIcon.transform.localPosition = new Vector3((total - 1) * -20 + pos * 40, 50, 0);
+                avIcon.transform.localScale = new Vector3(1.25f, 1.25f, 1f);
+                pos++;
             }
             else
             {
-                avIcon.transform.GetChild(0).GetComponent<Image>().color = Color.clear;
-                avIcon.transform.localPosition = new Vector3(0, 0, 0);
+                avIcon.transform.localPosition = new Vector3((total - 1) * -20 + pos * 40 - 20, 50, 0);
+                avIcon.transform.localScale = new Vector3(0, 0, 1);
             }
-            avAnchor = avIcon;
         }
+
+        StartCoroutine(ControlAVUI());
     }
 
     public void AdjustAvailableVinesUI(Shade color, int amount)
     {
-        GameObject avBase = GameObject.Find("PlayerCanvas/AvailableVinesMenu/AVAnchor");
-        GameObject avIcon = avBase.transform.GetChild(0).gameObject;
-        for (int i = 0; i < (int)color - 1; i++)
-        {
-            avIcon = avIcon.transform.GetChild(2).gameObject;
-        }
-
-        if (availableVines[(int)color - 1] == 0)
-        {
-            availableVines[(int)color - 1] += amount;
-            avIcon.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = availableVines[(int)color - 1].ToString();
-            avIcon.transform.GetChild(0).GetComponent<Image>().color = palette[(int)color];
-            avIcon.transform.localPosition = Vector3.zero;
-            avIcon.transform.position += new Vector3(30 / avIcon.transform.lossyScale.x, 0, 0);
-            avBase.transform.localPosition += new Vector3(-15, 0, 0);
-        }
-        else if (amount > 0)
-        {
-            availableVines[(int)color - 1] += amount;
-            avIcon.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = availableVines[(int)color - 1].ToString();
-        }
-        else
-        {
-            availableVines[(int)color - 1] += amount;
-            avIcon.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = availableVines[(int)color - 1].ToString();
-            if (availableVines[(int)color - 1] == 0)
-            {
-                avIcon.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
-                avIcon.transform.GetChild(0).GetComponent<Image>().color = Color.clear;
-                avIcon.transform.localPosition = new Vector3(0, 0, 0);
-                avBase.transform.localPosition += new Vector3(15, 0, 0);
-            }
-        }
-        
+        availableVines[(int)color - 1] += amount;
     }
 
     private IEnumerator ControlAVUI ()
@@ -604,19 +585,21 @@ public class LevelManager : MonoBehaviour
             }
 
             int pos = 0;
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < avBase.transform.childCount; i++)
             {
                 GameObject avIcon = avBase.transform.GetChild(i).gameObject;
                 if (availableVines[i] > 0)
                 {
-                    avIcon.transform.localPosition = Vector3.Lerp(avIcon.transform.localPosition, new Vector3((total - 1) * -15 + pos * 30, 0, 0), 0.5f);
-                    avIcon.transform.localScale = Vector3.Lerp(avIcon.transform.localScale, Vector3.one, 0.5f);
+                    avIcon.transform.localPosition = Vector3.Lerp(avIcon.transform.localPosition, new Vector3((total - 1) * -20 + pos * 40, 0, 0), 0.25f);
+                    avIcon.transform.localScale = Vector3.Lerp(avIcon.transform.localScale, new Vector3(1.25f, 1.25f, 1f), 0.25f);
+                    avIcon.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = "" + availableVines[i];
                     pos++;
                 }
                 else
                 {
-                    avIcon.transform.localPosition = Vector3.Lerp(avIcon.transform.localPosition, new Vector3((total - 1) * -15 + pos * 30 - 15, 0, 0), 0.5f);
-                    avIcon.transform.localScale = Vector3.Lerp(avIcon.transform.localScale, Vector3.zero, 0.5f);
+                    avIcon.transform.localPosition = Vector3.Lerp(avIcon.transform.localPosition, new Vector3((total - 1) * -20 + pos * 40 - 20, 0, 0), 0.25f);
+                    avIcon.transform.localScale = avIcon.transform.localScale.x < 0.001f ? new Vector3(0, 0, 1) : Vector3.Lerp(avIcon.transform.localScale, new Vector3(0, 0, 1), 0.25f);
+                    avIcon.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = "";
                 }
             }
 
@@ -755,12 +738,12 @@ public class LevelManager : MonoBehaviour
 
     public void DeleteAVUI (GameObject avui)
     {
-        if (avui.transform.childCount != 1)
+        StopCoroutine("ControlAVUI");
+
+        for (int i = 0; i < avui.transform.childCount; i++)
         {
-            DeleteAVUI(avui.transform.GetChild(1).gameObject);
+            Destroy(avui.transform.GetChild(i).gameObject);
         }
-        Destroy(avui.transform.GetChild(0).gameObject);
-        Destroy(avui);
     }
 
     public void LeaveLevel()
@@ -776,7 +759,7 @@ public class LevelManager : MonoBehaviour
         StopCoroutine(brambleInput);
 
         GameObject avBase = GameObject.Find("PlayerCanvas/AvailableVinesMenu/AVAnchor");
-        DeleteAVUI(avBase.transform.GetChild(0).gameObject);
+        DeleteAVUI(avBase);
         
         //Destroy(avBase.transform.GetChild(0));
 
