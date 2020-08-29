@@ -539,7 +539,7 @@ public class LevelManager : MonoBehaviour
                 avIcon.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = availableVines[i].ToString();
                 avIcon.transform.GetChild(0).GetComponent<Image>().color = palette[i + 1];
                 avIcon.transform.localPosition = Vector3.zero;
-                avIcon.transform.position += new Vector3(30, 0, 0);
+                avIcon.transform.position += new Vector3(30 / avIcon.transform.lossyScale.x, 0, 0);
                 avBase.transform.localPosition += new Vector3(-15, 0, 0);
             }
             else
@@ -566,7 +566,7 @@ public class LevelManager : MonoBehaviour
             avIcon.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = availableVines[(int)color - 1].ToString();
             avIcon.transform.GetChild(0).GetComponent<Image>().color = palette[(int)color];
             avIcon.transform.localPosition = Vector3.zero;
-            avIcon.transform.position += new Vector3(30, 0, 0);
+            avIcon.transform.position += new Vector3(30 / avIcon.transform.lossyScale.x, 0, 0);
             avBase.transform.localPosition += new Vector3(-15, 0, 0);
         }
         else if (amount > 0)
@@ -587,6 +587,41 @@ public class LevelManager : MonoBehaviour
             }
         }
         
+    }
+
+    private IEnumerator ControlAVUI ()
+    {
+        GameObject avBase = GameObject.Find("PlayerCanvas/AvailableVinesMenu/AVAnchor");
+        while (true)
+        {
+            int total = 0;
+            for (int i = 0; i < 10; i++)
+            {
+                if (availableVines[i] > 0)
+                {
+                    total++;
+                }
+            }
+
+            int pos = 0;
+            for (int i = 0; i < 10; i++)
+            {
+                GameObject avIcon = avBase.transform.GetChild(i).gameObject;
+                if (availableVines[i] > 0)
+                {
+                    avIcon.transform.localPosition = Vector3.Lerp(avIcon.transform.localPosition, new Vector3((total - 1) * -15 + pos * 30, 0, 0), 0.5f);
+                    avIcon.transform.localScale = Vector3.Lerp(avIcon.transform.localScale, Vector3.one, 0.5f);
+                    pos++;
+                }
+                else
+                {
+                    avIcon.transform.localPosition = Vector3.Lerp(avIcon.transform.localPosition, new Vector3((total - 1) * -15 + pos * 30 - 15, 0, 0), 0.5f);
+                    avIcon.transform.localScale = Vector3.Lerp(avIcon.transform.localScale, Vector3.zero, 0.5f);
+                }
+            }
+
+            yield return null;
+        }
     }
 
     public void UndoTurn ()
