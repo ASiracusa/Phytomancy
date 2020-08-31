@@ -298,41 +298,34 @@ public class LevelManager : MonoBehaviour
 
     private void TraceVine(RaycastHit hit)
     {
-        float deltaX = Input.mousePosition.x - CameraManager.current.cam.WorldToScreenPoint(tracedVine.position).x;
-        float deltaY = Input.mousePosition.y - CameraManager.current.cam.WorldToScreenPoint(tracedVine.position).y;
-        float theta = Mathf.Atan(deltaY / deltaX) * Mathf.Rad2Deg + (deltaX < 0 ? 180 : (deltaY < 0 ? 360 : 0));
-        Vector3Int givenDirection = Vector3Int.zero;
-
-        if (Mathf.Abs(Mathf.DeltaAngle(theta, 90)) < 20)
-        {
-            Debug.Log("UP");
-            givenDirection = new Vector3Int(0, 1, 0);
-        }
-        else if (Mathf.Abs(Mathf.DeltaAngle(theta, 270 + CameraManager.current.cam.transform.parent.localEulerAngles.y)) < 45)
-        {
-            Debug.Log("EAST");
-            givenDirection = new Vector3Int(0, 0, -1);
-        }
-        else if (Mathf.Abs(Mathf.DeltaAngle(theta, 0 + CameraManager.current.cam.transform.parent.localEulerAngles.y)) < 45)
-        {
-            Debug.Log("NORTH");
-            givenDirection = new Vector3Int(1, 0, 0);
-        }
-        else if (Mathf.Abs(Mathf.DeltaAngle(theta, 90 + CameraManager.current.cam.transform.parent.localEulerAngles.y)) < 45)
-        {
-            Debug.Log("WEST");
-            givenDirection = new Vector3Int(0, 0, 1);
-        }
-        else if (Mathf.Abs(Mathf.DeltaAngle(theta, 180 + CameraManager.current.cam.transform.parent.localEulerAngles.y)) < 45)
-        {
-            Debug.Log("SOUTH");
-            givenDirection = new Vector3Int(-1, 0, 0);
-        }
-
         if (hit.distance == 0 || !((hit.transform == tracedVine) || (hit.transform == tracedVine.parent)))
         {
-            Debug.Log("It be different!");
-            Debug.Log(givenDirection);
+            float deltaX = Input.mousePosition.x - CameraManager.current.cam.WorldToScreenPoint(tracedVine.position).x;
+            float deltaY = Input.mousePosition.y - CameraManager.current.cam.WorldToScreenPoint(tracedVine.position).y;
+            float theta = Mathf.Atan(deltaY / deltaX) * Mathf.Rad2Deg + (deltaX < 0 ? 180 : (deltaY < 0 ? 360 : 0));
+            Vector3Int givenDirection = Vector3Int.zero;
+
+            if (Mathf.Abs(Mathf.DeltaAngle(theta, 90)) < 20)
+            {
+                givenDirection = new Vector3Int(0, 1, 0);
+            }
+            else if (Mathf.Abs(Mathf.DeltaAngle(theta, 270 + CameraManager.current.cam.transform.parent.localEulerAngles.y)) < 45)
+            {
+                givenDirection = new Vector3Int(0, 0, -1);
+            }
+            else if (Mathf.Abs(Mathf.DeltaAngle(theta, 0 + CameraManager.current.cam.transform.parent.localEulerAngles.y)) < 45)
+            {
+                givenDirection = new Vector3Int(1, 0, 0);
+            }
+            else if (Mathf.Abs(Mathf.DeltaAngle(theta, 90 + CameraManager.current.cam.transform.parent.localEulerAngles.y)) < 45)
+            {
+                givenDirection = new Vector3Int(0, 0, 1);
+            }
+            else if (Mathf.Abs(Mathf.DeltaAngle(theta, 180 + CameraManager.current.cam.transform.parent.localEulerAngles.y)) < 45)
+            {
+                givenDirection = new Vector3Int(-1, 0, 0);
+            }
+
             CreateVine(givenDirection);
         }
     }
@@ -723,8 +716,7 @@ public class LevelManager : MonoBehaviour
         voidGradient.SetColor("_GradientColor", palette[0]);
 
         LoadLevel(levelPath);
-
-        //CameraManager.current.onClick += CreateVine;
+        
         CameraManager.current.onClick += MainVineControlHelper;
         CameraManager.current.onClick += PreTraceVine;
         CameraManager.current.onReleaseAny += delegate { CameraManager.current.onHover -= TraceVine; };
@@ -750,8 +742,7 @@ public class LevelManager : MonoBehaviour
     {
         RemoveBoard();
         Destroy(bramble.model);
-
-        //CameraManager.current.onClick -= CreateVine;
+        
         CameraManager.current.onClick -= MainVineControlHelper;
         CameraManager.current.onClick -= PreTraceVine;
         CameraManager.current.onReleaseAny -= delegate { CameraManager.current.onHover -= TraceVine; };
@@ -760,8 +751,6 @@ public class LevelManager : MonoBehaviour
 
         GameObject avBase = GameObject.Find("PlayerCanvas/AvailableVinesMenu/AVAnchor");
         DeleteAVUI(avBase);
-        
-        //Destroy(avBase.transform.GetChild(0));
 
         avBase.transform.localPosition = new Vector3(-15f, 0, 0);
 
