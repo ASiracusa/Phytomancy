@@ -612,7 +612,7 @@ public class CreatorManager : MonoBehaviour
                         board[x, y, z].model = Instantiate(Resources.Load("Models/Ground")) as GameObject;
                         board[x, y, z].BindDataToModel();
                         board[x, y, z].WarpToPos();
-                        ((Ground)board[x, y, z]).ColorFacets(palette);
+                        ((Ground)board[x, y, z]).ColorFacets(materials);
                     }
                 }
             }
