@@ -9,7 +9,6 @@ using UnityEngine.SceneManagement;
 public class EditorMenuManager : MonoBehaviour
 {
     public static EditorMenuManager current;
-    private WorldData worldData;
     private string worldName;
 
     private GameObject editorCanvas;
@@ -55,8 +54,8 @@ public class EditorMenuManager : MonoBehaviour
 
     public void ChooseWorldForEditing (string worldName)
     {
-        worldData = (WorldData)SerializationManager.LoadData(Application.persistentDataPath + "/worlds/" + worldName + "/worldData.wld");
-        worldName = worldData.worldName;
+        WorldManager.current.worldData = (WorldData)SerializationManager.LoadData(Application.persistentDataPath + "/worlds/" + worldName + "/worldData.wld");
+        worldName = WorldManager.current.worldData.worldName;
         worldEditorMenu.SetActive(true);
         worldSelectorMenu.SetActive(false);
 
@@ -66,7 +65,7 @@ public class EditorMenuManager : MonoBehaviour
     public void CreateNewWorld()
     {
         int worldCount = Directory.GetDirectories(Application.persistentDataPath + "/worlds").Length;
-        worldData = new WorldData(
+        WorldManager.current.worldData = new WorldData(
             "_world" + worldCount,
             new float[]
             {
@@ -82,16 +81,18 @@ public class EditorMenuManager : MonoBehaviour
             },
             new string[] { }
         );
-        worldName = worldData.worldName;
+        worldName = WorldManager.current.worldData.worldName;
 
-        Directory.CreateDirectory(Application.persistentDataPath + "/worlds/" + worldData.worldName);
-        SerializationManager.SaveWorld(worldData.worldName, worldData);
+        Directory.CreateDirectory(Application.persistentDataPath + "/worlds/" + WorldManager.current.worldData.worldName);
+        SerializationManager.SaveWorld(WorldManager.current.worldData.worldName, WorldManager.current.worldData);
 
         LoadWorldForEditing();
     }
 
     private void LoadWorldForEditing ()
     {
+        WorldData worldData = WorldManager.current.worldData;
+
         foreach (Transform t in GameObject.Find("EditorMenuCanvas/WorldEditorMenu/Levels/LevelsPanel").transform)
         {
             Destroy(t.gameObject);
@@ -136,7 +137,7 @@ public class EditorMenuManager : MonoBehaviour
     
     public void ReturnToWorldSelectorMenu ()
     {
-        worldData = null;
+        WorldManager.current.worldData = null;
         GenerateWorldListUI();
     }
 
@@ -150,9 +151,14 @@ public class EditorMenuManager : MonoBehaviour
 
     public void MakeNewLevel ()
     {
+        print(WorldManager.current.levelData.levelName);
+
+        WorldData worldData = WorldManager.current.worldData;
+
         editorMenuCanvas.SetActive(false);
         editorCanvas.SetActive(true);
-        CreatorManager.current.palette = new Color[]
+
+        WorldManager.current.palette = new Color[]
         {
             new Color(worldData.reds[0], worldData.greens[0], worldData.blues[0]),
             new Color(worldData.reds[1], worldData.greens[1], worldData.blues[1]),
@@ -166,13 +172,13 @@ public class EditorMenuManager : MonoBehaviour
             new Color(worldData.reds[9], worldData.greens[9], worldData.blues[9]),
             new Color(worldData.reds[10], worldData.greens[10], worldData.blues[10])
         };
-        CreatorManager.current.materials = new Material[11];
+        WorldManager.current.materials = new Material[11];
         for (int i = 0; i < 11; i++)
         {
-            CreatorManager.current.materials[i] = new Material(Resources.Load<Material>("Materials/TwotoneMat"));
-            CreatorManager.current.materials[i].SetColor("_TopColor", CreatorManager.current.palette[i]);
-            CreatorManager.current.materials[i].SetColor("_FrontColor", Color.Lerp(CreatorManager.current.palette[i], CreatorManager.current.palette[0], 0.45f));
-            CreatorManager.current.materials[i].SetColor("_SideColor", Color.Lerp(CreatorManager.current.palette[i], CreatorManager.current.palette[0], 0.6f));
+            WorldManager.current.materials[i] = new Material(Resources.Load<Material>("Materials/TwotoneMat"));
+            WorldManager.current.materials[i].SetColor("_TopColor", WorldManager.current.palette[i]);
+            WorldManager.current.materials[i].SetColor("_FrontColor", Color.Lerp(WorldManager.current.palette[i], WorldManager.current.palette[0], 0.45f));
+            WorldManager.current.materials[i].SetColor("_SideColor", Color.Lerp(WorldManager.current.palette[i], WorldManager.current.palette[0], 0.6f));
         }
         CreatorManager.current.GenerateNewLevel();
         CreatorManager.current.OpenLevel();
@@ -189,10 +195,10 @@ public class EditorMenuManager : MonoBehaviour
             color = Color.black;
         }
         paletteBox.GetComponent<Image>().color = color;
-
-        worldData.reds[index] = color.r;
-        worldData.greens[index] = color.g;
-        worldData.blues[index] = color.b;
+        
+        WorldManager.current.worldData.reds[index] = color.r;
+        WorldManager.current.worldData.greens[index] = color.g;
+        WorldManager.current.worldData.blues[index] = color.b;
     }
 
     public void ChangeWorldName(TMP_InputField inputField)
@@ -202,6 +208,8 @@ public class EditorMenuManager : MonoBehaviour
 
     public void SaveWorld()
     {
+        WorldData worldData = WorldManager.current.worldData;
+
         if (!worldName.Equals(worldData.worldName))
         {
             Directory.CreateDirectory(Application.persistentDataPath + "/worlds/" + worldName);
@@ -221,14 +229,17 @@ public class EditorMenuManager : MonoBehaviour
 
     public string GetWorldName()
     {
-        return worldData.worldName;
+        return WorldManager.current.worldData.worldName;
     }
 
     public void LoadLevel (string levelPath)
     {
+        WorldData worldData = WorldManager.current.worldData;
+
         editorMenuCanvas.SetActive(false);
         editorCanvas.SetActive(true);
-        CreatorManager.current.palette = new Color[]
+
+        WorldManager.current.palette = new Color[]
         {
             new Color(worldData.reds[0], worldData.greens[0], worldData.blues[0]),
             new Color(worldData.reds[1], worldData.greens[1], worldData.blues[1]),
@@ -242,13 +253,13 @@ public class EditorMenuManager : MonoBehaviour
             new Color(worldData.reds[9], worldData.greens[9], worldData.blues[9]),
             new Color(worldData.reds[10], worldData.greens[10], worldData.blues[10])
         };
-        CreatorManager.current.materials = new Material[11];
+        WorldManager.current.materials = new Material[11];
         for (int i = 0; i < 11; i++)
         {
-            CreatorManager.current.materials[i] = new Material(Resources.Load<Material>("Materials/TwotoneMat"));
-            CreatorManager.current.materials[i].SetColor("_TopColor", CreatorManager.current.palette[i]);
-            CreatorManager.current.materials[i].SetColor("_FrontColor", Color.Lerp(CreatorManager.current.palette[i], CreatorManager.current.palette[0], 0.45f));
-            CreatorManager.current.materials[i].SetColor("_SideColor", Color.Lerp(CreatorManager.current.palette[i], CreatorManager.current.palette[0], 0.6f));
+            WorldManager.current.materials[i] = new Material(Resources.Load<Material>("Materials/TwotoneMat"));
+            WorldManager.current.materials[i].SetColor("_TopColor", WorldManager.current.palette[i]);
+            WorldManager.current.materials[i].SetColor("_FrontColor", Color.Lerp(WorldManager.current.palette[i], WorldManager.current.palette[0], 0.45f));
+            WorldManager.current.materials[i].SetColor("_SideColor", Color.Lerp(WorldManager.current.palette[i], WorldManager.current.palette[0], 0.6f));
         }
         CreatorManager.current.LoadLevel(levelPath);
         CreatorManager.current.OpenLevel();

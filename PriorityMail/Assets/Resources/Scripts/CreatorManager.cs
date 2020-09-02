@@ -11,24 +11,11 @@ public class CreatorManager : MonoBehaviour
 {
     public static CreatorManager current;
 
-    private TileElement[,,] board;
-    private LevelData levelData;
-
     // EDITOR DATA
     private Vector3Int primarySelection;
     private TileElement tileModel;
     private Facet direction;
     private Shade paintColor;
-
-    // BOARD DATA
-    private Bramble bramble;
-    private Sigil sigil;
-
-    public Color[] palette;
-    public Material[] materials;
-    public int[] availableVines;
-
-    private delegate void MonocoordFunction(int x, int y, int z);
 
 
 
@@ -50,19 +37,19 @@ public class CreatorManager : MonoBehaviour
 
     private void RemoveTile(int x, int y, int z)
     {
-        board[x, y, z].RemoveModel();
-        board[x, y, z] = null;
+        WorldManager.current.board[x, y, z].RemoveModel();
+        WorldManager.current.board[x, y, z] = null;
     }
 
 
 
     private void PlaceStandardTile(int x, int y, int z)
     {
-        if (board[x, y, z] != null)
+        if (WorldManager.current.board[x, y, z] != null)
         {
-            board[x, y, z].RemoveModel();
+            WorldManager.current.board[x, y, z].RemoveModel();
         }
-        board[x, y, z].GenerateTileElement();
+        WorldManager.current.board[x, y, z].GenerateTileElement();
     }
 
 
@@ -76,6 +63,7 @@ public class CreatorManager : MonoBehaviour
 
     private void ExecuteSelection(bool left, RaycastHit hit)
     {
+        TileElement[,,] board = WorldManager.current.board;
         Vector3Int secondarySelection = CameraManager.GetAdjacentCoords(hit, left);
 
         NormalizeCoords(ref primarySelection, ref secondarySelection);
@@ -103,11 +91,11 @@ public class CreatorManager : MonoBehaviour
                     {
                         if (board[x, y, z] != null && board[x, y, z] is Bramble)
                         {
-                            bramble = null;
+                            WorldManager.current.bramble = null;
                         }
                         if (board[x, y, z] != null && board[x, y, z] is Sigil)
                         {
-                            sigil = null;
+                            WorldManager.current.sigil = null;
                         }
                         board[x, y, z]?.EditorDeleteTileElement(board);
                     }
@@ -130,7 +118,7 @@ public class CreatorManager : MonoBehaviour
             dicoord.AdjustRender();
             if (dicoord is IColorable)
             {
-                ((IColorable)dicoord).ColorFacets(palette);
+                ((IColorable)dicoord).ColorFacets(WorldManager.current.materials);
             }
 
             for (int x = primarySelection.x; x <= secondarySelection.x; x++)
@@ -141,11 +129,11 @@ public class CreatorManager : MonoBehaviour
                     {
                         if (board[x, y, z] != null && board[x, y, z] is Bramble)
                         {
-                            bramble = null;
+                            WorldManager.current.bramble = null;
                         }
                         if (board[x, y, z] != null && board[x, y, z] is Sigil)
                         {
-                            sigil = null;
+                            WorldManager.current.sigil = null;
                         }
                         board[x, y, z]?.EditorDeleteTileElement(board);
                         board[x, y, z] = dicoord;
@@ -157,9 +145,9 @@ public class CreatorManager : MonoBehaviour
         {
             if (primarySelection.Equals(secondarySelection))
             {
-                if (bramble != null)
+                if (WorldManager.current.bramble != null)
                 {
-                    board[bramble.GetPos().x, bramble.GetPos().y, bramble.GetPos().z].EditorDeleteTileElement(board);
+                    board[WorldManager.current.bramble.GetPos().x, WorldManager.current.bramble.GetPos().y, WorldManager.current.bramble.GetPos().z].EditorDeleteTileElement(board);
                 }
 
                 EditorTEIndices[] etei = tileModel.GetEditorTEIndices();
@@ -172,16 +160,16 @@ public class CreatorManager : MonoBehaviour
                 board[primarySelection.x, primarySelection.y, primarySelection.z].model = Instantiate(Resources.Load("Models/Bramble")) as GameObject;
                 board[primarySelection.x, primarySelection.y, primarySelection.z].BindDataToModel();
                 board[primarySelection.x, primarySelection.y, primarySelection.z].WarpToPos();
-                bramble = (Bramble)board[primarySelection.x, primarySelection.y, primarySelection.z];
+                WorldManager.current.bramble = (Bramble)board[primarySelection.x, primarySelection.y, primarySelection.z];
             }
         }
         else if (tileModel is Sigil)
         {
             if (primarySelection.Equals(secondarySelection))
             {
-                if (sigil != null)
+                if (WorldManager.current.sigil != null)
                 {
-                    board[sigil.GetPos().x, sigil.GetPos().y, sigil.GetPos().z].EditorDeleteTileElement(board);
+                    board[WorldManager.current.sigil.GetPos().x, WorldManager.current.sigil.GetPos().y, WorldManager.current.sigil.GetPos().z].EditorDeleteTileElement(board);
                 }
 
                 EditorTEIndices[] etei = tileModel.GetEditorTEIndices();
@@ -194,7 +182,7 @@ public class CreatorManager : MonoBehaviour
                 board[primarySelection.x, primarySelection.y, primarySelection.z].model = Instantiate(Resources.Load("Models/Sigil")) as GameObject;
                 board[primarySelection.x, primarySelection.y, primarySelection.z].BindDataToModel();
                 board[primarySelection.x, primarySelection.y, primarySelection.z].WarpToPos();
-                sigil = (Sigil)board[primarySelection.x, primarySelection.y, primarySelection.z];
+                WorldManager.current.sigil = (Sigil)board[primarySelection.x, primarySelection.y, primarySelection.z];
             }
         }
         else
@@ -210,11 +198,11 @@ public class CreatorManager : MonoBehaviour
                     {
                         if (board[x, y, z] != null && board[x, y, z] is Bramble)
                         {
-                            bramble = null;
+                            WorldManager.current.bramble = null;
                         }
                         if (board[x, y, z] != null && board[x, y, z] is Sigil)
                         {
-                            sigil = null;
+                            WorldManager.current.sigil = null;
                         }
                         if (board[x, y, z] != null)
                         {
@@ -231,7 +219,7 @@ public class CreatorManager : MonoBehaviour
                         board[x, y, z].WarpToPos();
                         if (board[x, y, z] is IColorable)
                         {
-                            ((IColorable)board[x, y, z]).ColorFacets(materials);
+                            ((IColorable)board[x, y, z]).ColorFacets(WorldManager.current.materials);
                         }
                     }
                 }
@@ -265,10 +253,10 @@ public class CreatorManager : MonoBehaviour
             button.transform.localPosition = new Vector3(-120 + (60 * (i % 5)), 130 - (80 * (i / 5)), 1);
             int _i = i;
             button.GetComponent<Button>().onClick.AddListener(delegate { ChangeColor(_i + 1); });
-            button.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = levelData == null ? "0" : levelData.availableVines[i].ToString();
+            button.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = WorldManager.current.levelData.availableVines.Length == 0 ? "0" : WorldManager.current.levelData.availableVines[i].ToString();
             button.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(delegate { EditAvailableVines(_i, true); });
             button.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(delegate { EditAvailableVines(_i, false); });
-            button.GetComponent<Image>().color = palette[i + 1];
+            button.GetComponent<Image>().color = WorldManager.current.palette[i + 1];
         }
     }
 
@@ -276,6 +264,8 @@ public class CreatorManager : MonoBehaviour
 
     public void ResizeBoard()
     {
+        TileElement[,,] board = WorldManager.current.board;
+
         int _x = (int)GameObject.Find("EditorCanvas/LeftMenu/InfoMenu/XSlider").GetComponent<Slider>().value;
         int _y = (int)GameObject.Find("EditorCanvas/LeftMenu/InfoMenu/YSlider").GetComponent<Slider>().value;
         int _z = (int)GameObject.Find("EditorCanvas/LeftMenu/InfoMenu/ZSlider").GetComponent<Slider>().value;
@@ -384,7 +374,7 @@ public class CreatorManager : MonoBehaviour
     {
         if (hit.transform.gameObject.GetComponent<ColoredMeshBridge>() != null)
         {
-            hit.transform.gameObject.GetComponent<MeshRenderer>().material = materials[(int)paintColor];
+            hit.transform.gameObject.GetComponent<MeshRenderer>().material = WorldManager.current.materials[(int)paintColor];
             ((IColorable)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).SetShade(paintColor,
                 hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index);
         }
@@ -410,7 +400,7 @@ public class CreatorManager : MonoBehaviour
     public void SaveLevel()
     {
         // Don't save if the vital components are missing or if the level is unnamed
-        if (bramble == null || sigil == null)
+        if (WorldManager.current.bramble == null || WorldManager.current.sigil == null)
         {
             return;
         }
@@ -421,6 +411,7 @@ public class CreatorManager : MonoBehaviour
         }
 
         // Initialize arrays and lists
+        TileElement[,,] board = WorldManager.current.board;
         Shade[,,][] grounds = new Shade[board.GetLength(0), board.GetLength(1), board.GetLength(2)][];
 
         LinkedList<TileElementNames> dataTypes = new LinkedList<TileElementNames>();
@@ -454,19 +445,19 @@ public class CreatorManager : MonoBehaviour
             GameObject.Find("EditorCanvas/LeftMenu/InfoMenu/LevelName").GetComponent<TMP_InputField>().text,
             new int[]
             {
-                bramble.GetPos().x,
-                bramble.GetPos().y,
-                bramble.GetPos().z
+                WorldManager.current.bramble.GetPos().x,
+                WorldManager.current.bramble.GetPos().y,
+                WorldManager.current.bramble.GetPos().z
             },
-            bramble.GetDirection(),
+            WorldManager.current.bramble.GetDirection(),
             new int[]
             {
-                sigil.GetPos().x,
-                sigil.GetPos().y,
-                sigil.GetPos().z
+                WorldManager.current.sigil.GetPos().x,
+                WorldManager.current.sigil.GetPos().y,
+                WorldManager.current.sigil.GetPos().z
             },
             grounds,
-            availableVines,
+            WorldManager.current.availableVines,
             dataTypes.ToArray(),
             dataInts.ToArray(),
             dataShades.ToArray()
@@ -484,7 +475,8 @@ public class CreatorManager : MonoBehaviour
     {
         tileModel = Constants.TILE_MODELS[(int)TileElementNames.Ground];
 
-        board = new TileElement[20, 10, 20];
+        WorldManager.current.board = new TileElement[20, 10, 20];
+        TileElement[,,] board = WorldManager.current.board;
 
         for (int x = 0; x < 20; x++)
         {
@@ -495,14 +487,14 @@ public class CreatorManager : MonoBehaviour
                 );
                 board[x, 0, z] = bottom;
                 bottom.model = Instantiate(Resources.Load("Models/" + tileModel.TileName())) as GameObject;
-                bottom.ColorFacets(materials);
+                bottom.ColorFacets(WorldManager.current.materials);
                 board[x, 0, z].BindDataToModel();
                 bottom.WarpToPos();
             }
         }
 
         GameObject.Find("EditorCanvas/LeftMenu/InfoMenu/LevelName").GetComponent<TMP_InputField>().text = "";
-        availableVines = new int[10];
+        WorldManager.current.availableVines = new int[10];
         
         CameraManager.current.CalibrateCamera(board);
     }
@@ -513,7 +505,7 @@ public class CreatorManager : MonoBehaviour
         CameraManager.current.onReleaseBoth += ExecuteSelection;
         
         GeneratePaletteMenu();
-        GameObject.Find("LevelAnchor/CameraAnchor/Camera").GetComponent<Camera>().backgroundColor = palette[0];
+        GameObject.Find("LevelAnchor/CameraAnchor/Camera").GetComponent<Camera>().backgroundColor = WorldManager.current.palette[0];
 
         StartCoroutine(ShowAndHideEditorMenu());
     }
@@ -523,7 +515,7 @@ public class CreatorManager : MonoBehaviour
         CameraManager.current.onClickBoth -= SetPrimarySelection;
         CameraManager.current.onReleaseBoth -= ExecuteSelection;
 
-        availableVines = null;
+        WorldManager.current.availableVines = null;
         RemoveBoard();
         foreach (Transform t in GameObject.Find("EditorCanvas/LeftMenu/ColorMenu").transform)
         {
@@ -560,6 +552,8 @@ public class CreatorManager : MonoBehaviour
 
     public void RemoveBoard()
     {
+        TileElement[,,] board = WorldManager.current.board;
+
         for (int x = 0; x < board.GetLength(0); x++)
         {
             for (int y = 0; y < board.GetLength(1); y++)
@@ -579,106 +573,108 @@ public class CreatorManager : MonoBehaviour
     {
         if (increase)
         {
-            availableVines[shade] = availableVines[shade] + 1;
+            WorldManager.current.availableVines[shade] = WorldManager.current.availableVines[shade] + 1;
 
         }
-        else if (availableVines[shade] > 0)
+        else if (WorldManager.current.availableVines[shade] > 0)
         {
-            availableVines[shade] = availableVines[shade] - 1;
+            WorldManager.current.availableVines[shade] = WorldManager.current.availableVines[shade] - 1;
         }
-        GameObject.Find("EditorCanvas/LeftMenu/ColorMenu").transform.GetChild(shade).GetChild(0).GetComponent<TextMeshProUGUI>().text = availableVines[shade].ToString();
+        GameObject.Find("EditorCanvas/LeftMenu/ColorMenu").transform.GetChild(shade).GetChild(0).GetComponent<TextMeshProUGUI>().text = WorldManager.current.availableVines[shade].ToString();
     }
 
     public void LoadLevel(string levelPath)
     {
-        levelData = (LevelData)SerializationManager.LoadData(levelPath);
-        TileElement tileModel = Constants.TILE_MODELS[(int)TileElementNames.Ground];
+        WorldManager.current.LoadLevel(levelPath, false);
 
-        availableVines = levelData.availableVines;
+        //levelData = (LevelData)SerializationManager.LoadData(levelPath);
+        //TileElement tileModel = Constants.TILE_MODELS[(int)TileElementNames.Ground];
 
-        board = new TileElement[levelData.grounds.GetLength(0), levelData.grounds.GetLength(1), levelData.grounds.GetLength(2)];
-        for (int x = 0; x < board.GetLength(0); x++)
-        {
-            for (int y = 0; y < board.GetLength(1); y++)
-            {
-                for (int z = 0; z < board.GetLength(2); z++)
-                {
-                    if (levelData.grounds[x, y, z] != null)
-                    {
-                        board[x, y, z] = tileModel.LoadTileElement(new object[] {
-                            new Vector3Int(x, y, z),
-                            levelData.grounds[x, y, z]
-                        });
-                        board[x, y, z].model = Instantiate(Resources.Load("Models/Ground")) as GameObject;
-                        board[x, y, z].BindDataToModel();
-                        board[x, y, z].WarpToPos();
-                        ((Ground)board[x, y, z]).ColorFacets(materials);
-                    }
-                }
-            }
-        }
+        //availableVines = levelData.availableVines;
 
-        bramble = (Bramble)Constants.TILE_MODELS[(int)TileElementNames.Bramble].LoadTileElement(new object[]
-        {
-            new Vector3Int(levelData.brambleCoords[0], levelData.brambleCoords[1], levelData.brambleCoords[2]),
-            levelData.brambleDirection
-        });
-        bramble.model = Instantiate(Resources.Load("Models/Bramble")) as GameObject;
-        bramble.BindDataToModel();
-        bramble.WarpToPos();
-        board[bramble.GetPos().x, bramble.GetPos().y, bramble.GetPos().z] = bramble;
+        //board = new TileElement[levelData.grounds.GetLength(0), levelData.grounds.GetLength(1), levelData.grounds.GetLength(2)];
+        //for (int x = 0; x < board.GetLength(0); x++)
+        //{
+        //    for (int y = 0; y < board.GetLength(1); y++)
+        //    {
+        //        for (int z = 0; z < board.GetLength(2); z++)
+        //        {
+        //            if (levelData.grounds[x, y, z] != null)
+        //            {
+        //                board[x, y, z] = tileModel.LoadTileElement(new object[] {
+        //                    new Vector3Int(x, y, z),
+        //                    levelData.grounds[x, y, z]
+        //                });
+        //                board[x, y, z].model = Instantiate(Resources.Load("Models/Ground")) as GameObject;
+        //                board[x, y, z].BindDataToModel();
+        //                board[x, y, z].WarpToPos();
+        //                ((Ground)board[x, y, z]).ColorFacets(materials);
+        //            }
+        //        }
+        //    }
+        //}
 
-        board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]] = (Sigil)Constants.TILE_MODELS[(int)TileElementNames.Sigil].LoadTileElement(new object[]
-        {
-            new Vector3Int(levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]),
-        });
-        board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]].model = Instantiate(Resources.Load("Models/Sigil")) as GameObject;
-        board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]].BindDataToModel();
-        board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]].WarpToPos();
-        sigil = (Sigil)board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]];
+        //bramble = (Bramble)Constants.TILE_MODELS[(int)TileElementNames.Bramble].LoadTileElement(new object[]
+        //{
+        //    new Vector3Int(levelData.brambleCoords[0], levelData.brambleCoords[1], levelData.brambleCoords[2]),
+        //    levelData.brambleDirection
+        //});
+        //bramble.model = Instantiate(Resources.Load("Models/Bramble")) as GameObject;
+        //bramble.BindDataToModel();
+        //bramble.WarpToPos();
+        //board[bramble.GetPos().x, bramble.GetPos().y, bramble.GetPos().z] = bramble;
 
-        Queue<int> intQueue = new Queue<int>();
-        for (int i = 0; i < levelData.dataInts.Length; i++)
-        {
-            intQueue.Enqueue(levelData.dataInts[i]);
-        }
-        Queue<Shade> shadeQueue = new Queue<Shade>();
-        for (int i = 0; i < levelData.dataShades.Length; i++)
-        {
-            shadeQueue.Enqueue(levelData.dataShades[i]);
-        }
+        //board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]] = (Sigil)Constants.TILE_MODELS[(int)TileElementNames.Sigil].LoadTileElement(new object[]
+        //{
+        //    new Vector3Int(levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]),
+        //});
+        //board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]].model = Instantiate(Resources.Load("Models/Sigil")) as GameObject;
+        //board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]].BindDataToModel();
+        //board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]].WarpToPos();
+        //sigil = (Sigil)board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]];
 
-        for (int i = 0; i < levelData.tileTypes.Length; i++)
-        {
-            TileElement tileBase = Constants.TILE_MODELS[(int)levelData.tileTypes[i]];
-            TileElement decompiledTile = tileBase.DecompileTileElement(ref intQueue, ref shadeQueue);
-            decompiledTile.model = Instantiate(Resources.Load("Models/" + tileBase.TileName())) as GameObject;
-            decompiledTile.BindDataToModel();
-            decompiledTile.WarpToPos();
-            decompiledTile.AdjustRender();
-            if (tileBase is Monocoord)
-            {
-                Monocoord monoTile = (Monocoord)decompiledTile;
-                board[monoTile.GetPos().x, monoTile.GetPos().y, monoTile.GetPos().z] = decompiledTile;
-            }
-            else
-            {
-                Dicoord diTile = (Dicoord)decompiledTile;
-                for (int x = diTile.GetPos1().x; x <= diTile.GetPos2().x; x++)
-                {
-                    for (int y = diTile.GetPos1().y; y <= diTile.GetPos2().y; y++)
-                    {
-                        for (int z = diTile.GetPos1().z; z <= diTile.GetPos2().z; z++)
-                        {
-                            board[x, y, z] = decompiledTile;
-                        }
-                    }
-                }
-            }
-        }
+        //Queue<int> intQueue = new Queue<int>();
+        //for (int i = 0; i < levelData.dataInts.Length; i++)
+        //{
+        //    intQueue.Enqueue(levelData.dataInts[i]);
+        //}
+        //Queue<Shade> shadeQueue = new Queue<Shade>();
+        //for (int i = 0; i < levelData.dataShades.Length; i++)
+        //{
+        //    shadeQueue.Enqueue(levelData.dataShades[i]);
+        //}
 
-        GameObject.Find("EditorCanvas/LeftMenu/InfoMenu/LevelName").GetComponent<TMP_InputField>().text = levelData.levelName;
+        //for (int i = 0; i < levelData.tileTypes.Length; i++)
+        //{
+        //    TileElement tileBase = Constants.TILE_MODELS[(int)levelData.tileTypes[i]];
+        //    TileElement decompiledTile = tileBase.DecompileTileElement(ref intQueue, ref shadeQueue);
+        //    decompiledTile.model = Instantiate(Resources.Load("Models/" + tileBase.TileName())) as GameObject;
+        //    decompiledTile.BindDataToModel();
+        //    decompiledTile.WarpToPos();
+        //    decompiledTile.AdjustRender();
+        //    if (tileBase is Monocoord)
+        //    {
+        //        Monocoord monoTile = (Monocoord)decompiledTile;
+        //        board[monoTile.GetPos().x, monoTile.GetPos().y, monoTile.GetPos().z] = decompiledTile;
+        //    }
+        //    else
+        //    {
+        //        Dicoord diTile = (Dicoord)decompiledTile;
+        //        for (int x = diTile.GetPos1().x; x <= diTile.GetPos2().x; x++)
+        //        {
+        //            for (int y = diTile.GetPos1().y; y <= diTile.GetPos2().y; y++)
+        //            {
+        //                for (int z = diTile.GetPos1().z; z <= diTile.GetPos2().z; z++)
+        //                {
+        //                    board[x, y, z] = decompiledTile;
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
 
-        CameraManager.current.CalibrateCamera(board);
+        //GameObject.Find("EditorCanvas/LeftMenu/InfoMenu/LevelName").GetComponent<TMP_InputField>().text = levelData.levelName;
+
+        //CameraManager.current.CalibrateCamera(board);
     }
 }

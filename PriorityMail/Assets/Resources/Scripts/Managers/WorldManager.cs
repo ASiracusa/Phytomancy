@@ -7,19 +7,29 @@ public class WorldManager : MonoBehaviour
     public static WorldManager current;
 
     // BOARD DATA
-    private WorldData worldData;
-    private LevelData levelData;
-    private TileElement[,,] board;
-    private Bramble bramble;
-    private Sigil sigil;
+    public WorldData worldData;
+    public LevelData levelData;
+    public TileElement[,,] board;
+    public Bramble bramble;
+    public Sigil sigil;
+    public int[] availableVines;
 
     // RENDERING AND MATERIALS
     public Color[] palette;
     public Material[] materials;
     public Material darkener;
 
-    private void LoadLevel(string levelPath, bool playing)
+    private void Start()
     {
+        current = this;
+
+        Debug.Log(WorldManager.current.levelData.availableVines == null);
+    }
+
+    public void LoadLevel(string levelPath, bool playing)
+    {
+        print("loading lelvel?");
+        print(levelPath);
         // Load LevelData and initialize the lists
         levelData = (LevelData)SerializationManager.LoadData(levelPath);
         TileElement tileModel = Constants.TILE_MODELS[(int)TileElementNames.Ground];
@@ -28,7 +38,7 @@ public class WorldManager : MonoBehaviour
         //movementAnims = new LinkedList<TileAnimationMovement>();
         //fallAnims = new LinkedList<TileAnimationFall>();
 
-        //availableVines = levelData.availableVines;
+        availableVines = levelData.availableVines;
 
         //GameObject voidPlane = Resources.Load<GameObject>("Models/VoidEdge");
 
