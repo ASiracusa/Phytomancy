@@ -586,5 +586,95 @@ public class CreatorManager : MonoBehaviour
     public void LoadLevel(string levelPath)
     {
         WorldManager.current.LoadLevel(levelPath, false);
+
+        //levelData = (LevelData)SerializationManager.LoadData(levelPath);
+        //TileElement tileModel = Constants.TILE_MODELS[(int)TileElementNames.Ground];
+
+        //availableVines = levelData.availableVines;
+
+        //board = new TileElement[levelData.grounds.GetLength(0), levelData.grounds.GetLength(1), levelData.grounds.GetLength(2)];
+        //for (int x = 0; x < board.GetLength(0); x++)
+        //{
+        //    for (int y = 0; y < board.GetLength(1); y++)
+        //    {
+        //        for (int z = 0; z < board.GetLength(2); z++)
+        //        {
+        //            if (levelData.grounds[x, y, z] != null)
+        //            {
+        //                board[x, y, z] = tileModel.LoadTileElement(new object[] {
+        //                    new Vector3Int(x, y, z),
+        //                    levelData.grounds[x, y, z]
+        //                });
+        //                board[x, y, z].model = Instantiate(Resources.Load("Models/Ground")) as GameObject;
+        //                board[x, y, z].BindDataToModel();
+        //                board[x, y, z].WarpToPos();
+        //                ((Ground)board[x, y, z]).ColorFacets(materials);
+        //            }
+        //        }
+        //    }
+        //}
+
+        //bramble = (Bramble)Constants.TILE_MODELS[(int)TileElementNames.Bramble].LoadTileElement(new object[]
+        //{
+        //    new Vector3Int(levelData.brambleCoords[0], levelData.brambleCoords[1], levelData.brambleCoords[2]),
+        //    levelData.brambleDirection
+        //});
+        //bramble.model = Instantiate(Resources.Load("Models/Bramble")) as GameObject;
+        //bramble.BindDataToModel();
+        //bramble.WarpToPos();
+        //board[bramble.GetPos().x, bramble.GetPos().y, bramble.GetPos().z] = bramble;
+
+        //board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]] = (Sigil)Constants.TILE_MODELS[(int)TileElementNames.Sigil].LoadTileElement(new object[]
+        //{
+        //    new Vector3Int(levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]),
+        //});
+        //board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]].model = Instantiate(Resources.Load("Models/Sigil")) as GameObject;
+        //board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]].BindDataToModel();
+        //board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]].WarpToPos();
+        //sigil = (Sigil)board[levelData.sigilCoords[0], levelData.sigilCoords[1], levelData.sigilCoords[2]];
+
+        //Queue<int> intQueue = new Queue<int>();
+        //for (int i = 0; i < levelData.dataInts.Length; i++)
+        //{
+        //    intQueue.Enqueue(levelData.dataInts[i]);
+        //}
+        //Queue<Shade> shadeQueue = new Queue<Shade>();
+        //for (int i = 0; i < levelData.dataShades.Length; i++)
+        //{
+        //    shadeQueue.Enqueue(levelData.dataShades[i]);
+        //}
+
+        //for (int i = 0; i < levelData.tileTypes.Length; i++)
+        //{
+        //    TileElement tileBase = Constants.TILE_MODELS[(int)levelData.tileTypes[i]];
+        //    TileElement decompiledTile = tileBase.DecompileTileElement(ref intQueue, ref shadeQueue);
+        //    decompiledTile.model = Instantiate(Resources.Load("Models/" + tileBase.TileName())) as GameObject;
+        //    decompiledTile.BindDataToModel();
+        //    decompiledTile.WarpToPos();
+        //    decompiledTile.AdjustRender();
+        //    if (tileBase is Monocoord)
+        //    {
+        //        Monocoord monoTile = (Monocoord)decompiledTile;
+        //        board[monoTile.GetPos().x, monoTile.GetPos().y, monoTile.GetPos().z] = decompiledTile;
+        //    }
+        //    else
+        //    {
+        //        Dicoord diTile = (Dicoord)decompiledTile;
+        //        for (int x = diTile.GetPos1().x; x <= diTile.GetPos2().x; x++)
+        //        {
+        //            for (int y = diTile.GetPos1().y; y <= diTile.GetPos2().y; y++)
+        //            {
+        //                for (int z = diTile.GetPos1().z; z <= diTile.GetPos2().z; z++)
+        //                {
+        //                    board[x, y, z] = decompiledTile;
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
+
+        //GameObject.Find("EditorCanvas/LeftMenu/InfoMenu/LevelName").GetComponent<TMP_InputField>().text = levelData.levelName;
+
+        //CameraManager.current.CalibrateCamera(board);
     }
 }
