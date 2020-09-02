@@ -151,35 +151,13 @@ public class EditorMenuManager : MonoBehaviour
 
     public void MakeNewLevel ()
     {
-        print(WorldManager.current.levelData.levelName);
-
         WorldData worldData = WorldManager.current.worldData;
 
         editorMenuCanvas.SetActive(false);
         editorCanvas.SetActive(true);
 
-        WorldManager.current.palette = new Color[]
-        {
-            new Color(worldData.reds[0], worldData.greens[0], worldData.blues[0]),
-            new Color(worldData.reds[1], worldData.greens[1], worldData.blues[1]),
-            new Color(worldData.reds[2], worldData.greens[2], worldData.blues[2]),
-            new Color(worldData.reds[3], worldData.greens[3], worldData.blues[3]),
-            new Color(worldData.reds[4], worldData.greens[4], worldData.blues[4]),
-            new Color(worldData.reds[5], worldData.greens[5], worldData.blues[5]),
-            new Color(worldData.reds[6], worldData.greens[6], worldData.blues[6]),
-            new Color(worldData.reds[7], worldData.greens[7], worldData.blues[7]),
-            new Color(worldData.reds[8], worldData.greens[8], worldData.blues[8]),
-            new Color(worldData.reds[9], worldData.greens[9], worldData.blues[9]),
-            new Color(worldData.reds[10], worldData.greens[10], worldData.blues[10])
-        };
-        WorldManager.current.materials = new Material[11];
-        for (int i = 0; i < 11; i++)
-        {
-            WorldManager.current.materials[i] = new Material(Resources.Load<Material>("Materials/TwotoneMat"));
-            WorldManager.current.materials[i].SetColor("_TopColor", WorldManager.current.palette[i]);
-            WorldManager.current.materials[i].SetColor("_FrontColor", Color.Lerp(WorldManager.current.palette[i], WorldManager.current.palette[0], 0.45f));
-            WorldManager.current.materials[i].SetColor("_SideColor", Color.Lerp(WorldManager.current.palette[i], WorldManager.current.palette[0], 0.6f));
-        }
+        WorldManager.current.GenerateMaterials();
+
         CreatorManager.current.GenerateNewLevel();
         CreatorManager.current.OpenLevel();
     }
@@ -239,28 +217,8 @@ public class EditorMenuManager : MonoBehaviour
         editorMenuCanvas.SetActive(false);
         editorCanvas.SetActive(true);
 
-        WorldManager.current.palette = new Color[]
-        {
-            new Color(worldData.reds[0], worldData.greens[0], worldData.blues[0]),
-            new Color(worldData.reds[1], worldData.greens[1], worldData.blues[1]),
-            new Color(worldData.reds[2], worldData.greens[2], worldData.blues[2]),
-            new Color(worldData.reds[3], worldData.greens[3], worldData.blues[3]),
-            new Color(worldData.reds[4], worldData.greens[4], worldData.blues[4]),
-            new Color(worldData.reds[5], worldData.greens[5], worldData.blues[5]),
-            new Color(worldData.reds[6], worldData.greens[6], worldData.blues[6]),
-            new Color(worldData.reds[7], worldData.greens[7], worldData.blues[7]),
-            new Color(worldData.reds[8], worldData.greens[8], worldData.blues[8]),
-            new Color(worldData.reds[9], worldData.greens[9], worldData.blues[9]),
-            new Color(worldData.reds[10], worldData.greens[10], worldData.blues[10])
-        };
-        WorldManager.current.materials = new Material[11];
-        for (int i = 0; i < 11; i++)
-        {
-            WorldManager.current.materials[i] = new Material(Resources.Load<Material>("Materials/TwotoneMat"));
-            WorldManager.current.materials[i].SetColor("_TopColor", WorldManager.current.palette[i]);
-            WorldManager.current.materials[i].SetColor("_FrontColor", Color.Lerp(WorldManager.current.palette[i], WorldManager.current.palette[0], 0.45f));
-            WorldManager.current.materials[i].SetColor("_SideColor", Color.Lerp(WorldManager.current.palette[i], WorldManager.current.palette[0], 0.6f));
-        }
+        WorldManager.current.GenerateMaterials();
+        
         CreatorManager.current.LoadLevel(levelPath);
         CreatorManager.current.OpenLevel();
     }
