@@ -126,9 +126,11 @@ public class WorldManager : MonoBehaviour
                 }
             }
         }
+
+        CameraManager.current.CalibrateCamera(board);
     }
 
-    private void GenerateMaterials ()
+    public void GenerateMaterials ()
     {
         palette = new Color[]
         {
