@@ -26,8 +26,8 @@ public class Vine : Monocoord
     {
         model.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().materials = new Material[]
         {
-            LevelManager.current.materials[(int)color],
-            LevelManager.current.darkener
+            WorldManager.current.materials[(int)color],
+            WorldManager.current.darkener
         };
 
         model.transform.GetChild(0).localPosition = Constants.VINE_ANCHORS[(int)origin];

@@ -34,14 +34,17 @@ public class WorldManager : MonoBehaviour
         levelData = (LevelData)SerializationManager.LoadData(levelPath);
         TileElement tileModel = Constants.TILE_MODELS[(int)TileElementNames.Ground];
 
-        //undoData = new Stack<Stack<BoardStateChange>>();
-        //movementAnims = new LinkedList<TileAnimationMovement>();
-        //fallAnims = new LinkedList<TileAnimationFall>();
-
-        availableVines = levelData.availableVines;
+        if (playing)
+        {
+            //undoData = new Stack<Stack<BoardStateChange>>();
+            //movementAnims = new LinkedList<TileAnimationMovement>();
+            //fallAnims = new LinkedList<TileAnimationFall>();
+        }
 
         //GameObject voidPlane = Resources.Load<GameObject>("Models/VoidEdge");
 
+        availableVines = levelData.availableVines;
+        
         // Create the Grounds
         board = new TileElement[levelData.grounds.GetLength(0), levelData.grounds.GetLength(1), levelData.grounds.GetLength(2)];
         for (int x = 0; x < board.GetLength(0); x++)

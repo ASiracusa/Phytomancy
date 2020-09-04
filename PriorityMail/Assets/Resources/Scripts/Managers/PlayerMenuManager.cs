@@ -9,8 +9,6 @@ using UnityEngine.SceneManagement;
 public class PlayerMenuManager : MonoBehaviour
 {
     public static PlayerMenuManager current;
-
-    private WorldData worldData;
     
     private GameObject levelMenuCanvas;
     private GameObject worldSelectorMenu;
@@ -53,7 +51,7 @@ public class PlayerMenuManager : MonoBehaviour
     public void ChooseWorldForEditing(string _worldName)
     {
         Debug.Log("here uwu");
-        worldData = (WorldData)SerializationManager.LoadData(Application.persistentDataPath + "/worlds/" + _worldName + "/worldData.wld");
+        WorldManager.current.worldData = (WorldData)SerializationManager.LoadData(Application.persistentDataPath + "/worlds/" + _worldName + "/worldData.wld");
         levelSelectorMenu.SetActive(true);
         worldSelectorMenu.SetActive(false);
 
@@ -67,13 +65,13 @@ public class PlayerMenuManager : MonoBehaviour
             Destroy(t.gameObject);
         }
         
-        string[] levelNames = Directory.GetFiles(Application.persistentDataPath + "/worlds\\" + worldData.worldName);
+        string[] levelNames = Directory.GetFiles(Application.persistentDataPath + "/worlds\\" + WorldManager.current.worldData.worldName);
 
         GameObject levelAssetModel = Resources.Load<GameObject>("Prefabs/LevelPlayerUIElement");
         int levelNameOffset = -1;
         for (int i = 0; i < levelNames.Length; i++)
         {
-            string levelName = levelNames[i].Substring(Application.persistentDataPath.Length + 9 + worldData.worldName.Length, levelNames[i].Length - 4 - Application.persistentDataPath.Length - 9 - worldData.worldName.Length);
+            string levelName = levelNames[i].Substring(Application.persistentDataPath.Length + 9 + WorldManager.current.worldData.worldName.Length, levelNames[i].Length - 4 - Application.persistentDataPath.Length - 9 - WorldManager.current.worldData.worldName.Length);
             if (levelName.Equals("worldData"))
             {
                 continue;
@@ -96,7 +94,7 @@ public class PlayerMenuManager : MonoBehaviour
     {
         levelMenuCanvas.SetActive(false);
 
-        LevelManager.current.OpenLevel(worldData, levelPath);
+        LevelManager.current.OpenLevel(WorldManager.current.worldData, levelPath);
     }
     
     public void ReturnToLevelSelector()
