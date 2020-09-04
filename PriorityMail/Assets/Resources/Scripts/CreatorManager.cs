@@ -516,7 +516,7 @@ public class CreatorManager : MonoBehaviour
         CameraManager.current.onReleaseBoth -= ExecuteSelection;
 
         WorldManager.current.availableVines = null;
-        RemoveBoard();
+        WorldManager.current.RemoveBoard();
         foreach (Transform t in GameObject.Find("EditorCanvas/LeftMenu/ColorMenu").transform)
         {
             Destroy(t.gameObject);
@@ -547,25 +547,6 @@ public class CreatorManager : MonoBehaviour
                 GameObject.Find("EditorCanvas/LeftMenu").transform.localPosition = Vector3.Lerp(GameObject.Find("EditorCanvas/LeftMenu").transform.localPosition, targetPos, 0.2f);
             }
             yield return null;
-        }
-    }
-
-    public void RemoveBoard()
-    {
-        TileElement[,,] board = WorldManager.current.board;
-
-        for (int x = 0; x < board.GetLength(0); x++)
-        {
-            for (int y = 0; y < board.GetLength(1); y++)
-            {
-                for (int z = 0; z < board.GetLength(2); z++)
-                {
-                    if (board[x, y, z] != null)
-                    {
-                        board[x, y, z].EditorDeleteTileElement(board);
-                    }
-                }
-            }
         }
     }
 
