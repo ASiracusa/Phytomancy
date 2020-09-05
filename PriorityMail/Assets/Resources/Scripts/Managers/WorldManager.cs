@@ -18,6 +18,7 @@ public class WorldManager : MonoBehaviour
     public Color[] palette;
     public Material[] materials;
     public Material darkener;
+    public Material voidGradient;
 
     private void Start()
     {
@@ -33,15 +34,6 @@ public class WorldManager : MonoBehaviour
         // Load LevelData and initialize the lists
         levelData = (LevelData)SerializationManager.LoadData(levelPath);
         TileElement tileModel = Constants.TILE_MODELS[(int)TileElementNames.Ground];
-
-        if (playing)
-        {
-            //undoData = new Stack<Stack<BoardStateChange>>();
-            //movementAnims = new LinkedList<TileAnimationMovement>();
-            //fallAnims = new LinkedList<TileAnimationFall>();
-        }
-
-        //GameObject voidPlane = Resources.Load<GameObject>("Models/VoidEdge");
 
         availableVines = levelData.availableVines;
         
@@ -178,5 +170,57 @@ public class WorldManager : MonoBehaviour
 
         darkener = new Material(Resources.Load<Material>("Materials/DarkenMat"));
         darkener.SetColor("_BlendColor", palette[0]);
+
+        voidGradient = new Material(Resources.Load<Material>("Materials/VoidGradientMat"));
+        voidGradient.SetColor("_GradientColor", WorldManager.current.palette[0]);
+    }
+
+    public void GenerateVoidGradient()
+    {
+        GameObject voidPlane = Resources.Load<GameObject>("Models/VoidEdge");
+        GameObject edges = GameObject.Find("Edges");
+
+        for (int x = 0; x < board.GetLength(0); x++)
+        {
+            for (int z = 0; z < board.GetLength(2); z++)
+            {
+                if (levelData.grounds[x, 0, z] != null)
+                {
+                    GameObject northEdge = Instantiate(voidPlane, new Vector3(x, -5, z + 0.5f), Quaternion.identity, edges.transform);
+                    northEdge.transform.eulerAngles = new Vector3(90, 0, 0);
+                    northEdge.GetComponent<MeshRenderer>().materials = new Material[] {
+                        materials[(int)(levelData.grounds[x, 0, z][2])],
+                        voidGradient
+                    };
+                    GameObject eastEdge = Instantiate(voidPlane, new Vector3(x - 0.5f, -5, z), Quaternion.identity, edges.transform);
+                    eastEdge.transform.eulerAngles = new Vector3(90, 0, 90);
+                    eastEdge.GetComponent<MeshRenderer>().materials = new Material[] {
+                        materials[(int)(levelData.grounds[x, 0, z][5])],
+                        voidGradient
+                    };
+                    GameObject southEdge = Instantiate(voidPlane, new Vector3(x, -5, z - 0.5f), Quaternion.identity, edges.transform);
+                    southEdge.transform.eulerAngles = new Vector3(90, 0, 180);
+                    southEdge.GetComponent<MeshRenderer>().materials = new Material[] {
+                        materials[(int)(levelData.grounds[x, 0, z][3])],
+                        voidGradient
+                    };
+                    GameObject westEdge = Instantiate(voidPlane, new Vector3(x + 0.5f, -5, z), Quaternion.identity, edges.transform);
+                    westEdge.transform.eulerAngles = new Vector3(90, 0, 270);
+                    westEdge.GetComponent<MeshRenderer>().materials = new Material[] {
+                        materials[(int)(levelData.grounds[x, 0, z][4])],
+                        voidGradient
+                    };
+                }
+            }
+        }
+    }
+
+    public void DestroyVoidGradient ()
+    {
+        GameObject edges = GameObject.Find("Edges");
+        for (int i = 0; i < edges.transform.childCount; i++)
+        {
+            Destroy(edges.transform.GetChild(i).gameObject);
+        }
     }
 }
