@@ -804,6 +804,7 @@ GameObject:
   - component: {fileID: 1314063556}
   - component: {fileID: 1314063555}
   - component: {fileID: 1314063557}
+  - component: {fileID: 1314063558}
   m_Layer: 0
   m_Name: LevelManager
   m_TagString: Untagged
@@ -823,20 +824,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 633c7cc6a869a1145a3726994042369c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  palette:
-  - {r: 1.977374e+33, g: 4.75e-43, b: 0.00017377875, a: 0.00000016502374}
-  - {r: 5.429102e+30, g: 4.72e-43, b: 4.6e-44, a: 3.416553e+21}
-  - {r: 1.977374e+33, g: 4.75e-43, b: 1.977379e+33, a: 4.75e-43}
-  - {r: 5.4291214e+30, g: 4.72e-43, b: 6.9e-44, a: 0}
-  - {r: 1.977374e+33, g: 4.75e-43, b: 1.977379e+33, a: 4.75e-43}
-  - {r: 1.9773839e+33, g: 4.75e-43, b: 0, a: 0}
-  - {r: 5.429141e+30, g: 4.72e-43, b: 9.1e-44, a: 0}
-  - {r: 1.977374e+33, g: 4.75e-43, b: 1.977379e+33, a: 4.75e-43}
-  - {r: 1.9773839e+33, g: 4.75e-43, b: 1.9773889e+33, a: 4.75e-43}
-  - {r: 5.42917e+30, g: 4.72e-43, b: 1.36e-43, a: 0}
-  - {r: 1.977374e+33, g: 4.75e-43, b: 1.977379e+33, a: 4.75e-43}
-  materials: []
-  darkener: {fileID: 0}
   voidGradient: {fileID: 0}
 --- !u!4 &1314063556
 Transform:
@@ -864,6 +851,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5cc6ea9d94c9ab40a7c5ad761891c84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1314063558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1314063554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 032de3a38f2c0b04696a7cf032604ee0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  worldData:
+    worldName: 
+    reds: []
+    greens: []
+    blues: []
+    levelOrder: []
+  levelData:
+    levelName: 
+    brambleCoords: 
+    brambleDirection: 0
+    sigilCoords: 
+    availableVines: 
+    tileTypes: 
+    dataInts: 
+    dataShades: 
+  availableVines: 
+  palette: []
+  materials: []
+  darkener: {fileID: 0}
 --- !u!1 &1323634714
 GameObject:
   m_ObjectHideFlags: 0

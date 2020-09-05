@@ -149,4 +149,15 @@ public class Constants
         new Vector3(0, 0, 0)
     };
 
+    public static int DirectionToDegree (Facet direction)
+    {
+        int[] degrees = new int[]
+        {
+            90,
+            0,
+            270,
+            180,
+        };
+        return degrees[(int)direction];
+    }
 }

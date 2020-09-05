@@ -34,6 +34,14 @@ public abstract class TileElement
         Squishy = squishy;
     }
 
+    public void FaceTowards (Facet direction)
+    {
+        if (model != null)
+        {
+            model.transform.eulerAngles = new Vector3(0, Constants.DirectionToDegree(direction), 0);
+        }
+    }
+
     public abstract void WarpToPos();
 
     public abstract void MoveToPos(bool accelerate);
