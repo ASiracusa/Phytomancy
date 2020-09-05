@@ -124,7 +124,7 @@ public class LevelManager : MonoBehaviour
 
     private void TraceVine(RaycastHit hit)
     {
-        if (hit.distance == 0 || !((hit.transform == tracedVine) || (hit.transform == tracedVine.parent)))
+        if (Input.GetMouseButton(0) && (hit.distance == 0 || !((hit.transform == tracedVine) || (hit.transform == tracedVine.parent))))
         {
             float deltaX = Input.mousePosition.x - CameraManager.current.cam.WorldToScreenPoint(tracedVine.position).x;
             float deltaY = Input.mousePosition.y - CameraManager.current.cam.WorldToScreenPoint(tracedVine.position).y;
@@ -179,7 +179,11 @@ public class LevelManager : MonoBehaviour
                 int vinesOfColor = WorldManager.current.availableVines[(int)vineColor - 1];
                 Vector3Int stemCoords = CameraManager.GetAdjacentCoords(hit, false);
 
-                if (vinesOfColor > 0 && (!(board[stemCoords.x, stemCoords.y, stemCoords.z] is Vine) || ((Vine)board[stemCoords.x, stemCoords.y, stemCoords.z]).GetVine() == null))
+                if (vinesOfColor <= 0)
+                {
+                    CameraManager.current.ShakeCamera(0.05f, 8f);
+                }
+                else if (!(board[stemCoords.x, stemCoords.y, stemCoords.z] is Vine) || ((Vine)board[stemCoords.x, stemCoords.y, stemCoords.z]).GetVine() == null)
                 {
                     Vector3Int vineCoords = CameraManager.GetAdjacentCoords(hit, true);
                     if (vineCoords.x < 0 || vineCoords.y < 0 || vineCoords.z < 0 ||

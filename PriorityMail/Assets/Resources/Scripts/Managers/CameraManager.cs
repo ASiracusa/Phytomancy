@@ -183,6 +183,23 @@ public class CameraManager : MonoBehaviour
         levelAnchor.transform.localPosition = new Vector3((board.GetLength(0) - 1) / 2.0f, 0, (board.GetLength(2) - 1) / 2.0f);
     }
 
+    public void ShakeCamera (float duration, float intensity)
+    {
+        StartCoroutine(ShakeCameraHelper(duration, intensity));
+    }
+
+    private IEnumerator ShakeCameraHelper (float duration, float intensity)
+    {
+        float start = Time.time;
+        while (Time.time < start + duration)
+        {
+            float angle = UnityEngine.Random.Range(0, 2 * Mathf.PI);
+            cam.transform.localPosition = new Vector3(Mathf.Cos(angle) * cam.orthographicSize * intensity * 0.001f, Mathf.Sin(angle) * cam.orthographicSize * intensity * 0.001f, 0);
+            yield return null;
+        }
+        cam.transform.localPosition = Vector3.zero;
+    }
+
     public Facet GetCameraOrientation ()
     {
         float y = camAnchor.transform.localEulerAngles.y;
