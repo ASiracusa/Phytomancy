@@ -279,6 +279,7 @@ public class LevelManager : MonoBehaviour
         board[vineCoords.x, vineCoords.y, vineCoords.z].BindDataToModel();
         board[vineCoords.x, vineCoords.y, vineCoords.z].AdjustRender();
         board[vineCoords.x, vineCoords.y, vineCoords.z].WarpToPos();
+        StartCoroutine(GrowVine((Vine)(board[vineCoords.x, vineCoords.y, vineCoords.z])));
 
         if (tracedVine.gameObject.GetComponent<ColoredMeshBridge>().data is Vine)
         {
@@ -290,6 +291,30 @@ public class LevelManager : MonoBehaviour
         AddUndoData(new BoardCreationState(vine));
 
         AdjustAvailableVinesUI(vineColor, -1);
+        CameraManager.current.ShakeCamera(0.1f, 3f);
+    }
+
+    private IEnumerator GrowVine (Vine vine)
+    {
+        float t = Time.time;
+        vine.model.transform.GetChild(0).localScale = new Vector3(
+            Constants.VINE_STRETCHES[(int)vine.GetOrigin()].x == 1 ? 1 : 0,
+            Constants.VINE_STRETCHES[(int)vine.GetOrigin()].y == 1 ? 1 : 0,
+            Constants.VINE_STRETCHES[(int)vine.GetOrigin()].z == 1 ? 1 : 0);
+        vine.model.transform.GetChild(0).localPosition = Constants.VINE_STARTS[(int)vine.GetOrigin()];
+
+        while (Time.time - t < 0.1f)
+        {
+            if (vine.model != null)
+            {
+                vine.model.transform.GetChild(0).localScale = Vector3.Lerp(vine.model.transform.GetChild(0).localScale, Constants.VINE_STRETCHES[(int)vine.GetOrigin()], 0.2f);
+                vine.model.transform.GetChild(0).localPosition = Vector3.Lerp(vine.model.transform.GetChild(0).localPosition, Constants.VINE_ANCHORS[(int)vine.GetOrigin()], 0.2f);
+            }
+            yield return null;
+        }
+
+        vine.model.transform.GetChild(0).localScale = Constants.VINE_STRETCHES[(int)vine.GetOrigin()];
+        vine.model.transform.GetChild(0).localPosition = Constants.VINE_ANCHORS[(int)vine.GetOrigin()];
     }
 
     private void ClearSpaciousTiles()

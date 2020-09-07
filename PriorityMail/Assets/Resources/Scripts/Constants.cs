@@ -149,6 +149,16 @@ public class Constants
         new Vector3(0, 0, 0)
     };
 
+    public static readonly Vector3[] VINE_STARTS = new Vector3[]
+    {
+        new Vector3(0.5f, 0.1f, 0),
+        new Vector3(0, 0.1f, 0.5f),
+        new Vector3(-0.5f, 0.1f, 0),
+        new Vector3(0, 0.1f, -0.5f),
+        new Vector3(0, -0.5f, 0),
+        new Vector3(0, -0.5f, 0)
+    };
+
     public static int DirectionToDegree (Facet direction)
     {
         int[] degrees = new int[]
