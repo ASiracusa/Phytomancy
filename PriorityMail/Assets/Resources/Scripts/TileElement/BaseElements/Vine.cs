@@ -24,11 +24,7 @@ public class Vine : Monocoord
 
     public override void AdjustRender()
     {
-        model.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().materials = new Material[]
-        {
-            WorldManager.current.materials[(int)color],
-            WorldManager.current.darkener
-        };
+        model.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material = WorldManager.current.litDarks[(int)color];
 
         model.transform.GetChild(0).localPosition = Constants.VINE_ANCHORS[(int)origin];
         model.transform.GetChild(0).localScale = Constants.VINE_STRETCHES[(int)origin];

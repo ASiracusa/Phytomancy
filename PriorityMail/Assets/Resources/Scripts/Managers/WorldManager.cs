@@ -16,15 +16,16 @@ public class WorldManager : MonoBehaviour
 
     // RENDERING AND MATERIALS
     public Color[] palette;
-    public Material[] materials;
+    public Material[] unlitBases;
+    public Material[] litBases;
+    public Material[] unlitDarks;
+    public Material[] litDarks;
     public Material darkener;
     public Material voidGradient;
 
     private void Start()
     {
         current = this;
-
-        Debug.Log(WorldManager.current.levelData.availableVines == null);
     }
 
     public void LoadLevel(string levelPath, bool playing)
@@ -54,7 +55,7 @@ public class WorldManager : MonoBehaviour
                         board[x, y, z].model = Instantiate(Resources.Load("Models/Ground")) as GameObject;
                         board[x, y, z].BindDataToModel();
                         board[x, y, z].WarpToPos();
-                        ((Ground)board[x, y, z]).ColorFacets(materials);
+                        ((Ground)board[x, y, z]).ColorFacets(litBases);
                     }
                 }
             }
@@ -159,13 +160,24 @@ public class WorldManager : MonoBehaviour
             new Color(worldData.reds[10], worldData.greens[10], worldData.blues[10])
         };
 
-        materials = new Material[11];
+        unlitBases = new Material[11];
+        litBases = new Material[11];
+        unlitDarks = new Material[11];
+        litDarks = new Material[11];
         for (int i = 0; i < 11; i++)
         {
-            materials[i] = new Material(Resources.Load<Material>("Materials/TwotoneMat"));
-            materials[i].SetColor("_TopColor", palette[i]);
-            materials[i].SetColor("_FrontColor", Color.Lerp(palette[i], palette[0], 0.45f));
-            materials[i].SetColor("_SideColor", Color.Lerp(palette[i], palette[0], 0.6f));
+            unlitBases[i] = new Material(Resources.Load<Material>("Materials/BaseMat"));
+            unlitBases[i].SetColor("_BaseColor", palette[i]);
+            litBases[i] = new Material(Resources.Load<Material>("Materials/TwotoneMat"));
+            litBases[i].SetColor("_TopColor", palette[i]);
+            litBases[i].SetColor("_FrontColor", Color.Lerp(palette[i], palette[0], 0.2f));
+            litBases[i].SetColor("_SideColor", Color.Lerp(palette[i], palette[0], 0.4f));
+            unlitDarks[i] = new Material(Resources.Load<Material>("Materials/BaseMat"));
+            unlitDarks[i].SetColor("_BaseColor", palette[i]);
+            litDarks[i] = new Material(Resources.Load<Material>("Materials/TwotoneMat"));
+            litDarks[i].SetColor("_TopColor", Color.Lerp(palette[i], palette[0], 0.3f));
+            litDarks[i].SetColor("_FrontColor", Color.Lerp(palette[i], palette[0], 0.5f));
+            litDarks[i].SetColor("_SideColor", Color.Lerp(palette[i], palette[0], 0.7f));
         }
 
         darkener = new Material(Resources.Load<Material>("Materials/DarkenMat"));
@@ -189,25 +201,25 @@ public class WorldManager : MonoBehaviour
                     GameObject northEdge = Instantiate(voidPlane, new Vector3(x, -5, z + 0.5f), Quaternion.identity, edges.transform);
                     northEdge.transform.eulerAngles = new Vector3(90, 0, 0);
                     northEdge.GetComponent<MeshRenderer>().materials = new Material[] {
-                        materials[(int)(levelData.grounds[x, 0, z][2])],
+                        litBases[(int)(levelData.grounds[x, 0, z][2])],
                         voidGradient
                     };
                     GameObject eastEdge = Instantiate(voidPlane, new Vector3(x - 0.5f, -5, z), Quaternion.identity, edges.transform);
                     eastEdge.transform.eulerAngles = new Vector3(90, 0, 90);
                     eastEdge.GetComponent<MeshRenderer>().materials = new Material[] {
-                        materials[(int)(levelData.grounds[x, 0, z][5])],
+                        litBases[(int)(levelData.grounds[x, 0, z][5])],
                         voidGradient
                     };
                     GameObject southEdge = Instantiate(voidPlane, new Vector3(x, -5, z - 0.5f), Quaternion.identity, edges.transform);
                     southEdge.transform.eulerAngles = new Vector3(90, 0, 180);
                     southEdge.GetComponent<MeshRenderer>().materials = new Material[] {
-                        materials[(int)(levelData.grounds[x, 0, z][3])],
+                        litBases[(int)(levelData.grounds[x, 0, z][3])],
                         voidGradient
                     };
                     GameObject westEdge = Instantiate(voidPlane, new Vector3(x + 0.5f, -5, z), Quaternion.identity, edges.transform);
                     westEdge.transform.eulerAngles = new Vector3(90, 0, 270);
                     westEdge.GetComponent<MeshRenderer>().materials = new Material[] {
-                        materials[(int)(levelData.grounds[x, 0, z][4])],
+                        litBases[(int)(levelData.grounds[x, 0, z][4])],
                         voidGradient
                     };
                 }

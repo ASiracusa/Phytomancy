@@ -824,7 +824,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 633c7cc6a869a1145a3726994042369c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  voidGradient: {fileID: 0}
 --- !u!4 &1314063556
 Transform:
   m_ObjectHideFlags: 0
@@ -881,7 +880,9 @@ MonoBehaviour:
   availableVines: 
   palette: []
   materials: []
+  triplanars: []
   darkener: {fileID: 0}
+  voidGradient: {fileID: 0}
 --- !u!1 &1323634714
 GameObject:
   m_ObjectHideFlags: 0

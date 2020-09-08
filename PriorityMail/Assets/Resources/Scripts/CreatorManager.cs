@@ -118,7 +118,7 @@ public class CreatorManager : MonoBehaviour
             dicoord.AdjustRender();
             if (dicoord is IColorable)
             {
-                ((IColorable)dicoord).ColorFacets(WorldManager.current.materials);
+                ((IColorable)dicoord).ColorFacets(WorldManager.current.litBases);
             }
 
             for (int x = primarySelection.x; x <= secondarySelection.x; x++)
@@ -219,7 +219,7 @@ public class CreatorManager : MonoBehaviour
                         board[x, y, z].WarpToPos();
                         if (board[x, y, z] is IColorable)
                         {
-                            ((IColorable)board[x, y, z]).ColorFacets(WorldManager.current.materials);
+                            ((IColorable)board[x, y, z]).ColorFacets(WorldManager.current.litBases);
                         }
                     }
                 }
@@ -374,7 +374,7 @@ public class CreatorManager : MonoBehaviour
     {
         if (hit.transform.gameObject.GetComponent<ColoredMeshBridge>() != null)
         {
-            hit.transform.gameObject.GetComponent<MeshRenderer>().material = WorldManager.current.materials[(int)paintColor];
+            hit.transform.gameObject.GetComponent<MeshRenderer>().material = WorldManager.current.unlitBases[(int)paintColor];
             ((IColorable)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).SetShade(paintColor,
                 hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index);
         }
@@ -487,7 +487,7 @@ public class CreatorManager : MonoBehaviour
                 );
                 board[x, 0, z] = bottom;
                 bottom.model = Instantiate(Resources.Load("Models/" + tileModel.TileName())) as GameObject;
-                bottom.ColorFacets(WorldManager.current.materials);
+                bottom.ColorFacets(WorldManager.current.litBases);
                 board[x, 0, z].BindDataToModel();
                 bottom.WarpToPos();
             }
