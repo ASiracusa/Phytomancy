@@ -879,8 +879,10 @@ MonoBehaviour:
     dataShades: 
   availableVines: 
   palette: []
-  materials: []
-  triplanars: []
+  unlitBases: []
+  litBases: []
+  unlitDarks: []
+  litDarks: []
   darkener: {fileID: 0}
   voidGradient: {fileID: 0}
 --- !u!1 &1323634714
