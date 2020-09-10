@@ -1,16 +1,16 @@
 fileFormatVersion: 2
-guid: e3265ab4bf004d28a9537516768c1c75
+guid: 921400110aa9fa64c8a43f08fe538007
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
   fontSize: 16
-  forceTextureCase: -1
+  forceTextureCase: -2
   characterSpacing: 0
   characterPadding: 1
   includeFontData: 1
-  fontName: Liberation Sans
+  fontName: Pixellari
   fontNames:
-  - Liberation Sans
+  - Pixellari
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0
