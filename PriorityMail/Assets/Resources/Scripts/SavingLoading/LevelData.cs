@@ -29,6 +29,55 @@ public class LevelData
 }
 
 [System.Serializable]
+public class LevelData2
+{
+    public string levelName;
+
+    public int x;
+    public int y;
+    public int z;
+    public float startRotation;
+    public float startZoom;
+
+    public int[] brambleCoords;
+    public Facet brambleDirection;
+    public int[] sigilCoords;
+
+    public int[] availableVines;
+
+    public int[][] grounds;
+    public int[][] decals;
+
+    public TileElementNames[] tileTypes;
+    public int[] dataInts;
+    public Shade[] dataShades;
+
+    public LevelData2(string _levelName, int _x, int _y, int _z, float _startRotation, float _startZoom, int[] _brambleCoords, Facet _brambleDirection, int[] _sigilCoords, int[] _availableVines, int[][] _grounds, int[][] _decals, TileElementNames[] _tileTypes, int[] _dataInts, Shade[] _dataShades)
+    {
+        levelName = _levelName;
+
+        x = _x;
+        y = _y;
+        z = _z;
+        startRotation = _startRotation;
+        startZoom = _startZoom;
+
+        brambleCoords = _brambleCoords;
+        brambleDirection = _brambleDirection;
+        sigilCoords = _sigilCoords;
+
+        availableVines = _availableVines;
+
+        grounds = _grounds;
+        decals = _decals;
+
+        tileTypes = _tileTypes;
+        dataInts = _dataInts;
+        dataShades = _dataShades;
+    }
+}
+
+[System.Serializable]
 public class WorldData
 {
     public string worldName;

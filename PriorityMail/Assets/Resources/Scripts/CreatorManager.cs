@@ -469,7 +469,95 @@ public class CreatorManager : MonoBehaviour
         LevelData ld = (LevelData)SerializationManager.LoadData(Application.persistentDataPath + "/worlds/" + EditorMenuManager.current.GetWorldName() + "/" + _ld.levelName + ".lvl");
     }
 
+    public void SaveLevel2()
+    {
+        // Don't save if the vital components are missing or if the level is unnamed
+        if (WorldManager.current.bramble == null || WorldManager.current.sigil == null)
+        {
+            return;
+        }
 
+        if (GameObject.Find("EditorCanvas/LeftMenu/InfoMenu/LevelName").GetComponent<TMP_InputField>().text.Length == 0)
+        {
+            return;
+        }
+
+        // Initialize arrays and lists
+        TileElement[,,] board = WorldManager.current.board;
+        Queue<int[]> grounds2 = new Queue<int[]>();
+        Queue<int[]> decals = new Queue<int[]>();
+
+        LinkedList<TileElementNames> dataTypes = new LinkedList<TileElementNames>();
+        LinkedList<int> dataInts = new LinkedList<int>();
+        LinkedList<Shade> dataShades = new LinkedList<Shade>();
+
+        // Compile the non-essential elements and grounds in their respective lists/arrays
+        for (int x = 0; x < board.GetLength(0); x++)
+        {
+            for (int y = 0; y < board.GetLength(1); y++)
+            {
+                for (int z = 0; z < board.GetLength(2); z++)
+                {
+                    if (board[x, y, z] != null && !(board[x, y, z] is Ground) && !(board[x, y, z] is Bramble) && !(board[x, y, z] is Sigil) && !board[x, y, z].Checked)
+                    {
+                        board[x, y, z].Checked = true;
+                        dataTypes.AddLast(board[x, y, z].TileID());
+                        board[x, y, z].CompileTileElement(ref dataInts, ref dataShades);
+                        print(dataInts.Last.Value.ToString());
+                    }
+                    if (board[x, y, z] is Ground)
+                    {
+                        Shade[] shades = ((Ground)(board[x, y, z])).GetShades();
+                        grounds2.Enqueue(new int[] {
+                            x, y, z,
+                            (int)shades[0], (int)shades[1], (int)shades[2], (int)shades[3], (int)shades[4], (int)shades[5]
+                        });
+                    }
+                }
+            }
+        }
+
+        // Create the LevelData
+        LevelData2 _ld2 = new LevelData2(
+
+            GameObject.Find("EditorCanvas/LeftMenu/InfoMenu/LevelName").GetComponent<TMP_InputField>().text,
+
+            board.GetLength(0),
+            board.GetLength(1),
+            board.GetLength(2),
+            GameObject.Find("LevelAnchor/CameraAnchor").transform.eulerAngles.x,
+            CameraManager.current.cam.orthographicSize,
+
+            new int[]
+            {
+                WorldManager.current.bramble.GetPos().x,
+                WorldManager.current.bramble.GetPos().y,
+                WorldManager.current.bramble.GetPos().z
+            },
+            WorldManager.current.bramble.GetDirection(),
+            new int[]
+            {
+                WorldManager.current.sigil.GetPos().x,
+                WorldManager.current.sigil.GetPos().y,
+                WorldManager.current.sigil.GetPos().z
+            },
+
+            WorldManager.current.availableVines,
+
+            grounds2.ToArray(),
+            decals.ToArray(),
+
+            dataTypes.ToArray(),
+            dataInts.ToArray(),
+            dataShades.ToArray()
+
+        );
+
+        // Create the file for the level
+        SerializationManager.SaveLevel(EditorMenuManager.current.GetWorldName(), _ld2.levelName, _ld2);
+
+        LevelData ld = (LevelData)SerializationManager.LoadData(Application.persistentDataPath + "/worlds/" + EditorMenuManager.current.GetWorldName() + "/" + _ld2.levelName + ".level");
+    }
 
     public void GenerateNewLevel()
     {
