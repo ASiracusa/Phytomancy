@@ -391,7 +391,6 @@ public class CreatorManager : MonoBehaviour
 
     public void ChangeTileModel(int index)
     {
-        print(index);
         tileModel = Constants.TILE_MODELS[index];
     }
 
@@ -430,7 +429,6 @@ public class CreatorManager : MonoBehaviour
                         board[x, y, z].Checked = true;
                         dataTypes.AddLast(board[x, y, z].TileID());
                         board[x, y, z].CompileTileElement(ref dataInts, ref dataShades);
-                        print(dataInts.Last.Value.ToString());
                     }
                     if (board[x, y, z] is Ground)
                     {
@@ -503,7 +501,6 @@ public class CreatorManager : MonoBehaviour
                         board[x, y, z].Checked = true;
                         dataTypes.AddLast(board[x, y, z].TileID());
                         board[x, y, z].CompileTileElement(ref dataInts, ref dataShades);
-                        print(dataInts.Last.Value.ToString());
                     }
                     if (board[x, y, z] is Ground)
                     {

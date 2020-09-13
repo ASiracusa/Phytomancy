@@ -42,7 +42,6 @@ public class EditorMenuManager : MonoBehaviour
         GameObject worldAssetModel = Resources.Load<GameObject>("Prefabs/WorldEditorUIElement");
         for (int i = 0; i < worldNames.Length; i++)
         {
-            print(worldNames[i]);
             GameObject worldAsset = Instantiate(worldAssetModel, GameObject.Find("EditorMenuCanvas/WorldSelectorMenu/WorldsPanel").transform);
             worldAsset.transform.localPosition = new Vector3(0, 135 - 35 * i, 0);
             worldAsset.transform.GetChild(1).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = worldNames[i].Substring(Application.persistentDataPath.Length + 8);
@@ -164,7 +163,6 @@ public class EditorMenuManager : MonoBehaviour
 
     public void ChangePaletteColor (GameObject paletteBox, int index)
     {
-        Debug.Log("we be changin boys");
         Color color;
         ColorUtility.TryParseHtmlString(paletteBox.GetComponent<TMP_InputField>().text, out color);
 

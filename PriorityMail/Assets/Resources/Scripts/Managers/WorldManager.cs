@@ -30,8 +30,6 @@ public class WorldManager : MonoBehaviour
 
     public void LoadLevel(string levelPath, bool playing)
     {
-        print("loading lelvel?");
-        print(levelPath);
         // Load LevelData and initialize the lists
         levelData = (LevelData)SerializationManager.LoadData(levelPath);
         TileElement tileModel = Constants.TILE_MODELS[(int)TileElementNames.Ground];
