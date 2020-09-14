@@ -16,6 +16,7 @@ public class CreatorManager : MonoBehaviour
     private TileElement tileModel;
     private Facet direction;
     private Shade paintColor;
+    private string decalName = "FourStepPath";
 
 
 
@@ -366,6 +367,10 @@ public class CreatorManager : MonoBehaviour
         {
             CameraManager.current.onHoldBoth += ColorMesh;
         }
+        else if (menu == 3)
+        {
+            CameraManager.current.onHold += ControlDecals;
+        }
     }
 
 
@@ -377,6 +382,29 @@ public class CreatorManager : MonoBehaviour
             hit.transform.gameObject.GetComponent<MeshRenderer>().material = WorldManager.current.unlitBases[(int)paintColor];
             ((IColorable)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).SetShade(paintColor,
                 hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index);
+        }
+    }
+
+    private void ControlDecals(bool left, RaycastHit hit)
+    {
+        if (left)
+        {
+            if (((Ground)hit.transform.parent.GetComponent<ModelTileBridge>().Data).GetDecalIds()[hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index] != 0)
+            {
+                Destroy(hit.transform.GetChild(0).gameObject);
+            }
+            GameObject decal = Instantiate(Resources.Load<GameObject>("Decals/Tops/" + decalName), hit.transform);
+            decal.transform.localPosition = Vector3.zero;
+            decal.GetComponent<MeshRenderer>().material = WorldManager.current.unlitDarks[(int)(((Ground)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).GetShades()[hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index])];
+            ((Ground)hit.transform.parent.GetComponent<ModelTileBridge>().Data).SetDecal(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index, (int)Enum.Parse(typeof(DecalID), decalName), (int)direction);
+        }
+        else
+        {
+            if (hit.transform.childCount != 0)
+            {
+                Destroy(hit.transform.GetChild(0).gameObject);
+                ((Ground)hit.transform.parent.GetComponent<ModelTileBridge>().Data).SetDecal(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index, 0, 0);
+            }
         }
     }
 

@@ -171,7 +171,7 @@ public class WorldManager : MonoBehaviour
             litBases[i].SetColor("_FrontColor", Color.Lerp(palette[i], palette[0], 0.2f));
             litBases[i].SetColor("_SideColor", Color.Lerp(palette[i], palette[0], 0.4f));
             unlitDarks[i] = new Material(Resources.Load<Material>("Materials/BaseMat"));
-            unlitDarks[i].SetColor("_BaseColor", palette[i]);
+            unlitDarks[i].SetColor("_BaseColor", Color.Lerp(palette[i], palette[0], 0.3f));
             litDarks[i] = new Material(Resources.Load<Material>("Materials/TwotoneMat"));
             litDarks[i].SetColor("_TopColor", Color.Lerp(palette[i], palette[0], 0.3f));
             litDarks[i].SetColor("_FrontColor", Color.Lerp(palette[i], palette[0], 0.5f));

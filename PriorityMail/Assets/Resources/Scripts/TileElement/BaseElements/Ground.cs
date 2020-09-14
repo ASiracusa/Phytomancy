@@ -7,6 +7,8 @@ using System.Linq;
 public class Ground : Monocoord, IColorable
 {
     private Shade[] facets;
+    private int[] decalIds;
+    private int[] decalRots;
 
     public Ground() { }
 
@@ -26,6 +28,8 @@ public class Ground : Monocoord, IColorable
             Shade.Color1,
             Shade.Color1
         };
+        decalIds = new int[6];
+        decalRots = new int[6];
     }
 
     public override void AdjustRender()
@@ -86,6 +90,22 @@ public class Ground : Monocoord, IColorable
     public Shade[] GetShades ()
     {
         return facets;
+    }
+
+    public void SetDecal (int index, int decalId, int decalRot)
+    {
+        decalIds[index] = decalId;
+        decalRots[index] = decalRot;
+    }
+
+    public int[] GetDecalIds ()
+    {
+        return decalIds;
+    }
+
+    public int[] GetDecalRots ()
+    {
+        return decalRots;
     }
 
     public void ColorFacets(Color[] palette)

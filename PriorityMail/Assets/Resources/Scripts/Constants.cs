@@ -62,6 +62,11 @@ public enum CardinalDirection
     East
 }
 
+public enum DecalID
+{
+    FourStepPath = 10
+}
+
 public delegate TileElement TileElementConstructor(params object[] vars);
 
 public class Constants
@@ -170,4 +175,19 @@ public class Constants
         };
         return degrees[(int)direction];
     }
+
+    public static readonly string[] BASE_DECALS = new string[]
+    {
+        
+    };
+
+    public static readonly string[] DARK_DECALS = new string[]
+    {
+        "FourStepPath"
+    };
+
+    public static readonly string[] LIGHT_DECALS = new string[]
+    {
+        
+    };
 }
