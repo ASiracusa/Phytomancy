@@ -353,6 +353,7 @@ public class CreatorManager : MonoBehaviour
         CameraManager.current.onClickBoth -= SetPrimarySelection;
         CameraManager.current.onReleaseBoth -= ExecuteSelection;
         CameraManager.current.onHoldBoth -= ColorMesh;
+        CameraManager.current.onHold -= ControlDecals;
 
         if (menu == 0)
         {
@@ -382,6 +383,18 @@ public class CreatorManager : MonoBehaviour
             hit.transform.gameObject.GetComponent<MeshRenderer>().material = WorldManager.current.unlitBases[(int)paintColor];
             ((IColorable)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).SetShade(paintColor,
                 hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index);
+            if (((Ground)hit.transform.parent.GetComponent<ModelTileBridge>().Data).GetDecalIds()[hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index] != 0)
+            {
+                if (((Ground)hit.transform.parent.GetComponent<ModelTileBridge>().Data).GetDecalIds()[hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index] != 0)
+                {
+                    Destroy(hit.transform.GetChild(0).gameObject);
+                }
+                GameObject decal = Instantiate(Resources.Load<GameObject>("Decals/Tops/" + decalName), hit.transform);
+                decal.transform.localPosition = Vector3.zero;
+                decal.transform.localEulerAngles = -decal.transform.eulerAngles;
+                decal.GetComponent<MeshRenderer>().material = WorldManager.current.unlitDarks[(int)(((Ground)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).GetShades()[hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index])];
+                ((Ground)hit.transform.parent.GetComponent<ModelTileBridge>().Data).SetDecal(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index, (int)Enum.Parse(typeof(DecalID), decalName), (int)direction);
+            }
         }
     }
 
@@ -395,6 +408,7 @@ public class CreatorManager : MonoBehaviour
             }
             GameObject decal = Instantiate(Resources.Load<GameObject>("Decals/Tops/" + decalName), hit.transform);
             decal.transform.localPosition = Vector3.zero;
+            decal.transform.localEulerAngles = -decal.transform.eulerAngles;
             decal.GetComponent<MeshRenderer>().material = WorldManager.current.unlitDarks[(int)(((Ground)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).GetShades()[hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index])];
             ((Ground)hit.transform.parent.GetComponent<ModelTileBridge>().Data).SetDecal(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index, (int)Enum.Parse(typeof(DecalID), decalName), (int)direction);
         }
