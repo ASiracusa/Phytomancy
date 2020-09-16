@@ -383,6 +383,7 @@ public class CreatorManager : MonoBehaviour
             hit.transform.gameObject.GetComponent<MeshRenderer>().material = WorldManager.current.unlitBases[(int)paintColor];
             ((IColorable)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).SetShade(paintColor,
                 hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index);
+            ((Ground)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).ColorFacets(WorldManager.current.litBases);
             if (((Ground)hit.transform.parent.GetComponent<ModelTileBridge>().Data).GetDecalIds()[hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index] != 0)
             {
                 if (((Ground)hit.transform.parent.GetComponent<ModelTileBridge>().Data).GetDecalIds()[hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index] != 0)
@@ -391,9 +392,9 @@ public class CreatorManager : MonoBehaviour
                 }
                 GameObject decal = Instantiate(Resources.Load<GameObject>("Decals/Tops/" + decalName), hit.transform);
                 decal.transform.localPosition = Vector3.zero;
-                decal.transform.localEulerAngles = -decal.transform.eulerAngles;
-                decal.GetComponent<MeshRenderer>().material = WorldManager.current.unlitDarks[(int)(((Ground)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).GetShades()[hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index])];
-                ((Ground)hit.transform.parent.GetComponent<ModelTileBridge>().Data).SetDecal(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index, (int)Enum.Parse(typeof(DecalID), decalName), (int)direction);
+                decal.transform.localEulerAngles = new Vector3(Constants.DirectionToDegree((Facet)((Ground)hit.transform.parent.GetComponent<ModelTileBridge>().Data).GetDecalRots()[hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index]), 90, -90);
+                decal.GetComponent<MeshRenderer>().material = WorldManager.current.litDarks[(int)(((Ground)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).GetShades()[hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index])];
+                ((Ground)hit.transform.parent.GetComponent<ModelTileBridge>().Data).SetDecal(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index, (int)Enum.Parse(typeof(DecalID), decalName), ((Ground)(hit.transform.parent.GetComponent<ModelTileBridge>().Data)).GetDecalRots()[hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index]);
             }
         }
     }
@@ -408,8 +409,8 @@ public class CreatorManager : MonoBehaviour
             }
             GameObject decal = Instantiate(Resources.Load<GameObject>("Decals/Tops/" + decalName), hit.transform);
             decal.transform.localPosition = Vector3.zero;
-            decal.transform.localEulerAngles = -decal.transform.eulerAngles;
-            decal.GetComponent<MeshRenderer>().material = WorldManager.current.unlitDarks[(int)(((Ground)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).GetShades()[hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index])];
+            decal.transform.localEulerAngles = new Vector3(Constants.DirectionToDegree(direction), 90, -90);
+            decal.GetComponent<MeshRenderer>().material = WorldManager.current.litDarks[(int)(((Ground)(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().data)).GetShades()[hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index])];
             ((Ground)hit.transform.parent.GetComponent<ModelTileBridge>().Data).SetDecal(hit.transform.gameObject.GetComponent<ColoredMeshBridge>().index, (int)Enum.Parse(typeof(DecalID), decalName), (int)direction);
         }
         else
@@ -565,7 +566,6 @@ public class CreatorManager : MonoBehaviour
             board.GetLength(1),
             board.GetLength(2),
             GameObject.Find("LevelAnchor/CameraAnchor").transform.eulerAngles.x,
-            CameraManager.current.cam.orthographicSize,
 
             new int[]
             {

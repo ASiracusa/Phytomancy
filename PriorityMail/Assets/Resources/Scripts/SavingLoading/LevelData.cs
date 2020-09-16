@@ -37,7 +37,6 @@ public class LevelData2
     public int y;
     public int z;
     public float startRotation;
-    public float startZoom;
 
     public int[] brambleCoords;
     public Facet brambleDirection;
@@ -52,7 +51,7 @@ public class LevelData2
     public int[] dataInts;
     public Shade[] dataShades;
 
-    public LevelData2(string _levelName, int _x, int _y, int _z, float _startRotation, float _startZoom, int[] _brambleCoords, Facet _brambleDirection, int[] _sigilCoords, int[] _availableVines, int[][] _grounds, int[][] _decals, TileElementNames[] _tileTypes, int[] _dataInts, Shade[] _dataShades)
+    public LevelData2(string _levelName, int _x, int _y, int _z, float _startRotation, int[] _brambleCoords, Facet _brambleDirection, int[] _sigilCoords, int[] _availableVines, int[][] _grounds, int[][] _decals, TileElementNames[] _tileTypes, int[] _dataInts, Shade[] _dataShades)
     {
         levelName = _levelName;
 
@@ -60,7 +59,6 @@ public class LevelData2
         y = _y;
         z = _z;
         startRotation = _startRotation;
-        startZoom = _startZoom;
 
         brambleCoords = _brambleCoords;
         brambleDirection = _brambleDirection;
