@@ -106,7 +106,7 @@ public class CameraManager : MonoBehaviour
 
             velocity *= 0.95f;
             
-            zoom = Mathf.Clamp(zoom - Input.mouseScrollDelta.y, 2, 14);
+            zoom = Mathf.Clamp(zoom - Input.mouseScrollDelta.y, 2, WorldManager.current != null && WorldManager.current.board != null ? Mathf.Max(WorldManager.current.board.GetLength(0), WorldManager.current.board.GetLength(2)) * 0.8f : 5);
             cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, zoom, 0.1f);
 
             yield return null;

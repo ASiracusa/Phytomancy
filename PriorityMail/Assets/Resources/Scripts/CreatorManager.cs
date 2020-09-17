@@ -297,8 +297,9 @@ public class CreatorManager : MonoBehaviour
             }
         }
 
-        board = _board;
-        CameraManager.current.CalibrateCamera(board);
+        WorldManager.current.board = _board;
+        CameraManager.current.CalibrateCamera(_board);
+        CameraManager.current.cam.orthographicSize = Mathf.Max(WorldManager.current.board.GetLength(0), WorldManager.current.board.GetLength(2)) * 0.8f;
     }
 
 
