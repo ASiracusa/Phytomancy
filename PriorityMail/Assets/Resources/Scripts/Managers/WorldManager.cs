@@ -134,10 +134,13 @@ public class WorldManager : MonoBehaviour
 
         availableVines = levelData2.availableVines;
 
+        board = new TileElement[levelData2.x, levelData2.y, levelData2.z];
         // Create the Grounds
         for (int i = 0; i < levelData2.grounds.GetLength(0); i++)
         {
+            Debug.Log(i);
             int[] gData = levelData2.grounds[i];
+            Debug.Log(gData.Length);
 
             board[gData[0], gData[1], gData[2]] = tileModel.LoadTileElement(new object[] {
                  new Vector3Int(gData[0], gData[1], gData[2]),
@@ -161,8 +164,8 @@ public class WorldManager : MonoBehaviour
             Ground g = (Ground)board[dData[0], dData[1], dData[2]];
             GameObject decal = Instantiate(Resources.Load<GameObject>("Decals/Tops/" + (DecalID)dData[4]), g.model.transform.GetChild(dData[3]));
             decal.transform.localPosition = Vector3.zero;
-            decal.transform.localEulerAngles = new Vector3(g.GetDecalRots()[(int)Constants.FacetToModel((Facet)dData[3])], 90, -90);
-            decal.GetComponent<MeshRenderer>().material = litDarks[(int)g.GetShades()[(int)Constants.FacetToModel((Facet)dData[3])]];
+            decal.transform.localEulerAngles = new Vector3(g.GetDecalRots()[dData[3]], 90, -90);
+            decal.GetComponent<MeshRenderer>().material = litDarks[(int)g.GetShades()[dData[3]]];
             g.SetDecal(g.model.transform.GetChild((int)Constants.FacetToModel((Facet)dData[3])).GetComponent<ColoredMeshBridge>().index, dData[4], dData[5]);
         }
 

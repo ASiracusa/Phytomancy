@@ -9416,7 +9416,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1744096054}
-        m_MethodName: SaveLevel
+        m_MethodName: SaveLevel2
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -11066,6 +11066,19 @@ MonoBehaviour:
     levelOrder: []
   levelData:
     levelName: 
+    brambleCoords: 
+    brambleDirection: 0
+    sigilCoords: 
+    availableVines: 
+    tileTypes: 
+    dataInts: 
+    dataShades: 
+  levelData2:
+    levelName: 
+    x: 0
+    y: 0
+    z: 0
+    startRotation: 0
     brambleCoords: 
     brambleDirection: 0
     sigilCoords: 

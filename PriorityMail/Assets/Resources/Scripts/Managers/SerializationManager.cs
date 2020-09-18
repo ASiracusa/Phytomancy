@@ -31,6 +31,31 @@ public class SerializationManager
         return true;
     }
 
+    public static bool SaveLevel2(string worldName, string levelName, object levelData)
+    {
+        BinaryFormatter formatter = GetBinaryFormatter();
+
+        if (!Directory.Exists(Application.persistentDataPath + "/worlds"))
+        {
+            Directory.CreateDirectory(Application.persistentDataPath + "/worlds");
+        }
+
+        if (!Directory.Exists(Application.persistentDataPath + "/worlds/" + worldName))
+        {
+            Directory.CreateDirectory(Application.persistentDataPath + "/worlds/" + worldName);
+        }
+
+        string path = Application.persistentDataPath + "/worlds/" + worldName + "/" + levelName + ".level";
+
+        FileStream file = File.Create(path);
+
+        formatter.Serialize(file, levelData);
+
+        file.Close();
+
+        return true;
+    }
+
     public static bool SaveWorld(string worldName, object levelData)
     {
         BinaryFormatter formatter = GetBinaryFormatter();

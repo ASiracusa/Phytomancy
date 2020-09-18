@@ -606,9 +606,9 @@ public class CreatorManager : MonoBehaviour
         );
 
         // Create the file for the level
-        SerializationManager.SaveLevel(EditorMenuManager.current.GetWorldName(), _ld2.levelName, _ld2);
+        SerializationManager.SaveLevel2(EditorMenuManager.current.GetWorldName(), _ld2.levelName, _ld2);
 
-        LevelData ld = (LevelData)SerializationManager.LoadData(Application.persistentDataPath + "/worlds/" + EditorMenuManager.current.GetWorldName() + "/" + _ld2.levelName + ".level");
+        LevelData2 ld = (LevelData2)SerializationManager.LoadData(Application.persistentDataPath + "/worlds/" + EditorMenuManager.current.GetWorldName() + "/" + _ld2.levelName + ".level");
     }
 
     public void GenerateNewLevel()
@@ -706,6 +706,6 @@ public class CreatorManager : MonoBehaviour
 
     public void LoadLevel(string levelPath)
     {
-        WorldManager.current.LoadLevel(levelPath, false);
+        WorldManager.current.LoadLevel2(levelPath);
     }
 }
