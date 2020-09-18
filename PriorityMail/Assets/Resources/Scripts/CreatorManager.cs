@@ -553,6 +553,18 @@ public class CreatorManager : MonoBehaviour
                             x, y, z,
                             (int)shades[0], (int)shades[1], (int)shades[2], (int)shades[3], (int)shades[4], (int)shades[5]
                         });
+
+                        for (int d = 0; d < 6; d++)
+                        {
+                            if (((Ground)(board[x, y, z])).GetDecalIds()[d] > 0)
+                            {
+                                decals.Enqueue(new int[]
+                                {
+                                    x, y, z, d,
+                                    ((Ground)(board[x, y, z])).GetDecalIds()[d], ((Ground)(board[x, y, z])).GetDecalRots()[d]
+                                });
+                            }
+                        }
                     }
                 }
             }
