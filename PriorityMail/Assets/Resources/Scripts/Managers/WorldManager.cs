@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
 
 public class WorldManager : MonoBehaviour
 {
@@ -10,7 +9,6 @@ public class WorldManager : MonoBehaviour
     // BOARD DATA
     public WorldData worldData;
     public LevelData levelData;
-    public LevelData2 levelData2;
     public TileElement[,,] board;
     public Bramble bramble;
     public Sigil sigil;
@@ -97,114 +95,6 @@ public class WorldManager : MonoBehaviour
         for (int i = 0; i < levelData.tileTypes.Length; i++)
         {
             TileElement tileBase = Constants.TILE_MODELS[(int)levelData.tileTypes[i]];
-            TileElement decompiledTile = tileBase.DecompileTileElement(ref intQueue, ref shadeQueue);
-            decompiledTile.model = Instantiate(Resources.Load("Models/" + tileBase.TileName())) as GameObject;
-            decompiledTile.BindDataToModel();
-            decompiledTile.WarpToPos();
-            decompiledTile.AdjustRender();
-            if (tileBase is Monocoord)
-            {
-                Monocoord monoTile = (Monocoord)decompiledTile;
-                board[monoTile.GetPos().x, monoTile.GetPos().y, monoTile.GetPos().z] = decompiledTile;
-            }
-            else
-            {
-                Dicoord diTile = (Dicoord)decompiledTile;
-                for (int x = diTile.GetPos1().x; x <= diTile.GetPos2().x; x++)
-                {
-                    for (int y = diTile.GetPos1().y; y <= diTile.GetPos2().y; y++)
-                    {
-                        for (int z = diTile.GetPos1().z; z <= diTile.GetPos2().z; z++)
-                        {
-                            board[x, y, z] = decompiledTile;
-                        }
-                    }
-                }
-            }
-        }
-
-        CameraManager.current.CalibrateCamera(board);
-    }
-
-    public void LoadLevel2(string levelPath)
-    {
-        // Load LevelData and initialize the lists
-        levelData2 = (LevelData2)SerializationManager.LoadData(levelPath);
-        TileElement tileModel = Constants.TILE_MODELS[(int)TileElementNames.Ground];
-
-        availableVines = levelData2.availableVines;
-
-        board = new TileElement[levelData2.x, levelData2.y, levelData2.z];
-        // Create the Grounds
-        for (int i = 0; i < levelData2.grounds.GetLength(0); i++)
-        {
-            Debug.Log(i);
-            int[] gData = levelData2.grounds[i];
-            Debug.Log(gData.Length);
-
-            board[gData[0], gData[1], gData[2]] = tileModel.LoadTileElement(new object[] {
-                 new Vector3Int(gData[0], gData[1], gData[2]),
-                 new Shade[]
-                 {
-                     (Shade)gData[3], (Shade)gData[4], (Shade)gData[5], (Shade)gData[6], (Shade)gData[7], (Shade)gData[8]
-                 }
-            });
-
-            board[gData[0], gData[1], gData[2]].model = Instantiate(Resources.Load("Models/Ground")) as GameObject;
-            board[gData[0], gData[1], gData[2]].BindDataToModel();
-            board[gData[0], gData[1], gData[2]].WarpToPos();
-            ((Ground)board[gData[0], gData[1], gData[2]]).ColorFacets(litBases);
-        }
-
-        // Create the Decals
-        for (int d = 0; d < levelData2.decals.GetLength(0); d++)
-        {
-            int[] dData = levelData2.decals[d];
-
-            Ground g = (Ground)board[dData[0], dData[1], dData[2]];
-            GameObject decal = Instantiate(Resources.Load<GameObject>("Decals/Tops/" + (DecalID)dData[4]), g.model.transform.GetChild(dData[3]));
-            decal.transform.localPosition = Vector3.zero;
-            decal.transform.localEulerAngles = new Vector3(g.GetDecalRots()[dData[3]], 90, -90);
-            decal.GetComponent<MeshRenderer>().material = litDarks[(int)g.GetShades()[dData[3]]];
-            g.SetDecal(g.model.transform.GetChild((int)Constants.FacetToModel((Facet)dData[3])).GetComponent<ColoredMeshBridge>().index, dData[4], dData[5]);
-        }
-
-        // Create Bramble and save his position
-        bramble = (Bramble)Constants.TILE_MODELS[(int)TileElementNames.Bramble].LoadTileElement(new object[]
-        {
-            new Vector3Int(levelData2.brambleCoords[0], levelData2.brambleCoords[1], levelData2.brambleCoords[2]),
-            levelData2.brambleDirection
-        });
-        bramble.model = Instantiate(Resources.Load("Models/Bramble")) as GameObject;
-        bramble.BindDataToModel();
-        bramble.WarpToPos();
-        board[bramble.GetPos().x, bramble.GetPos().y, bramble.GetPos().z] = bramble;
-
-        // Create the Sigil
-        board[levelData2.sigilCoords[0], levelData2.sigilCoords[1], levelData2.sigilCoords[2]] = (Sigil)Constants.TILE_MODELS[(int)TileElementNames.Sigil].LoadTileElement(new object[]
-        {
-            new Vector3Int(levelData2.sigilCoords[0], levelData2.sigilCoords[1], levelData2.sigilCoords[2]),
-        });
-        board[levelData2.sigilCoords[0], levelData2.sigilCoords[1], levelData2.sigilCoords[2]].model = Instantiate(Resources.Load("Models/Sigil")) as GameObject;
-        board[levelData2.sigilCoords[0], levelData2.sigilCoords[1], levelData2.sigilCoords[2]].BindDataToModel();
-        board[levelData2.sigilCoords[0], levelData2.sigilCoords[1], levelData2.sigilCoords[2]].WarpToPos();
-
-        // Convert the data arrays to Queues
-        Queue<int> intQueue = new Queue<int>();
-        for (int i = 0; i < levelData2.dataInts.Length; i++)
-        {
-            intQueue.Enqueue(levelData2.dataInts[i]);
-        }
-        Queue<Shade> shadeQueue = new Queue<Shade>();
-        for (int i = 0; i < levelData2.dataShades.Length; i++)
-        {
-            shadeQueue.Enqueue(levelData2.dataShades[i]);
-        }
-
-        // Decompile all of the non-essential elements
-        for (int i = 0; i < levelData2.tileTypes.Length; i++)
-        {
-            TileElement tileBase = Constants.TILE_MODELS[(int)levelData2.tileTypes[i]];
             TileElement decompiledTile = tileBase.DecompileTileElement(ref intQueue, ref shadeQueue);
             decompiledTile.model = Instantiate(Resources.Load("Models/" + tileBase.TileName())) as GameObject;
             decompiledTile.BindDataToModel();

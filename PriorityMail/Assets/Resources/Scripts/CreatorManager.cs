@@ -553,18 +553,6 @@ public class CreatorManager : MonoBehaviour
                             x, y, z,
                             (int)shades[0], (int)shades[1], (int)shades[2], (int)shades[3], (int)shades[4], (int)shades[5]
                         });
-
-                        for (int d = 0; d < 6; d++)
-                        {
-                            if (((Ground)(board[x, y, z])).GetDecalIds()[d] > 0)
-                            {
-                                decals.Enqueue(new int[]
-                                {
-                                    x, y, z, d,
-                                    ((Ground)(board[x, y, z])).GetDecalIds()[d], ((Ground)(board[x, y, z])).GetDecalRots()[d]
-                                });
-                            }
-                        }
                     }
                 }
             }
@@ -606,9 +594,9 @@ public class CreatorManager : MonoBehaviour
         );
 
         // Create the file for the level
-        SerializationManager.SaveLevel2(EditorMenuManager.current.GetWorldName(), _ld2.levelName, _ld2);
+        SerializationManager.SaveLevel(EditorMenuManager.current.GetWorldName(), _ld2.levelName, _ld2);
 
-        LevelData2 ld = (LevelData2)SerializationManager.LoadData(Application.persistentDataPath + "/worlds/" + EditorMenuManager.current.GetWorldName() + "/" + _ld2.levelName + ".level");
+        LevelData ld = (LevelData)SerializationManager.LoadData(Application.persistentDataPath + "/worlds/" + EditorMenuManager.current.GetWorldName() + "/" + _ld2.levelName + ".level");
     }
 
     public void GenerateNewLevel()
@@ -706,6 +694,6 @@ public class CreatorManager : MonoBehaviour
 
     public void LoadLevel(string levelPath)
     {
-        WorldManager.current.LoadLevel2(levelPath);
+        WorldManager.current.LoadLevel(levelPath, false);
     }
 }
