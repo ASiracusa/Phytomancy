@@ -220,6 +220,7 @@ public class CreatorManager : MonoBehaviour
                         board[x, y, z].WarpToPos();
                         if (board[x, y, z] is IColorable)
                         {
+                            ((IColorable)board[x, y, z]).SetShades(paintColor);
                             ((IColorable)board[x, y, z]).ColorFacets(WorldManager.current.litBases);
                         }
                     }

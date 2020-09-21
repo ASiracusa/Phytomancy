@@ -87,6 +87,14 @@ public class Ground : Monocoord, IColorable
         facets[index] = shade;
     }
 
+    public void SetShades(Shade shade)
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            facets[i] = shade;
+        }
+    }
+
     public Shade[] GetShades ()
     {
         return facets;
@@ -119,6 +127,7 @@ public class Ground : Monocoord, IColorable
 
     public void ColorFacets(Material[] materials)
     {
+        Debug.Log("coloring");
         for (int i = 0; i < 6; i++)
         {
             model.transform.GetChild(i).GetComponent<MeshRenderer>().material = materials[(int)facets[i]];
