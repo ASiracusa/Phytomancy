@@ -20,6 +20,8 @@ public class WorldManager : MonoBehaviour
     public Material[] litBases;
     public Material[] unlitDarks;
     public Material[] litDarks;
+    public Material[] unlitLights;
+    public Material[] litLights;
     public Material darkener;
     public Material voidGradient;
 
@@ -162,6 +164,8 @@ public class WorldManager : MonoBehaviour
         litBases = new Material[11];
         unlitDarks = new Material[11];
         litDarks = new Material[11];
+        unlitLights = new Material[11];
+        litLights = new Material[11];
         for (int i = 0; i < 11; i++)
         {
             unlitBases[i] = new Material(Resources.Load<Material>("Materials/BaseMat"));
@@ -176,6 +180,12 @@ public class WorldManager : MonoBehaviour
             litDarks[i].SetColor("_TopColor", Color.Lerp(palette[i], palette[0], 0.3f));
             litDarks[i].SetColor("_FrontColor", Color.Lerp(palette[i], palette[0], 0.5f));
             litDarks[i].SetColor("_SideColor", Color.Lerp(palette[i], palette[0], 0.7f));
+            unlitLights[i] = new Material(Resources.Load<Material>("Materials/BaseMat"));
+            unlitLights[i].SetColor("_BaseColor", Color.Lerp(palette[i], Color.white, 0.2f));
+            litLights[i] = new Material(Resources.Load<Material>("Materials/TwotoneMat"));
+            litLights[i].SetColor("_TopColor", Color.Lerp(palette[i], Color.white, 0.4f));
+            litLights[i].SetColor("_FrontColor", Color.Lerp(palette[i], Color.white, 0.2f));
+            litLights[i].SetColor("_SideColor", palette[i]);
         }
 
         darkener = new Material(Resources.Load<Material>("Materials/DarkenMat"));
