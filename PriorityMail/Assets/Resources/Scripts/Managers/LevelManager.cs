@@ -247,19 +247,18 @@ public class LevelManager : MonoBehaviour
     private void SpawnVine (Shade vineColor, Vector3Int stemCoords, Vector3Int vineCoords, Vector3Int direction)
     {
         TileElement[,,] board = WorldManager.current.board;
-
         TileElement tileAtPos = board[vineCoords.x, vineCoords.y, vineCoords.z];
 
         Vine vine = (Vine)Constants.TILE_MODELS[(int)TileElementNames.Vine].GenerateTileElement(new object[] {
-                vineCoords,
-                vineColor,
-                Constants.VectorToFacet(-direction)
-            });
+            vineCoords,
+            vineColor,
+            Constants.VectorToFacet(-direction)
+        });
 
         undoData.Push(new Stack<BoardStateChange>());
         if (tileAtPos != null && tileAtPos.Pushable && !tileAtPos.Weedblocked && !(tileAtPos is IMonoSpacious))
         {
-            if (!board[vineCoords.x, vineCoords.y, vineCoords.z].InitiatePush(board, Constants.VectorToFacet(direction), vine))
+            if (!tileAtPos.InitiatePush(board, Constants.VectorToFacet(direction), vine))
             {
                 undoData.Pop();
                 return;
@@ -267,26 +266,26 @@ public class LevelManager : MonoBehaviour
         }
         else if (tileAtPos == null)
         {
-            board[vineCoords.x, vineCoords.y, vineCoords.z] = vine;
+            tileAtPos = vine;
         }
         else
         {
             return;
         }
 
-        board[vineCoords.x, vineCoords.y, vineCoords.z].model = Instantiate(Resources.Load("Models/Vine")) as GameObject;
-        board[vineCoords.x, vineCoords.y, vineCoords.z].model.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material.color = WorldManager.current.palette[(int)vine.GetColor()];
-        board[vineCoords.x, vineCoords.y, vineCoords.z].BindDataToModel();
-        board[vineCoords.x, vineCoords.y, vineCoords.z].AdjustRender();
-        board[vineCoords.x, vineCoords.y, vineCoords.z].WarpToPos();
-        StartCoroutine(GrowVine((Vine)(board[vineCoords.x, vineCoords.y, vineCoords.z])));
+        tileAtPos.model = Instantiate(Resources.Load("Models/Vine")) as GameObject;
+        tileAtPos.model.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material.color = WorldManager.current.palette[(int)vine.GetColor()];
+        tileAtPos.BindDataToModel();
+        tileAtPos.AdjustRender();
+        tileAtPos.WarpToPos();
+        StartCoroutine(GrowVine((Vine)tileAtPos));
 
         if (tracedVine.gameObject.GetComponent<ColoredMeshBridge>().data is Vine)
         {
-            ((Vine)(board[stemCoords.x, stemCoords.y, stemCoords.z])).SetVine((Vine)board[vineCoords.x, vineCoords.y, vineCoords.z]);
+            ((Vine)(board[stemCoords.x, stemCoords.y, stemCoords.z])).SetVine((Vine)tileAtPos);
         }
 
-        tracedVine = board[vineCoords.x, vineCoords.y, vineCoords.z].model.transform.GetChild(1);
+        tracedVine = tileAtPos.model.transform.GetChild(1);
 
         AddUndoData(new BoardCreationState(vine));
 
@@ -349,7 +348,7 @@ public class LevelManager : MonoBehaviour
 
         for (int i = 0; i < WorldManager.current.availableVines.Length; i++)
         {
-            GameObject avIcon = Instantiate<GameObject>(avIconResource, Vector3.zero, Quaternion.identity);
+            GameObject avIcon = Instantiate(avIconResource, Vector3.zero, Quaternion.identity);
             avIcon.transform.SetParent(avBase.transform);
             avIcon.transform.GetChild(0).GetComponent<Image>().color = WorldManager.current.palette[i + 1];
         }

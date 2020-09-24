@@ -192,7 +192,7 @@ public class WorldManager : MonoBehaviour
         darkener.SetColor("_BlendColor", palette[0]);
 
         voidGradient = new Material(Resources.Load<Material>("Materials/VoidGradientMat"));
-        voidGradient.SetColor("_GradientColor", WorldManager.current.palette[0]);
+        voidGradient.SetColor("_GradientColor", palette[0]);
     }
 
     public void GenerateVoidGradient()
