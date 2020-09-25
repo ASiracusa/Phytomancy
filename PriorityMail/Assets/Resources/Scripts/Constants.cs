@@ -108,7 +108,7 @@ public class Constants
 
     public static Facet FacetToModel(Facet facet)
     {
-        Facet[] ftma = new Facet[]
+        return new Facet[]
         {
             Facet.Up,
             Facet.South,
@@ -116,13 +116,12 @@ public class Constants
             Facet.East,
             Facet.North,
             Facet.West,
-        };
-        return ftma[(int)facet];
+        }[(int)facet];
     }
 
     public static Facet FlipDirection(Facet facet)
     {
-        Facet[] flips = new Facet[]
+        return new Facet[]
         {
             Facet.South,
             Facet.East,
@@ -130,8 +129,7 @@ public class Constants
             Facet.West,
             Facet.Down,
             Facet.Up
-        };
-        return flips[(int)facet];
+        }[(int)facet];
     }
 
     public static readonly Vector3[] VINE_STRETCHES = new Vector3[]
@@ -166,14 +164,13 @@ public class Constants
 
     public static int DirectionToDegree (Facet direction)
     {
-        int[] degrees = new int[]
+        return new int[]
         {
             90,
             0,
             270,
             180,
-        };
-        return degrees[(int)direction];
+        }[(int)direction];
     }
 
     public static readonly string[] BASE_DECALS = new string[]
