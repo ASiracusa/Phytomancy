@@ -663,12 +663,14 @@ public class CreatorManager : MonoBehaviour
             if (!usingMenu && Input.mousePosition.x / Screen.width < 0.05f)
             {
                 usingMenu = true;
+                CameraManager.current.StopCoroutine(CameraManager.current.RotateBoard());
                 targetPos = new Vector3(-200, 0, 0);
 
             }
             if (usingMenu && Input.mousePosition.x / Screen.width > 0.5f)
             {
                 usingMenu = false;
+                CameraManager.current.StartCoroutine(CameraManager.current.RotateBoard());
                 targetPos = new Vector3(-550, 0, 0);
             }
             if (GameObject.Find("EditorCanvas/LeftMenu") != null)

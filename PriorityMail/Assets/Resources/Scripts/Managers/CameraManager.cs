@@ -77,7 +77,7 @@ public class CameraManager : MonoBehaviour
         }
     }
 
-    private IEnumerator RotateBoard()
+    public IEnumerator RotateBoard()
     {
         float pos = 0;
         float velocity = 0;
