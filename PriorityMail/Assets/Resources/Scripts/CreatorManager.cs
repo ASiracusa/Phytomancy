@@ -656,21 +656,18 @@ public class CreatorManager : MonoBehaviour
 
     public IEnumerator ShowAndHideEditorMenu()
     {
-        bool usingMenu = true;
         Vector3 targetPos = new Vector3(-200, 0, 0);
         while (true)
         {
-            if (!usingMenu && Input.mousePosition.x / Screen.width < 0.05f)
+            if (!CameraManager.current.usingMenu && Input.mousePosition.x / Screen.width < 0.05f)
             {
-                usingMenu = true;
-                CameraManager.current.StopCoroutine(CameraManager.current.RotateBoard());
+                CameraManager.current.usingMenu = true;
                 targetPos = new Vector3(-200, 0, 0);
 
             }
-            if (usingMenu && Input.mousePosition.x / Screen.width > 0.5f)
+            if (CameraManager.current.usingMenu && Input.mousePosition.x / Screen.width > 0.5f)
             {
-                usingMenu = false;
-                CameraManager.current.StartCoroutine(CameraManager.current.RotateBoard());
+                CameraManager.current.usingMenu = false;
                 targetPos = new Vector3(-550, 0, 0);
             }
             if (GameObject.Find("EditorCanvas/LeftMenu") != null)

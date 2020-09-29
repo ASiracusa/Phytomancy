@@ -11,6 +11,8 @@ public class CameraManager : MonoBehaviour
     private GameObject camAnchor;
     public Camera cam;
 
+    public bool usingMenu;
+
     void Start()
     {
         current = this;
@@ -85,28 +87,30 @@ public class CameraManager : MonoBehaviour
 
         while (true)
         {
-            if (Input.GetKey(KeyCode.Q) && velocity < 1f)
+            if (!usingMenu)
             {
-                velocity += Time.deltaTime / 5;
-            }
-            if (Input.GetKey(KeyCode.E) && velocity > -1f)
-            {
-                velocity -= Time.deltaTime / 5;
-            }
+                if (Input.GetKey(KeyCode.Q) && velocity < 1f)
+                {
+                    velocity += Time.deltaTime / 5;
+                }
+                if (Input.GetKey(KeyCode.E) && velocity > -1f)
+                {
+                    velocity -= Time.deltaTime / 5;
+                }
+                if (Input.GetMouseButton(2))
+                {
+                    velocity = Input.GetAxis("Mouse X") / 15f;
+                }
 
-            if (Input.GetMouseButton(2))
-            {
-                velocity = Input.GetAxis("Mouse X") / 15f;
+                zoom = Mathf.Clamp(zoom - Input.mouseScrollDelta.y, 2, WorldManager.current != null && WorldManager.current.board != null ? Mathf.Max(WorldManager.current.board.GetLength(0), WorldManager.current.board.GetLength(2)) * 0.8f : 5);
             }
-
             pos += velocity;
 
             camAnchor.transform.localPosition = new Vector3(17 * -Mathf.Sin(pos), 20, 17 * -Mathf.Cos(pos));
             camAnchor.transform.eulerAngles = new Vector3(45, pos * 180 / Mathf.PI, 0);
 
             velocity *= 0.95f;
-            
-            zoom = Mathf.Clamp(zoom - Input.mouseScrollDelta.y, 2, WorldManager.current != null && WorldManager.current.board != null ? Mathf.Max(WorldManager.current.board.GetLength(0), WorldManager.current.board.GetLength(2)) * 0.8f : 5);
+
             cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, zoom, 0.1f);
 
             yield return null;
