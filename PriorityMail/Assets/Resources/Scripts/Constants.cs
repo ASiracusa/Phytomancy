@@ -12,6 +12,16 @@ public enum Facet
     Unknown = 6
 }
 
+public enum Direction
+{
+    West = 1,
+    East = -1,
+    Up = 1,
+    Down = -1,
+    North = 1,
+    South = -1
+}
+
 public enum Shade
 {
     Nothing,
@@ -25,16 +35,6 @@ public enum Shade
     Color8,
     Color9,
     Color10
-}
-
-public enum Direction
-{
-    West = 1,
-    East = -1,
-    Up = 1,
-    Down = -1,
-    North = 1,
-    South = -1
 }
 
 public enum TileElementNames

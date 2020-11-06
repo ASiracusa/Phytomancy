@@ -42,38 +42,31 @@ public abstract class TileElement
         }
     }
 
+    // RENDERING
     public abstract void WarpToPos();
-
     public abstract void MoveToPos(bool accelerate);
-
     public abstract void AdjustRender();
 
+    // PHYSICS
     public abstract bool InitiatePush(TileElement[,,] board, Facet direction, Monocoord newOccupant);
-
     public abstract bool Move(TileElement[,,] board, Facet direction);
-
     public abstract bool Push(TileElement[,,] board, Facet direction, LinkedList<TileElement> evaluatedTiles);
-
     public abstract bool TryPush(TileElement[,,] board, Facet direction, LinkedList<TileElement> evaluatedTiles);
-
     public abstract bool Fall(TileElement[,,] board);
 
+    // DELETION
     public abstract void EditorDeleteTileElement(TileElement[,,] board);
-
     public abstract void PlayerDeleteTileElement(TileElement[,,] board);
 
+    // DATA MANAGEMENT
     public abstract TileElement GenerateTileElement(params object[] vars);
-
     public abstract TileElement LoadTileElement(params object[] vars);
-
     public abstract void CompileTileElement(ref LinkedList<int> dataInts, ref LinkedList<Shade> dataShades);
-
     public abstract TileElement DecompileTileElement(ref Queue<int> dataInts, ref Queue<Shade> dataShades);
 
+    // STRINGS
     public abstract EditorTEIndices[] GetEditorTEIndices();
-
     public abstract string TileName();
-
     public abstract TileElementNames TileID();
     
 }

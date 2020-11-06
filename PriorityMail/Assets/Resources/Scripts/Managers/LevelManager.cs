@@ -181,7 +181,7 @@ public class LevelManager : MonoBehaviour
 
                 if (vinesOfColor <= 0)
                 {
-                    CameraManager.current.ShakeCamera(0.05f, 8f);
+                    CameraManager.current.ShakeCamera(0.05f, 5f);
                 }
                 else if (!(board[stemCoords.x, stemCoords.y, stemCoords.z] is Vine) || ((Vine)board[stemCoords.x, stemCoords.y, stemCoords.z]).GetVine() == null)
                 {
