@@ -189,10 +189,10 @@ public class CameraManager : MonoBehaviour
 
     public void ShakeCamera (float duration, float intensity)
     {
-        StartCoroutine(ShakeCameraHelper(duration, intensity));
+        StartCoroutine(ShakeCameraCoroutine(duration, intensity));
     }
 
-    private IEnumerator ShakeCameraHelper (float duration, float intensity)
+    private IEnumerator ShakeCameraCoroutine (float duration, float intensity)
     {
         float start = Time.time;
         while (Time.time < start + duration)
