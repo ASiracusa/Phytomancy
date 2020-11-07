@@ -273,6 +273,7 @@ public class LevelManager : MonoBehaviour
             return;
         }
 
+        board[vineCoords.x, vineCoords.y, vineCoords.z] = vine;
         tileAtPos.model = Instantiate(Resources.Load("Models/Vine")) as GameObject;
         tileAtPos.model.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material.color = WorldManager.current.palette[(int)vine.GetColor()];
         tileAtPos.BindDataToModel();
